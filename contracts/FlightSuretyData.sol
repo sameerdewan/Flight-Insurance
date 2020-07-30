@@ -51,6 +51,7 @@ contract FlightSuretyData {
         address _address;
         AirlineStatus _status;
         uint8 _numberOfApprovals;
+        uint _funds;
         mapping(address => bool) _approvingAirlines;
         mapping(string => Flight) _flights;
         bool _exists;
@@ -60,6 +61,7 @@ contract FlightSuretyData {
     event AirlineApplied(address airlineAddress, string airlineName);
     event AirlineVotedFor(address voter, address airlineAddress, string airlineName);
     event AirlineApproved(address airlineAddress, string airlineName);
+    event AirlineFunded(address airlineAddress, string airlineName, uint valueSent, uint totalFunds, bool sufficientFunding);
 
     // Modifiers
     modifier isOperational() {
@@ -113,6 +115,20 @@ contract FlightSuretyData {
         _;
     }
 
+    modifier callerIsAirline(address airlineAddress) {
+        require(msg.sender == airlineAddress, "Error: Not called from airline address");
+        _;
+    }
+
+    modifier minimumFunding() {
+        uint existingFunds = airlinesByAddress[msg.sender]._funds;
+        if (existingFunds >= 10 ether) {
+            _;
+        }
+        require(existingFunds + msg.value >= 10 ether, "Error: Insufficent funding.");
+        _;
+    }
+
     // Constructor
     constructor() public {
         owner = msg.sender;
@@ -137,6 +153,7 @@ contract FlightSuretyData {
                 _address: _address,
                 _status: AirlineStatus.APPLIED,
                 _numberOfApprovals: 0,
+                _funds: 0 ether,
                 _exists: true
             });
             airlinesByAddress[_address] = airline;
@@ -160,8 +177,17 @@ contract FlightSuretyData {
                 airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
                 airlinesByName[_name]._status = AirlineStatus.APPROVED;
                 numberOfAirlines = numberOfAirlines + 1;
+                authorizedCallers[_address] = true;
                 emit AirlineApproved(_address, _name);
             }
     }
 
+    function fundAirline(address _address, string memory _name) public payable
+        isOperational() isAuthorized() callerIsAirline(_address) minimumFunding() {
+            airlinesByAddress[_address]._funds = SafeMath.add(airlinesByAddress[_address]._funds, msg.value);
+            airlinesByName[_name]._funds = SafeMath.add(airlinesByName[_name]._funds, msg.value);
+            uint funds = airlinesByAddress[_address]._funds;
+            bool sufficientFunds = funds >= 10 ether;
+            emit AirlineFunded(_address, _name, msg.value, funds, sufficientFunds);
+    }
 }

@@ -53,7 +53,7 @@ contract FlightSuretyData {
         string _name;
         address _address;
         AirlineStatus _status;
-        uint8 _numberOfApprovals;
+        uint _numberOfApprovals;
         uint _funds;
         // APPROVING AIRLINE => VOTE
         mapping(address => bool) _approvingAirlines;
@@ -98,14 +98,6 @@ contract FlightSuretyData {
         require(airlineAddressExists == false, "Error: Airline with address already exists.");
         bool airlineNameExists = airlinesByName[airlineName]._exists;
         require(airlineNameExists == false, "Error: Airline with name already exists.");
-        _;
-    }
-
-    modifier airlineExists(address airlineAddress, string memory airlineName) {
-        bool airlineAddressExists = airlinesByAddress[airlineAddress]._exists;
-        require(airlineAddressExists == true, "Error: Airline with address does not exist.");
-        bool airlineNameExists = airlinesByName[airlineName]._exists;
-        require(airlineNameExists == true, "Error: Airline with name does not exist.");
         _;
     }
 
@@ -183,15 +175,16 @@ contract FlightSuretyData {
     }
 
     function voteAirline(address _address, string memory _name) public
-        isOperational() isAuthorized() airlineExists(_address, _name) airlineIsPetitioned(_address, _name)
-        airlineIsNotApproved(_address, _name) {
-            airlinesByAddress[_address]._numberOfApprovals = airlinesByAddress[_address]._numberOfApprovals + 1;
-            airlinesByName[_name]._numberOfApprovals = airlinesByName[_name]._numberOfApprovals + 1;
+        isOperational() isAuthorized() airlineIsPetitioned(_address, _name) {
+            uint numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
+            uint numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
+            airlinesByAddress[_address]._numberOfApprovals = SafeMath.add(numberOfApprovals1, 1);
+            airlinesByName[_name]._numberOfApprovals = SafeMath.add(numberOfApprovals2, 1);
             airlinesByAddress[_address]._approvingAirlines[msg.sender] = true;
             airlinesByName[_name]._approvingAirlines[msg.sender] = true;
             emit AirlineVotedFor(msg.sender, _address, _name);
-            uint8 numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
-            uint8 numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
+            numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
+            numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
             bool isApproved1 = numberOfApprovals1 > SafeMath.div(numberOfAirlines, 2);
             bool isApproved2 = numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
             bool isApproved = isApproved1 && isApproved2;

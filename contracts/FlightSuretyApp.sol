@@ -2,6 +2,7 @@
 pragma solidity >=0.4.21 <0.7.0;
 
 import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import "./FlightSuretyDataInterface.sol";
 
 contract FlightSuretyApp {
     using SafeMath for uint256;
@@ -9,7 +10,9 @@ contract FlightSuretyApp {
     // Global Variables
     address private owner;
     bool private operational = true;
-    address dataContract;
+
+    FlightSuretyData dataContract;
+    address dataContractAddress;
 
     // Modifiers
     modifier isOperational() {
@@ -28,8 +31,9 @@ contract FlightSuretyApp {
     }
 
     // Constructor
-    constructor(address dataContractAddress) public {
+    constructor(address _dataContractAddress) public {
         owner = msg.sender;
-        dataContract = dataContractAddress;
+        dataContractAddress = _dataContractAddress;
+        dataContract = FlightSuretyData(dataContractAddress);
     }
 }

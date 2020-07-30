@@ -16,6 +16,8 @@ contract FlightSuretyData {
     mapping(address => Airline) private airlinesByAddress;
     // AIRLINE NAME => AIRLINE
     mapping(string => Airline) private airlinesByName;
+    // PASSENGER ADDRESS => AIRLINE NAME => FLIGHT NAME => INSURANCE POLICY
+    mapping(address => mapping(string => mapping(string => Insurance))) policies;
 
     // Structs
     enum AirlineStatus {
@@ -26,17 +28,9 @@ contract FlightSuretyData {
     }
 
     struct Insurance {
-        string _flight;
-        address _airline;
-        bool insured;
-        bool paidOut;
+        bool _insured;
+        bool _paidOut;
         uint _funds;
-    }
-
-    struct Passenger {
-        address _address;
-        // PASSENGER ADDRESS => AIRLINE NAME => FLIGHT NAME => POLICY
-        mapping(address => mapping(string => mapping(string => Insurance))) _insurance;
     }
 
     enum FlightStatus {
@@ -73,6 +67,8 @@ contract FlightSuretyData {
     event AirlineVotedFor(address voter, address airlineAddress, string airlineName);
     event AirlineApproved(address airlineAddress, string airlineName);
     event AirlineFunded(address airlineAddress, string airlineName, uint valueSent, uint totalFunds, bool sufficientFunding);
+    event InsuranceSold(address passengerAddress, string airlineName, string flightName, uint insuredValue);
+    event InsuranceChangeSent(address passengerAddress, uint change);
 
     // Modifiers
     modifier isOperational() {
@@ -112,6 +108,12 @@ contract FlightSuretyData {
         _;
     }
 
+    modifier airlineExistsName(string memory airlineName) {
+        bool airlineNameExists = airlinesByName[airlineName]._exists;
+        require(airlineNameExists == true, "Error: Airline with name does not exist.");
+        _;
+    }
+
     modifier airlineIsPetitioned(address airlineAddress, string memory airlineName) {
         bool isPetitioned = airlinesByAddress[airlineAddress]._status == AirlineStatus.APPLIED;
         require(isPetitioned == true, "Error: Airline is not applied.");
@@ -126,8 +128,9 @@ contract FlightSuretyData {
         _;
     }
 
-    modifier callerIsAirline(address airlineAddress) {
-        require(msg.sender == airlineAddress, "Error: Not called from airline address");
+    modifier callerIsNotAirline(string memory airline) {
+        address airlineAddress = airlinesByName[airline]._address;
+        require(msg.sender != airlineAddress, "Error: Called from airline address");
         _;
     }
 
@@ -137,6 +140,12 @@ contract FlightSuretyData {
             _;
         }
         require(existingFunds + msg.value >= 10 ether, "Error: Insufficent funding.");
+        _;
+    }
+
+    modifier flightExists(string memory flight, string memory airline) {
+        bool exists = airlinesByName[airline]._flights[flight]._exists;
+        require(exists == true, "Error: Flight does not exist.");
         _;
     }
 
@@ -158,7 +167,7 @@ contract FlightSuretyData {
 
     // Airline Functions
     function applyAirline(address _address, string memory _name) public
-        airlineDoesNotExist(_address, _name) {
+        isOperational() airlineDoesNotExist(_address, _name) {
             Airline memory airline = Airline({
                 _name: _name,
                 _address: _address,
@@ -173,7 +182,8 @@ contract FlightSuretyData {
     }
 
     function voteAirline(address _address, string memory _name) public
-        isAuthorized() airlineExists(_address, _name) airlineIsPetitioned(_address, _name) airlineIsNotApproved(_address, _name) {
+        isOperational() isAuthorized() airlineExists(_address, _name) airlineIsPetitioned(_address, _name)
+        airlineIsNotApproved(_address, _name) {
             airlinesByAddress[_address]._numberOfApprovals = airlinesByAddress[_address]._numberOfApprovals + 1;
             airlinesByName[_name]._numberOfApprovals = airlinesByName[_name]._numberOfApprovals + 1;
             airlinesByAddress[_address]._approvingAirlines[msg.sender] = true;
@@ -193,12 +203,46 @@ contract FlightSuretyData {
             }
     }
 
-    function fundAirline(address _address, string memory _name) public payable
-        isOperational() isAuthorized() callerIsAirline(_address) minimumFunding() {
-            airlinesByAddress[_address]._funds = SafeMath.add(airlinesByAddress[_address]._funds, msg.value);
+    function fundAirline() public payable
+        isOperational() isAuthorized() minimumFunding() {
+            airlinesByAddress[msg.sender]._funds = SafeMath.add(airlinesByAddress[msg.sender]._funds, msg.value);
+            string memory _name = airlinesByAddress[msg.sender]._name;
             airlinesByName[_name]._funds = SafeMath.add(airlinesByName[_name]._funds, msg.value);
-            uint funds = airlinesByAddress[_address]._funds;
+            uint funds = airlinesByAddress[msg.sender]._funds;
             bool sufficientFunds = funds >= 10 ether;
-            emit AirlineFunded(_address, _name, msg.value, funds, sufficientFunds);
+            emit AirlineFunded(msg.sender, _name, msg.value, funds, sufficientFunds);
+    }
+
+    function addFlight(string memory _flight) public
+        isOperational() isAuthorized() {
+            airlinesByAddress[msg.sender]._flights[_flight] = Flight({
+                _name: _flight,
+                _status: FlightStatus.UNKNOWN,
+                _airline: msg.sender,
+                _exists: true
+            });
+    }
+
+    // Passenger Functions
+    function buyInsurance(string memory _airline, string memory _flight) public payable
+        isOperational() callerIsNotAirline(_airline) airlineExistsName(_airline) flightExists(_flight, _airline) {
+            bool airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
+            require(airlineIsFunded == true, "Error: Airline is not funded and cannot insure flight.");
+            uint funds = msg.value;
+            uint fundsToReturn = 0;
+            if (funds > 1 ether) {
+                fundsToReturn = msg.value - 1 ether;
+                funds = 1 ether;
+            }
+            policies[msg.sender][_airline][_flight] = Insurance({
+                _insured: true,
+                _funds: funds,
+                _paidOut: false
+            });
+            if (fundsToReturn > 0) {
+                msg.sender.transfer(fundsToReturn);
+                emit InsuranceChangeSent(msg.sender, fundsToReturn);
+            }
+            emit InsuranceSold(msg.sender, _airline, _flight, funds);
     }
 }

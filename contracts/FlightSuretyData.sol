@@ -10,7 +10,8 @@ contract FlightSuretyData {
     address private owner;
     bool private operational;
     mapping(address => bool) private authorizedCallers;
-    mapping(address => Airline) private airlines;
+    mapping(address => Airline) private airlinesByAddress;
+    mapping(string => Airline) private airlinesByName;
 
     // Structs
     enum AirlineStatus {

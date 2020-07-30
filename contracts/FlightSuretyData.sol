@@ -154,6 +154,7 @@ contract FlightSuretyData {
             if (numberOfAirlines < 5 || isApproved) {
                 airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
                 airlinesByName[_name]._status = AirlineStatus.APPROVED;
+                numberOfAirlines = numberOfAirlines + 1;
                 emit AirlineApproved(_address, _name);
             }
     }

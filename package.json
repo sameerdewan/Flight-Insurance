@@ -1,0 +1,21 @@
+{
+  "name": "flightsurety",
+  "version": "1.0.0",
+  "description": "Udacity Oracle Project for Blockchain Engineer Nanodegree",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "client": "cd client && npm start",
+    "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster'",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate --reset --network rinkeby",
+    "test": "truffle test"
+  },
+  "author": "Sameer Dewan",
+  "license": "ISC",
+  "devDependencies": {
+    "@openzeppelin/contracts": "3.0.2",
+    "@truffle/hdwallet-provider": "1.0.35"
+  }
+}

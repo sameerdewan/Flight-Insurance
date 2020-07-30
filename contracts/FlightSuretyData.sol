@@ -67,6 +67,7 @@ contract FlightSuretyData {
     event AirlineVotedFor(address voter, address airlineAddress, string airlineName);
     event AirlineApproved(address airlineAddress, string airlineName);
     event AirlineFunded(address airlineAddress, string airlineName, uint valueSent, uint totalFunds, bool sufficientFunding);
+    event AirlineInsufficientFunds(address airlineAddress, string airlineName, uint totalFunds);
     event InsuranceSold(address passengerAddress, string airlineName, string flightName, uint insuredValue);
     event InsuranceChangeSent(address passengerAddress, uint change);
 
@@ -227,6 +228,13 @@ contract FlightSuretyData {
     function buyInsurance(string memory _airline, string memory _flight) public payable
         isOperational() callerIsNotAirline(_airline) airlineExistsName(_airline) flightExists(_flight, _airline) {
             bool airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
+            address _address = airlinesByName[_airline]._address;
+            if (airlineIsFunded == false) {
+                uint funds = airlinesByName[_airline]._funds;
+                airlinesByName[_airline]._status = AirlineStatus.INSUFFICIENT_FUNDS;
+                airlinesByAddress[_address]._status = AirlineStatus.INSUFFICIENT_FUNDS;
+                emit AirlineInsufficientFunds(_address, _airline, funds);
+            }
             require(airlineIsFunded == true, "Error: Airline is not funded and cannot insure flight.");
             uint funds = msg.value;
             uint fundsToReturn = 0;
@@ -239,6 +247,8 @@ contract FlightSuretyData {
                 _funds: funds,
                 _paidOut: false
             });
+            airlinesByName[_airline]._funds = SafeMath.add(airlinesByName[_airline]._funds, funds);
+            airlinesByAddress[_address]._funds = SafeMath.add(airlinesByAddress[_address]._funds, funds);
             if (fundsToReturn > 0) {
                 msg.sender.transfer(fundsToReturn);
                 emit InsuranceChangeSent(msg.sender, fundsToReturn);

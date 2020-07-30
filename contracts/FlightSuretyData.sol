@@ -10,8 +10,11 @@ contract FlightSuretyData {
     address private owner;
     bool private operational;
     uint256 private numberOfAirlines;
+    // CALLER => PERMISSION STATUS
     mapping(address => bool) private authorizedCallers;
+    // AIRLINE ADDRESS => AIRLINE
     mapping(address => Airline) private airlinesByAddress;
+    // AIRLINE NAME => AIRLINE
     mapping(string => Airline) private airlinesByName;
 
     // Structs
@@ -22,11 +25,18 @@ contract FlightSuretyData {
         FUNDED
     }
 
+    struct Insurance {
+        string _flight;
+        address _airline;
+        bool insured;
+        bool paidOut;
+        uint _funds;
+    }
+
     struct Passenger {
-        bool _insured;
-        bool _paidOut;
-        bool _exists;
-        uint256 _insuredAmount;
+        address _address;
+        // PASSENGER ADDRESS => AIRLINE NAME => FLIGHT NAME => POLICY
+        mapping(address => mapping(string => mapping(string => Insurance))) _insurance;
     }
 
     enum FlightStatus {
@@ -42,7 +52,6 @@ contract FlightSuretyData {
         string _name;
         FlightStatus _status;
         address _airline;
-        mapping(address => Passenger) _passengers;
         bool _exists;
     }
 
@@ -52,7 +61,9 @@ contract FlightSuretyData {
         AirlineStatus _status;
         uint8 _numberOfApprovals;
         uint _funds;
+        // APPROVING AIRLINE => VOTE
         mapping(address => bool) _approvingAirlines;
+        // FLIGHT NAME => FLIGHT
         mapping(string => Flight) _flights;
         bool _exists;
     }

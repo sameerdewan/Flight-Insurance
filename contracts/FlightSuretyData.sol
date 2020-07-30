@@ -119,26 +119,29 @@ contract FlightSuretyData {
     }
 
     // Contract Owner Functions
-    function disableContract() public isOwner() {
-        operational = false;
+    function disableContract() public
+        isOwner() {
+            operational = false;
     }
 
-    function enableContract() public isOwner() {
-        operational = true;
+    function enableContract() public
+        isOwner() {
+            operational = true;
     }
 
     // Airline Functions
-    function applyAirline(address _address, string memory _name) public airlineDoesNotExist(_address, _name) {
-        Airline memory airline = Airline({
-            _name: _name,
-            _address: _address,
-            _status: AirlineStatus.APPLIED,
-            _numberOfApprovals: 0,
-            _exists: true
-        });
-        airlinesByAddress[_address] = airline;
-        airlinesByName[_name] = airline;
-        emit AirlineApplied(_address, _name);
+    function applyAirline(address _address, string memory _name) public
+        airlineDoesNotExist(_address, _name) {
+            Airline memory airline = Airline({
+                _name: _name,
+                _address: _address,
+                _status: AirlineStatus.APPLIED,
+                _numberOfApprovals: 0,
+                _exists: true
+            });
+            airlinesByAddress[_address] = airline;
+            airlinesByName[_name] = airline;
+            emit AirlineApplied(_address, _name);
     }
 
     function voteAirline(address _address, string memory _name) public

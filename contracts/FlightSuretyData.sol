@@ -151,8 +151,10 @@ contract FlightSuretyData {
             airlinesByAddress[_address]._approvingAirlines[msg.sender] = true;
             airlinesByName[_name]._approvingAirlines[msg.sender] = true;
             emit AirlineVotedFor(msg.sender, _address, _name);
-            bool isApproved1 = airlinesByAddress[_address]._numberOfApprovals >= 4;
-            bool isApproved2 = airlinesByName[_name]._numberOfApprovals >= 4;
+            uint8 numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
+            uint8 numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
+            bool isApproved1 = numberOfApprovals1 > SafeMath.div(numberOfAirlines, 2);
+            bool isApproved2 = numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
             bool isApproved = isApproved1 && isApproved2;
             if (numberOfAirlines < 5 || isApproved) {
                 airlinesByAddress[_address]._status = AirlineStatus.APPROVED;

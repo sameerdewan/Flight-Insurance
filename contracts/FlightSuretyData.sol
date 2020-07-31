@@ -77,13 +77,13 @@ contract FlightSuretyData {
         _;
     }
 
-    modifier isOwner() {
-        require(msg.sender == owner, "Error: Caller is not Contract Owner.");
+    modifier isOwner(address _address) {
+        require(_address == owner, "Error: Caller is not Contract Owner.");
         _;
     }
 
-    modifier isAuthorized() {
-        bool authorized = msg.sender == owner || authorizedCallers[msg.sender];
+    modifier isAuthorized(address _address) {
+        bool authorized = msg.sender == owner || authorizedCallers[_address];
         require(authorized == true, "Error: Caller is not authorized.");
         _;
     }
@@ -127,14 +127,14 @@ contract FlightSuretyData {
         _;
     }
 
-    modifier minimumFunding() {
-        uint existingFunds = airlinesByAddress[msg.sender]._funds;
-        if (existingFunds >= 10 ether) {
-            _;
-        }
-        require(existingFunds + msg.value >= 10 ether, "Error: Insufficent funding.");
-        _;
-    }
+    // modifier minimumFunding() {
+    //     uint existingFunds = airlinesByAddress[msg.sender]._funds;
+    //     if (existingFunds >= 10 ether) {
+    //         _;
+    //     }
+    //     require(existingFunds + msg.value >= 10 ether, "Error: Insufficent funding.");
+    //     _;
+    // }
 
     modifier flightExists(string memory flight, string memory airline) {
         bool exists = airlinesByName[airline]._flights[flight]._exists;
@@ -148,13 +148,13 @@ contract FlightSuretyData {
     }
 
     // Contract Owner Functions
-    function disableContract() public
-        isOwner() {
+    function disableContract(address _address) public
+        isOwner(_address) {
             operational = false;
     }
 
-    function enableContract() public
-        isOwner() {
+    function enableContract(address _address) public
+        isOwner(_address) {
             operational = true;
     }
 
@@ -174,15 +174,15 @@ contract FlightSuretyData {
             emit AirlineApplied(_address, _name);
     }
 
-    function voteAirline(address _address, string memory _name) public
-        isOperational() isAuthorized() airlineIsPetitioned(_address, _name) {
+    function voteAirline(address _address, address _voter, string memory _name) public
+        isOperational() isAuthorized(_voter) airlineIsPetitioned(_address, _name) {
             uint numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
             uint numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
             airlinesByAddress[_address]._numberOfApprovals = SafeMath.add(numberOfApprovals1, 1);
             airlinesByName[_name]._numberOfApprovals = SafeMath.add(numberOfApprovals2, 1);
-            airlinesByAddress[_address]._approvingAirlines[msg.sender] = true;
-            airlinesByName[_name]._approvingAirlines[msg.sender] = true;
-            emit AirlineVotedFor(msg.sender, _address, _name);
+            airlinesByAddress[_address]._approvingAirlines[_voter] = true;
+            airlinesByName[_name]._approvingAirlines[_voter] = true;
+            emit AirlineVotedFor(_voter, _address, _name);
             numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
             numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
             bool isApproved1 = numberOfApprovals1 > SafeMath.div(numberOfAirlines, 2);

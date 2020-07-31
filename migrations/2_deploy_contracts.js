@@ -1,3 +1,4 @@
+const Web3 = require('web3');
 const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const fs = require('fs');
@@ -17,6 +18,7 @@ module.exports = function(deployer) {
                     };
                     fs.writeFileSync(__dirname + '/../src/dapp/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
                     fs.writeFileSync(__dirname + '/../src/server/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
+                    console.log({FlightSuretyData});
                 });
     });
 }

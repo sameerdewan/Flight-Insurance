@@ -84,4 +84,46 @@ contract FlightSuretyApp {
     function claimInsurance() public payable {
 
     }
+
+    // Oracle Management
+    uint256 public constant ORACLE_REGISTRATION_FEE = 1 ether;
+    uint8 private nonce = 0;
+
+    modifier minimumRegistrationFee(uint fee) {
+        require(fee >= ORACLE_REGISTRATION_FEE, "Error: Registration fee is required.");
+        _;
+    }
+
+    function registerOracle() external payable
+        minimumRegistrationFee(msg.value) {
+
+    }
+
+    // Oracle Utilities
+    function generateIndexes(address account) internal returns(uint8[3] memory indexes) {
+        indexes[0] = getRandomIndex(account);
+
+        indexes[1] = indexes[0];
+        while(indexes[1] == indexes[0]) {
+            indexes[1] = getRandomIndex(account);
+        }
+
+        indexes[2] = indexes[1];
+        while((indexes[2] == indexes[0]) || (indexes[2] == indexes[1])) {
+            indexes[2] = getRandomIndex(account);
+        }
+
+        return indexes;
+    }
+
+    function getRandomIndex(address account) internal returns (uint8) {
+        uint8 maxValue = 10;
+        uint8 random = uint8(uint256(keccak256(abi.encodePacked(blockhash(block.number - nonce++), account))) % maxValue);
+
+        if (nonce > 250) {
+            nonce = 0;  // Can only fetch blockhashes for last 256 blocks so we adapt
+        }
+
+        return random;
+    }
 }

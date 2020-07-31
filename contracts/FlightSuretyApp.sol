@@ -87,6 +87,7 @@ contract FlightSuretyApp {
 
     // Oracle Variables
     uint256 public constant ORACLE_REGISTRATION_FEE = 1 ether;
+    uint256 private constant MIN_RESPONSES = 3;
     uint8 private nonce = 0;
     mapping(address => uint8[3]) private oracles;
     mapping(bytes32 => ResponseInfo) private oracleResponses;
@@ -143,6 +144,9 @@ contract FlightSuretyApp {
             require(oracleResponses[responseKey]._isOpen == true, "Error: Invalid Oracle");
             oracleResponses[responseKey].responses[statusCode].push(msg.sender);
             emit OracleResponse(airline, flight, timestamp, statusCode);
+            if (oracleResponses[responseKey].responses[statusCode].length >= MIN_RESPONSES) {
+                flightSuretyData.setFlightDelayed(airline, flight, statusCode);
+            }
     }
 
     // Oracle Utilities

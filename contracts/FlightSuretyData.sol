@@ -72,6 +72,7 @@ contract FlightSuretyData {
     event FlightAdded(string airlineName, string flightName);
     event InsuranceSold(address passengerAddress, string airlineName, string flightName, uint insuredValue);
     event InsuranceChangeSent(address passengerAddress, uint change);
+    event FlightDelayed(string airlineName, string flightName, uint8 statusCode);
 
     // Modifiers
     modifier isOperational() {
@@ -276,5 +277,14 @@ contract FlightSuretyData {
         address _address = airlinesByName[_airline]._address;
         airlinesByAddress[_address]._funds = SafeMath.add(airlinesByAddress[_address]._funds, _funds);
         emit InsuranceSold(_passenger, _airline, _flight, _funds);
+    }
+
+    // Oracle Functions
+    function setFlightDelayed(string memory _airline, string memory _flight, uint8 _statusCode) external
+       isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) {
+           address _address = airlinesByName[_airline]._address;
+           airlinesByName[_airline]._flights[_flight]._status = _statusCode;
+           airlinesByAddress[_address]._flights[_flight]._status = _statusCode;
+           emit FlightDelayed(_airline, _flight, _statusCode);
     }
 }

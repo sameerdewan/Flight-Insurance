@@ -288,8 +288,11 @@ contract FlightSuretyData {
 
     function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) public
         isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) isInsured(_passenger, _airline, _flight) {
+            uint statusCode = airlinesByName[_airline]._flights[_flight]._status;
+            require(statusCode == STATUS_CODE_LATE_AIRLINE, "Error: Claim invalid - Airline (flight) was not late.");
             policies[_passenger][_airline][_flight]._paidOut = true;
-            uint funds = SafeMath.mul(policies[_passenger][_airline][_flight]._funds, 1.5);
+            uint payoutBy = SafeMath.div(3, 2);
+            uint funds = SafeMath.mul(policies[_passenger][_airline][_flight]._funds, payoutBy);
             _passenger.transfer(funds);
             emit InsuranceClaimed(_airline, _flight, _passenger, funds);
     }

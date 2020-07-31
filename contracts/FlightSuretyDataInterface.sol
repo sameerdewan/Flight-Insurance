@@ -18,6 +18,7 @@ interface FlightSuretyData {
 
     // Passenger Functions
     function buyInsurance(address _passenger, string memory _airline, string memory _flight, uint _funds) external payable;
+    function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) external;
 
     // Oracle Functions
     function setFlightDelayed(string memory _airline, string memory _flight, uint8 _statusCode) external;

@@ -81,8 +81,8 @@ contract FlightSuretyApp {
         }
     }
 
-    function claimInsurance() public payable {
-
+    function claimInsurance(string memory airline, string memory flight) public {
+        flightSuretyData.claimInsurance(msg.sender, airline, flight);
     }
 
     // Oracle Variables

@@ -89,9 +89,16 @@ contract FlightSuretyApp {
     uint256 public constant ORACLE_REGISTRATION_FEE = 1 ether;
     uint8 private nonce = 0;
     mapping(address => uint8[3]) private oracles;
+    mapping(bytes32 => ResponseInfo) private oracleResponses;
+
+    // Oracle Structs
+    struct ResponseInfo {
+        address _requester;
+        bool _isOpen;
+    }
 
     // Oracle Events
-    event OracleRequest(uint8 index, string flight, uint256 timestamp);
+    event OracleRequest(uint8 index, string airline, string flight, uint256 timestamp);
 
     // Oracle Modifiers
     modifier minimumRegistrationFee(uint fee) {
@@ -110,10 +117,16 @@ contract FlightSuretyApp {
         return oracles[account];
     }
 
-    function fetchFlightStatus(string memory airline, string memory flight, uint256 timestamp) external {
+    function fetchFlightStatus(string memory airline, string memory flight) external {
         address _address = flightSuretyData.getAirlineByName(airline);
+        uint256 currentTime = block.timestamp;
         uint8 index = getRandomIndex(_address);
-
+        bytes32 flightKey = keccak256(abi.encodePacked(index, airline,  flight, currentTime));
+        oracleResponses[flightKey] = ResponseInfo({
+            _requester: msg.sender,
+            _isOpen: true
+        });
+        emit OracleRequest(index, airline, flight, currentTime);
     }
 
     // Oracle Utilities

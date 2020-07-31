@@ -1,4 +1,3 @@
-const Web3 = require('web3');
 const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const fs = require('fs');
@@ -12,13 +11,17 @@ module.exports = function(deployer) {
                     let config = {
                         localhost: {
                             url: 'http://localhost:8545',
-                            dataAddress: FlightSuretyData.address,
-                            appAddress: FlightSuretyApp.address
+                            FlightSuretyData: {
+                                address: FlightSuretyData.address,
+                                abi: FlightSuretyData.abi
+                            },
+                            FlightSuretyApp: {
+                                address: FlightSuretyApp.address,
+                                abi: FlightSuretyData.abi
+                            }
                         }
                     };
-                    fs.writeFileSync(__dirname + '/../src/dapp/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
-                    fs.writeFileSync(__dirname + '/../src/server/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
-                    console.log({FlightSuretyData});
+                    fs.writeFileSync(__dirname + '/deployments.json',JSON.stringify(config, null, '\t'), 'utf-8');
                 });
     });
 }

@@ -11,7 +11,7 @@ contract FlightSuretyApp {
     address private owner;
     bool private operational = true;
 
-    FlightSuretyData flightSuretyData;
+    FlightSuretyDataInterface flightSuretyData;
     address payable flightSuretyContractAddress;
 
     // Modifiers

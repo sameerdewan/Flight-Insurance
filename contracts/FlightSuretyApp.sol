@@ -95,14 +95,22 @@ contract FlightSuretyApp {
     struct ResponseInfo {
         address _requester;
         bool _isOpen;
+        mapping(uint8 => address[]) responses;
     }
 
     // Oracle Events
     event OracleRequest(uint8 index, string airline, string flight, uint256 timestamp);
+    event OracleResponse(string airline, string flight, uint256 timestamp, uint8 statusCode);
 
     // Oracle Modifiers
     modifier minimumRegistrationFee(uint fee) {
         require(fee >= ORACLE_REGISTRATION_FEE, "Error: Registration fee is required.");
+        _;
+    }
+
+    modifier indexMustMatchOracleRequest(uint8 index) {
+        bool indexMatchesOracleRequest = oracles[msg.sender][0] == index || oracles[msg.sender][1] == index || oracles[msg.sender][2] == index;
+        require(indexMatchesOracleRequest == true, "Error: Index does not match oracle request.");
         _;
     }
 
@@ -119,18 +127,22 @@ contract FlightSuretyApp {
 
     function fetchFlightStatus(string memory airline, string memory flight) external {
         address _address = flightSuretyData.getAirlineByName(airline);
-        uint256 currentTime = block.timestamp;
+        uint256 timestamp = block.timestamp;
         uint8 index = getRandomIndex(_address);
-        bytes32 flightKey = keccak256(abi.encodePacked(index, airline,  flight, currentTime));
+        bytes32 flightKey = keccak256(abi.encodePacked(index, airline,  flight, timestamp));
         oracleResponses[flightKey] = ResponseInfo({
             _requester: msg.sender,
             _isOpen: true
         });
-        emit OracleRequest(index, airline, flight, currentTime);
+        emit OracleRequest(index, airline, flight, timestamp);
     }
 
-    function submitOracleResponse() external {
-
+    function submitOracleResponse(uint8 index, string memory airline, string memory flight, uint256 timestamp, uint8 statusCode) external
+        indexMustMatchOracleRequest(index) {
+            bytes32 responseKey = keccak256(abi.encodePacked(index, airline, flight, timestamp));
+            require(oracleResponses[responseKey]._isOpen == true, "Error: Invalid Oracle");
+            oracleResponses[responseKey].responses[statusCode].push(msg.sender);
+            emit OracleResponse(airline, flight, timestamp, statusCode);
     }
 
     // Oracle Utilities

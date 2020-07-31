@@ -16,7 +16,7 @@ contract FlightSuretyApp {
 
     // Modifiers
     modifier isOperational() {
-        require(operational == true, "Error: Contract is not operational.");
+        require(operational == true, "Error: Application Contract is not operational.");
         _;
     }
 
@@ -65,8 +65,20 @@ contract FlightSuretyApp {
     }
 
     // Passenger Functions
-    function buyInsurance() public payable {
-
+    function buyInsurance(string memory _airline, string memory _flight) public payable {
+        bool airlineIsFunded = flightSuretyData.getInsuredStatus(_airline);
+        require(airlineIsFunded == true, "Error: Airline does not meet funding requirements.");
+        uint funds = msg.value;
+        uint fundsToReturn = 0;
+        if (funds > 1 ether) {
+            fundsToReturn = msg.value - 1 ether;
+            funds = 1 ether;
+        }
+        flightSuretyContractAddress.transfer(funds);
+        flightSuretyData.buyInsurance(msg.sender, _airline, _flight, funds);
+        if (fundsToReturn > 0 ether) {
+            msg.sender.transfer(fundsToReturn);
+        }
     }
 
     function claimInsurance() public payable {

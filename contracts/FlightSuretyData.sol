@@ -168,15 +168,28 @@ contract FlightSuretyData {
     }
 
     // Constructor
-    constructor() public {
+    constructor(string memory initialAirline) public payable {
         owner = msg.sender;
+        Airline memory airline = Airline({
+            _name: initialAirline,
+            _address: msg.sender,
+            _status: AirlineStatus.FUNDED,
+            _numberOfApprovals: 0,
+            _funds: msg.value,
+            _exists: true
+        });
+        airlinesByName[initialAirline] = airline;
+        airlinesByAddress[msg.sender] = airline;
+        numberOfAirlines = numberOfAirlines + 1;
+        authorizedCallers[msg.sender] = true;
+        emit AirlineApproved(msg.sender, initialAirline);
     }
 
     // Utilities
-    function getInsuredStatus(string memory _airline) public returns (bool airlineIsFunded) {
+    function getInsuredStatus(string memory _airline) public returns (bool airlineIsFunded, uint funds) {
         airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
+        funds = airlinesByName[_airline]._funds;
         if (airlineIsFunded == false) {
-            uint funds = airlinesByName[_airline]._funds;
             airlinesByName[_airline]._status = AirlineStatus.INSUFFICIENT_FUNDS;
             address _address = airlinesByName[_airline]._address;
             airlinesByAddress[_address]._status = AirlineStatus.INSUFFICIENT_FUNDS;
@@ -228,7 +241,7 @@ contract FlightSuretyData {
             numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
             numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
             bool isApproved = numberOfApprovals1 > SafeMath.div(numberOfAirlines, 2) && numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
-            this.evaluateAirlineStatus(isApproved, _address, _name);
+            evaluateAirlineStatus(isApproved, _address, _name);
     }
 
     function evaluateAirlineStatus(bool isApproved, address _address, string memory _name) public

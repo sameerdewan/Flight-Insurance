@@ -3,14 +3,14 @@ const Web3 = require('web3');
 const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const fs = require('fs');
-const { mnemonic, infuraKey } = require('../constants');
+const { mnemonic, infuraKey, initialAirline } = require('../constants');
 
 module.exports = function(deployer) {
 
-    deployer.deploy(FlightSuretyData)
+    deployer.deploy(FlightSuretyData, initialAirline)
     .then(() => {
         return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
-                .then(() => {
+                .then(async () => {
                     let config = {
                         localhost: {
                             url: 'http://localhost:8545',
@@ -24,7 +24,7 @@ module.exports = function(deployer) {
                             }
                         }
                     };
-                    fs.writeFileSync(__dirname + '../deployments.json',JSON.stringify(config, null, '\t'), 'utf-8');
+                    await new Promise(resolve => resolve(fs.writeFileSync('../deployments.json',JSON.stringify(config, null, '\t'), 'utf-8')));
                     const provider = new HDWalletProvider(mnemonic, infuraKey);
                     const web3 = new Web3(provider);
                     const { abi, address } = config.localhost.FlightSuretyData;

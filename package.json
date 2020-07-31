@@ -7,7 +7,7 @@
   },
   "scripts": {
     "client": "cd client && npm start",
-    "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster'",
+    "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster' -l 10000000 -e 100000",
     "compile": "truffle compile",
     "migrate": "truffle migrate --reset --network rinkeby",
     "test": "truffle test"
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@openzeppelin/contracts": "^3.1.0",
     "@truffle/hdwallet-provider": "^1.0.40-4",
+    "big-number": "^2.0.0",
     "web3": "^1.2.11"
   }
 }

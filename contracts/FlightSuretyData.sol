@@ -217,14 +217,15 @@ contract FlightSuretyData {
             this.evaluateAirlineStatus(isApproved, _address, _name);
     }
 
-    function evaluateAirlineStatus(bool isApproved, address _address, string memory _name) public {
-        if (numberOfAirlines < 5 || isApproved) {
-            airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
-            airlinesByName[_name]._status = AirlineStatus.APPROVED;
-            numberOfAirlines = numberOfAirlines + 1;
-            authorizedCallers[_address] = true;
-            emit AirlineApproved(_address, _name);
-        }
+    function evaluateAirlineStatus(bool isApproved, address _address, string memory _name) public
+        isOperational() isCalledFromApp() isAuthorized(msg.sender) {
+            if (numberOfAirlines < 5 || isApproved) {
+                airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
+                airlinesByName[_name]._status = AirlineStatus.APPROVED;
+                numberOfAirlines = numberOfAirlines + 1;
+                authorizedCallers[_address] = true;
+                emit AirlineApproved(_address, _name);
+            }
     }
 
     function fundAirline(address _funder, address _airline, uint _funds) public

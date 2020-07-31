@@ -48,6 +48,7 @@ contract FlightSuretyData {
         FlightStatus _status;
         address _airline;
         bool _exists;
+        uint256 _timeOfFlightInSeconds;
     }
 
     struct Airline {
@@ -153,6 +154,12 @@ contract FlightSuretyData {
         _;
     }
 
+    modifier flightHasNotLeft(string memory flight, string memory airline) {
+        uint256 timeOfFlightInSeconds = airlinesByName[airline]._flights[flight]._timeOfFlightInSeconds;
+        require(block.timestamp < timeOfFlightInSeconds, "Error: Flight has already left.");
+        _;
+    }
+
     // Constructor
     constructor() public {
         owner = msg.sender;
@@ -238,13 +245,14 @@ contract FlightSuretyData {
             emit AirlineFunded(msg.sender, _name, _funds, fundedAmount, sufficientFunds);
     }
 
-    function addFlight(string memory _flight, address _caller, address _airline) public
+    function addFlight(string memory _flight, address _caller, address _airline, uint256 _timeOfFlightInSeconds) public
         isOperational() isCalledFromApp() isAuthorized(_caller) callerAndAirlineEqual(_caller, _airline) {
             Flight memory flight = Flight({
                 _name: _flight,
                 _status: FlightStatus.UNKNOWN,
                 _airline: _airline,
-                _exists: true
+                _exists: true,
+                _timeOfFlightInSeconds: _timeOfFlightInSeconds
             });
             airlinesByAddress[_airline]._flights[_flight] = flight;
             string memory _name = airlinesByAddress[_airline]._name;
@@ -252,9 +260,14 @@ contract FlightSuretyData {
             emit FlightAdded(_name, _flight);
     }
 
+    function getAirlineByName(string memory _airline) public view
+        isOperational() isCalledFromApp() airlineExistsName(_airline) returns(address _address) {
+            _address = airlinesByName[_airline]._address;
+    }
+
     // // Passenger Functions
     function buyInsurance(address _passenger, string memory _airline, string memory _flight, uint _funds) public
-        isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) {
+        isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) flightHasNotLeft(_flight, _airline) {
         policies[_passenger][_airline][_flight] = Insurance({
             _insured: true,
             _funds: _funds,

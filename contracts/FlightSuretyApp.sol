@@ -85,16 +85,21 @@ contract FlightSuretyApp {
 
     }
 
-    // Oracle Management
+    // Oracle Variables
     uint256 public constant ORACLE_REGISTRATION_FEE = 1 ether;
     uint8 private nonce = 0;
     mapping(address => uint8[3]) private oracles;
 
+    // Oracle Events
+    event OracleRequest(uint8 index, string flight, uint256 timestamp);
+
+    // Oracle Modifiers
     modifier minimumRegistrationFee(uint fee) {
         require(fee >= ORACLE_REGISTRATION_FEE, "Error: Registration fee is required.");
         _;
     }
 
+    // Oracle Functions
     function registerOracle() external payable
         minimumRegistrationFee(msg.value) {
             uint8[3] memory indexes = generateIndexes(msg.sender);
@@ -103,6 +108,12 @@ contract FlightSuretyApp {
 
     function getOracle(address account) external view isOwner() returns(uint8[3] memory) {
         return oracles[account];
+    }
+
+    function fetchFlightStatus(string memory airline, string memory flight, uint256 timestamp) external {
+        address _address = flightSuretyData.getAirlineByName(airline);
+        uint8 index = getRandomIndex(_address);
+
     }
 
     // Oracle Utilities

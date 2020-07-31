@@ -12,7 +12,7 @@ contract FlightSuretyApp {
     bool private operational = true;
 
     FlightSuretyData flightSuretyData;
-    address flightSuretyContractAddress;
+    address payable flightSuretyContractAddress;
 
     // Modifiers
     modifier isOperational() {
@@ -31,7 +31,7 @@ contract FlightSuretyApp {
     }
 
     // Constructor
-    constructor(address _dataContractAddress) public {
+    constructor(address payable _dataContractAddress) public {
         owner = msg.sender;
         flightSuretyContractAddress = _dataContractAddress;
         flightSuretyData = FlightSuretyData(flightSuretyContractAddress);
@@ -55,7 +55,8 @@ contract FlightSuretyApp {
         flightSuretyData.voteAirline(_address, msg.sender, _name);
     }
 
-    function fundAirline() public payable {
-
+    function fundAirline(address _address) public payable {
+        flightSuretyContractAddress.transfer(msg.value);
+        flightSuretyData.fundAirline(msg.sender, _address, msg.value);
     }
 }

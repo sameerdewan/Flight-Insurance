@@ -9,7 +9,7 @@ abstract contract FlightSuretyData {
     // Airline Functions
     function applyAirline(address _address, string memory _name) external virtual;
     function voteAirline(address _address, address _voter, string memory _name) external virtual;
-    function fundAirline() external virtual payable;
+    function fundAirline(address _funder, address _airline, uint _funds) external virtual;
     function addFlight(string memory _flight) external virtual;
 
     // Passenger Functions

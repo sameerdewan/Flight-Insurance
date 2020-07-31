@@ -213,16 +213,18 @@ contract FlightSuretyData {
             emit AirlineVotedFor(_voter, _address, _name);
             numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
             numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
-            bool isApproved1 = numberOfApprovals1 > SafeMath.div(numberOfAirlines, 2);
-            bool isApproved2 = numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
-            bool isApproved = isApproved1 && isApproved2;
-            if (numberOfAirlines < 5 || isApproved) {
-                airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
-                airlinesByName[_name]._status = AirlineStatus.APPROVED;
-                numberOfAirlines = numberOfAirlines + 1;
-                authorizedCallers[_address] = true;
-                emit AirlineApproved(_address, _name);
-            }
+            bool isApproved = numberOfApprovals1 > SafeMath.div(numberOfAirlines, 2) && numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
+            this.evaluateAirlineStatus(isApproved, _address, _name);
+    }
+
+    function evaluateAirlineStatus(bool isApproved, address _address, string memory _name) public {
+        if (numberOfAirlines < 5 || isApproved) {
+            airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
+            airlinesByName[_name]._status = AirlineStatus.APPROVED;
+            numberOfAirlines = numberOfAirlines + 1;
+            authorizedCallers[_address] = true;
+            emit AirlineApproved(_address, _name);
+        }
     }
 
     function fundAirline(address _funder, address _airline, uint _funds) public

@@ -101,6 +101,10 @@ contract FlightSuretyApp {
             oracles[msg.sender] = indexes;
     }
 
+    function getOracle(address account) external view isOwner() returns(uint8[3] memory) {
+        return oracles[account];
+    }
+
     // Oracle Utilities
     function generateIndexes(address account) internal returns(uint8[3] memory indexes) {
         indexes[0] = getRandomIndex(account);

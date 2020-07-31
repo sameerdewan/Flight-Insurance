@@ -129,6 +129,10 @@ contract FlightSuretyApp {
         emit OracleRequest(index, airline, flight, currentTime);
     }
 
+    function submitOracleResponse() external {
+
+    }
+
     // Oracle Utilities
     function generateIndexes(address account) internal returns(uint8[3] memory indexes) {
         indexes[0] = getRandomIndex(account);

@@ -20,6 +20,14 @@ contract FlightSuretyData {
     // PASSENGER ADDRESS => AIRLINE NAME => FLIGHT NAME => INSURANCE POLICY
     mapping(address => mapping(string => mapping(string => Insurance))) policies;
 
+    // Flight Status Codes
+    uint8 private constant STATUS_CODE_UNKNOWN = 0;
+    uint8 private constant STATUS_CODE_ON_TIME = 10;
+    uint8 private constant STATUS_CODE_LATE_AIRLINE = 20;
+    uint8 private constant STATUS_CODE_LATE_WEATHER = 30;
+    uint8 private constant STATUS_CODE_LATE_TECHNICAL = 40;
+    uint8 private constant STATUS_CODE_LATE_OTHER = 50;
+
     // Structs
     enum AirlineStatus {
         APPLIED,
@@ -34,18 +42,9 @@ contract FlightSuretyData {
         uint _funds;
     }
 
-    enum FlightStatus {
-        UNKNOWN,
-        ON_TIME,
-        LATE_AIRLINE,
-        LATE_WEATHER,
-        LATE_TECHNICAL,
-        LATE_OTHER
-    }
-
     struct Flight {
         string _name;
-        FlightStatus _status;
+        uint8 _status;
         address _airline;
         bool _exists;
         uint256 _timeOfFlightInSeconds;
@@ -249,7 +248,7 @@ contract FlightSuretyData {
         isOperational() isCalledFromApp() isAuthorized(_caller) callerAndAirlineEqual(_caller, _airline) {
             Flight memory flight = Flight({
                 _name: _flight,
-                _status: FlightStatus.UNKNOWN,
+                _status: STATUS_CODE_UNKNOWN,
                 _airline: _airline,
                 _exists: true,
                 _timeOfFlightInSeconds: _timeOfFlightInSeconds

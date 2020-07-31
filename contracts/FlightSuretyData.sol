@@ -8,6 +8,7 @@ contract FlightSuretyData {
 
     // Global Variables
     address private owner;
+    address private app;
     bool private operational;
     uint256 private numberOfAirlines;
     // CALLER => PERMISSION STATUS
@@ -80,6 +81,11 @@ contract FlightSuretyData {
 
     modifier isOwner(address _address) {
         require(_address == owner, "Error: Caller is not Contract Owner.");
+        _;
+    }
+
+    modifier isCalledFromApp() {
+        require(msg.sender == app, "Error: Not called from approved Application Contract");
         _;
     }
 
@@ -175,9 +181,14 @@ contract FlightSuretyData {
             operational = true;
     }
 
+    function wireApp(address _app) public
+        isOwner(msg.sender) {
+            app = _app;
+    }
+
     // Airline Functions
     function applyAirline(address _address, string memory _name) public
-        isOperational() airlineDoesNotExist(_address, _name) {
+        isOperational() isCalledFromApp() airlineDoesNotExist(_address, _name) {
             Airline memory airline = Airline({
                 _name: _name,
                 _address: _address,
@@ -192,7 +203,7 @@ contract FlightSuretyData {
     }
 
     function voteAirline(address _address, address _voter, string memory _name) public
-        isOperational() isAuthorized(_voter) airlineIsPetitioned(_address, _name) airlineDidNotVote(_address, _voter) {
+        isOperational() isCalledFromApp() isAuthorized(_voter) airlineIsPetitioned(_address, _name) airlineDidNotVote(_address, _voter) {
             uint numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
             uint numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
             airlinesByAddress[_address]._numberOfApprovals = SafeMath.add(numberOfApprovals1, 1);
@@ -215,7 +226,7 @@ contract FlightSuretyData {
     }
 
     function fundAirline(address _funder, address _airline, uint _funds) public
-        isOperational() isAuthorized(_funder) callerAndAirlineEqual(_funder, _airline) minimumFunding(_airline, _funds) {
+        isOperational() isCalledFromApp() isAuthorized(_funder) callerAndAirlineEqual(_funder, _airline) minimumFunding(_airline, _funds) {
             airlinesByAddress[_airline]._funds = SafeMath.add(airlinesByAddress[_airline]._funds, _funds);
             string memory _name = airlinesByAddress[_airline]._name;
             airlinesByName[_name]._funds = SafeMath.add(airlinesByName[_name]._funds, _funds);
@@ -225,7 +236,7 @@ contract FlightSuretyData {
     }
 
     function addFlight(string memory _flight, address _caller, address _airline) public
-        isOperational() isAuthorized(_caller) callerAndAirlineEqual(_caller, _airline) {
+        isOperational() isCalledFromApp() isAuthorized(_caller) callerAndAirlineEqual(_caller, _airline) {
             Flight memory flight = Flight({
                 _name: _flight,
                 _status: FlightStatus.UNKNOWN,
@@ -239,7 +250,8 @@ contract FlightSuretyData {
     }
 
     // // Passenger Functions
-    function buyInsurance(address _passenger, string memory _airline, string memory _flight, uint _funds) public {
+    function buyInsurance(address _passenger, string memory _airline, string memory _flight, uint _funds) public
+        isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) {
         policies[_passenger][_airline][_flight] = Insurance({
             _insured: true,
             _funds: _funds,

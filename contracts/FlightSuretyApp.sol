@@ -34,7 +34,7 @@ contract FlightSuretyApp {
     constructor(address payable _dataContractAddress) public {
         owner = msg.sender;
         flightSuretyContractAddress = _dataContractAddress;
-        flightSuretyData = FlightSuretyData(flightSuretyContractAddress);
+        flightSuretyData = FlightSuretyDataInterface(flightSuretyContractAddress);
     }
 
     // Contract Owner Functions

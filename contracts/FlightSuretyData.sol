@@ -73,6 +73,7 @@ contract FlightSuretyData {
     event InsuranceSold(address passengerAddress, string airlineName, string flightName, uint insuredValue);
     event InsuranceChangeSent(address passengerAddress, uint change);
     event FlightDelayed(string airlineName, string flightName, uint8 statusCode);
+    event InsuranceClaimed(string airlineName, string flightName, address passenger, uint funds);
 
     // Modifiers
     modifier isOperational() {
@@ -157,6 +158,12 @@ contract FlightSuretyData {
     modifier flightHasNotLeft(string memory flight, string memory airline) {
         uint256 timeOfFlightInSeconds = airlinesByName[airline]._flights[flight]._timeOfFlightInSeconds;
         require(block.timestamp < timeOfFlightInSeconds, "Error: Flight has already left.");
+        _;
+    }
+
+    modifier isInsured(address passenger, string memory airline, string memory flight) {
+        bool insured = policies[passenger][airline][flight]._insured;
+        require(insured == true, "Error: Insurance Policy does not exist.");
         _;
     }
 
@@ -277,6 +284,14 @@ contract FlightSuretyData {
         address _address = airlinesByName[_airline]._address;
         airlinesByAddress[_address]._funds = SafeMath.add(airlinesByAddress[_address]._funds, _funds);
         emit InsuranceSold(_passenger, _airline, _flight, _funds);
+    }
+
+    function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) public
+        isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) isInsured(_passenger, _airline, _flight) {
+            policies[_passenger][_airline][_flight]._paidOut = true;
+            uint funds = SafeMath.mul(policies[_passenger][_airline][_flight]._funds, 1.5);
+            _passenger.transfer(funds);
+            emit InsuranceClaimed(_airline, _flight, _passenger, funds);
     }
 
     // Oracle Functions

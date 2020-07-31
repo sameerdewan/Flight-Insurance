@@ -88,6 +88,7 @@ contract FlightSuretyApp {
     // Oracle Management
     uint256 public constant ORACLE_REGISTRATION_FEE = 1 ether;
     uint8 private nonce = 0;
+    mapping(address => uint8[3]) private oracles;
 
     modifier minimumRegistrationFee(uint fee) {
         require(fee >= ORACLE_REGISTRATION_FEE, "Error: Registration fee is required.");
@@ -96,7 +97,8 @@ contract FlightSuretyApp {
 
     function registerOracle() external payable
         minimumRegistrationFee(msg.value) {
-
+            uint8[3] memory indexes = generateIndexes(msg.sender);
+            oracles[msg.sender] = indexes;
     }
 
     // Oracle Utilities

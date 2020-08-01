@@ -7,7 +7,7 @@
   },
   "scripts": {
     "client": "cd client && npm start",
-    "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster' -l 10000000 -e 100000",
+    "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster' --allowUnlimitedContractSize  -l 10000000 -e 100000",
     "compile": "truffle compile",
     "migrate": "truffle migrate --reset --network rinkeby",
     "test": "truffle test"

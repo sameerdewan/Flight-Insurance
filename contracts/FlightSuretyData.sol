@@ -190,6 +190,18 @@ contract FlightSuretyData {
         }
     }
 
+    function getInsuredPassenger(address _passenger, string memory _airline, string memory _flight) external view isAuthorized(msg.sender)
+        returns (
+            bool insured,
+            bool paidOut,
+            uint funds
+        ) {
+            Insurance memory insurance = policies[_passenger][_airline][_flight];
+            insured = insurance._insured;
+            paidOut = insurance._paidOut;
+            funds = insurance._funds;
+    }
+
     function getAirlineByName(string memory _airline) public view
         isOperational() isCalledFromApp() airlineExistsName(_airline) returns(address _address) {
             _address = airlinesByName[_airline]._address;
@@ -302,17 +314,17 @@ contract FlightSuretyData {
     }
 
     // // Passenger Functions
-    function buyInsurance(address _passenger, string memory _airline, string memory _flight, uint _funds) public
+    function buyInsurance(address _passenger, string memory _airline, string memory _flight) public payable
         isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) flightHasNotLeft(_flight, _airline) {
         policies[_passenger][_airline][_flight] = Insurance({
             _insured: true,
-            _funds: _funds,
+            _funds: msg.value,
             _paidOut: false
         });
-        airlinesByName[_airline]._funds = SafeMath.add(airlinesByName[_airline]._funds, _funds);
+        airlinesByName[_airline]._funds = SafeMath.add(airlinesByName[_airline]._funds, msg.value);
         address _address = airlinesByName[_airline]._address;
-        airlinesByAddress[_address]._funds = SafeMath.add(airlinesByAddress[_address]._funds, _funds);
-        emit InsuranceSold(_passenger, _airline, _flight, _funds);
+        airlinesByAddress[_address]._funds = SafeMath.add(airlinesByAddress[_address]._funds, msg.value);
+        emit InsuranceSold(_passenger, _airline, _flight, msg.value);
     }
 
     function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) public

@@ -17,7 +17,7 @@ interface FlightSuretyDataInterface {
     function getAirlineByName(string memory _airline) external view returns(address _address);
 
     // Passenger Functions
-    function buyInsurance(address _passenger, string memory _airline, string memory _flight, uint _funds) external payable;
+    function buyInsurance(address _passenger, string memory _airline, string memory _flight) external payable;
     function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) external;
 
     // Oracle Functions

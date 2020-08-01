@@ -223,4 +223,21 @@ it('airline 2 should be able to add a flight', async () => {
     assert.equal(airline_flight_added_event_emitted, true, error2);
 });
 
-it('passenger should be able to buy insurance for airline 2 flight');
+it('passenger should be able to buy insurance for airline 2 initial flight', async () => {
+    let insurance_sold_event_emitted = false;
+    const value = web3.utils.toWei("5");
+    const maxValue = web3.utils.toWei("1");
+    await dataContract.InsuranceSold(() => insurance_sold_event_emitted = true);
+    await appContract.buyInsurance.sendTransaction(second_airline_name, default_initial_flight, { from: passenger, value, gas: default_gas  });
+    const { 
+        insured, 
+        paidOut, 
+        funds 
+    } = await dataContract.getInsuredPassenger.call(passenger, second_airline_name, default_initial_flight, { from: owner });
+    const expectedPassengerInsuranceState = [true, false, Number(maxValue)];
+    const actualPassengerInsuranceState = [insured, paidOut, Number(`${funds}`)];
+    const error1 = "Error: Unexpected Passenger Insurance State";
+    assert.deepEqual(expectedPassengerInsuranceState, actualPassengerInsuranceState, error1);
+    const error2 = "Error: Insurance Sold Event not Emitted";
+    assert.equal(insurance_sold_event_emitted, true, error2);
+});

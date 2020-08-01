@@ -14,6 +14,9 @@ contract FlightSuretyApp {
     FlightSuretyDataInterface flightSuretyData;
     address payable flightSuretyContractAddress;
 
+    // Events
+    event ChangeSent(address passenger, uint change, string flight, string airline);
+
     // Modifiers
     modifier isOperational() {
         require(operational == true, "Error: Application Contract is not operational.");
@@ -73,10 +76,10 @@ contract FlightSuretyApp {
             fundsToReturn = msg.value - 1 ether;
             funds = 1 ether;
         }
-        flightSuretyContractAddress.transfer(funds);
-        flightSuretyData.buyInsurance(msg.sender, _airline, _flight, funds);
+        flightSuretyData.buyInsurance{value: funds}(msg.sender, _airline, _flight);
         if (fundsToReturn > 0 ether) {
             msg.sender.transfer(fundsToReturn);
+            emit ChangeSent(msg.sender, fundsToReturn, _flight, _airline);
         }
     }
 

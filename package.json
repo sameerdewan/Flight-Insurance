@@ -6,13 +6,13 @@
     "test": "test"
   },
   "scripts": {
+    "clean": "rm -rf build && rm -rf ./server/deployments.json && rm -rf ./client/src/deployments.json",
     "dapp": "cd client && npm start",
     "server": "node server/index.js",
     "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster' --allowUnlimitedContractSize  -l 10000000 -e 100000",
     "compile": "truffle compile",
     "migrate": "truffle migrate --reset --network rinkeby",
     "migrate-dev": "truffle migrate --reset --network development",
-    "clean": "rm -rf build && rm -rf ./server/deployments.json && rm -rf ./client/src/deployments.json",
     "test": "truffle test"
   },
   "author": "Sameer Dewan",

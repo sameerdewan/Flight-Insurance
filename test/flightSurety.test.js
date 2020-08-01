@@ -62,78 +62,96 @@ it('initial airline should have a balance of 10 ETH on deployment', async () => 
 
 it('airline 2 should be able to apply', async () => {
     const tx = await appContract.applyAirline.sendTransaction(second_airline_name, { from: secondAirline });
+
     const airlineStatus = `${await dataContract.getAirlineStatus.call(second_airline_name, { from: owner })}`;
     const error = "Error: Airline status is not: APPLIED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
+
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
     truffleAssert.eventEmitted(newTx, 'AirlineApplied');
 });
 
 it('airline 1 should be able to vote for airline 2, immediately being approved', async () => {
     const tx = await appContract.voteAirline.sendTransaction(secondAirline, second_airline_name, { from: firstAirline });
+
     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(secondAirline, { from: owner });
     const error1 = "Error: Number of approvals should be 1";
     assert.equal(1, `${numberOfApprovals}`, error1);
+
     const airlineStatus = `${await dataContract.getAirlineStatus.call(second_airline_name, { from: owner })}`;
     const error2 = "Error: Airline status is not: APPROVED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
+
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
     truffleAssert.eventEmitted(newTx, 'AirlineVotedFor');
 });
 
 it('airline 3 should be able to apply', async () => {
     const tx = await appContract.applyAirline.sendTransaction(third_airline_name, { from: thirdAirline });
+
     const airlineStatus = `${await dataContract.getAirlineStatus.call(third_airline_name, { from: owner })}`;
     const error1 = "Error: Airline status is not: APPLIED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error1);
+
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
     truffleAssert.eventEmitted(newTx, 'AirlineApplied');
 });
 
 it('airline 2 should be able to vote for airline 3, immediately being approved', async () => {
     const tx = await appContract.voteAirline.sendTransaction(thirdAirline, third_airline_name, { from: secondAirline });
+
     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(thirdAirline, { from: owner });
     const error1 = "Error: Number of approvals should be 1";
     assert.equal(1, `${numberOfApprovals}`, error1);
+
     const airlineStatus = `${await dataContract.getAirlineStatus.call(third_airline_name, { from: owner })}`;
     const error2 = "Error: Airline status is not: APPROVED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
+
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
     truffleAssert.eventEmitted(newTx, 'AirlineVotedFor');
 });
 
 it('airline 4 should be able to apply', async () => {
     const tx = await appContract.applyAirline.sendTransaction(fourth_airline_name, { from: fourthAirline });
+
     const airlineStatus = `${await dataContract.getAirlineStatus.call(fourth_airline_name, { from: owner })}`;
     const error = "Error: Airline status is not: APPLIED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
+
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
     truffleAssert.eventEmitted(newTx, 'AirlineApplied');
 });
 
 it('airline 3 should be able to vote for airline 4, immediately being approved', async () => {
     const tx = await appContract.voteAirline.sendTransaction(fourthAirline, fourth_airline_name, { from: thirdAirline });
+
     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(fourthAirline, { from: owner });
     const error1 = "Error: Number of approvals should be 1";
     assert.equal(1, `${numberOfApprovals}`, error1);
+
     const airlineStatus = `${await dataContract.getAirlineStatus.call(fourth_airline_name, { from: owner })}`;
     const error2 = "Error: Airline status is not: APPROVED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
+
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
     truffleAssert.eventEmitted(newTx, 'AirlineVotedFor');
 });
 
 it('airline 5 should be able to apply', async () => {
     const tx = await appContract.applyAirline.sendTransaction(fifth_airline_name, { from: fifthAirline });
+
     const airlineStatus = `${await dataContract.getAirlineStatus.call(fifth_airline_name, { from: owner })}`;
     const error = "Error: Airline status is not: APPLIED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
+
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
     truffleAssert.eventEmitted(newTx, 'AirlineApplied');
 });
 
 it('airline 4 should be able to vote for airline 5, requiring 4 votes to be approved', async () => {
     const tx1 = await appContract.voteAirline.sendTransaction(fifthAirline, fifth_airline_name, { from: fourthAirline });
+    
     const newTx1 = await truffleAssert.createTransactionResult(dataContract, tx1.tx);
     truffleAssert.eventEmitted(newTx1, 'AirlineVotedFor');
 

@@ -193,6 +193,7 @@ it('airline 4 should be able to vote for airline 5, requiring 4 votes to be appr
 });
 
 it('airline 2 should be fundable and have appropriate funds post funding', async () => {
+    // TEST AIRLINE INSURED STATUS
     const initialInsuredState = await dataContract.getInsuredStatus.call(second_airline_name, { from: owner });
     const initialInsuredState_BOOL = initialInsuredState.airlineIsFunded;
     const initialInsuredState_FUNDS = Number(`${initialInsuredState.funds}`);
@@ -200,7 +201,13 @@ it('airline 2 should be fundable and have appropriate funds post funding', async
     const returnedPreInsuredState = [initialInsuredState_BOOL, initialInsuredState_FUNDS];
     const error1 = "Error: Unexpected Preinsured State";
     assert.deepEqual(expectedPreInsuredState, returnedPreInsuredState, error1);
-    await appContract.fundAirline.sendTransaction(secondAirline, { from: secondAirline, value: default_minimum_funding, gas: default_gas });
+    // TEST AIRLINE EVENT EMITTEED AIRLINE FUNDED
+    const tx = await appContract.fundAirline.sendTransaction(secondAirline, 
+        { from: secondAirline, value: default_minimum_funding, gas: default_gas }
+    );
+    // const newTx = truffleAssert.createTransactionResult(dataContract, tx.tx);
+    // truffleAssert.eventEmitted(newTx, 'AirlineFunded');
+    // TEST AIRLINE INSURED STATUS
     const postInsuredState = await dataContract.getInsuredStatus.call(second_airline_name, { from: owner });
     const postInsuredState_BOOL = postInsuredState.airlineIsFunded;
     const postInsuredState_FUNDS = Number(`${postInsuredState.funds}`);
@@ -213,9 +220,13 @@ it('airline 2 should be fundable and have appropriate funds post funding', async
 it('airline 2 should be able to add a flight', async () => {
     const _timeOfFlight = new Date(2021, 00, 01, 10, 30, 00, 0) // January 1, 2021 10:30
     const _timeOfFlightInSeconds = _timeOfFlight.getTime() / 1000;
-    await appContract.addFlight.sendTransaction(default_initial_flight, secondAirline, _timeOfFlightInSeconds, 
+    // TEST EVENT EMITTED FLIGHT ADDED
+    const tx = await appContract.addFlight.sendTransaction(default_initial_flight, secondAirline, _timeOfFlightInSeconds, 
         { from: secondAirline, gas: default_gas }
     );
+    // const newTx = truffleAssert.createTransactionResult(dataContract, tx.tx);
+    // truffleAssert.eventEmitted(newTx, 'FlightAdded');
+    // TEST FLIGHT ADDED 
     const { name, airline, timeOfFlightInSeconds } = await dataContract.getFlight.call(second_airline_name, default_initial_flight, { from: owner });
     const expectedFlightState = [default_initial_flight, secondAirline, _timeOfFlightInSeconds];
     const actualFlightState = [name, airline, Number(`${timeOfFlightInSeconds}`)];
@@ -226,7 +237,13 @@ it('airline 2 should be able to add a flight', async () => {
 it('passenger should be able to buy insurance for airline 2 initial flight', async () => {
     const value = web3.utils.toWei("5");
     const maxValue = web3.utils.toWei("1");
-    await appContract.buyInsurance.sendTransaction(second_airline_name, default_initial_flight, { from: passenger, value, gas: default_gas  });
+    // TEST EVENT INSURANCE SOLD
+    const tx = await appContract.buyInsurance.sendTransaction(second_airline_name, default_initial_flight, 
+        { from: passenger, value, gas: default_gas  }
+    );
+    // const newTx = truffleAssert.createTransactionResult(dataContract, tx.tx);
+    // truffleAssert.eventEmitted(newTx, 'InsuranceSold');
+    // TEST PASSENGER INSURED STATE
     const { 
         insured, 
         paidOut, 
@@ -240,11 +257,13 @@ it('passenger should be able to buy insurance for airline 2 initial flight', asy
 
 it('passenger should not be able to claim insurance if flight status not delayed on airline behalf', async () => {
     let caughtError = false;
+    let tx;
     try {
-        await appContract.claimInsurance.call(second_airline_name, default_initial_flight, { from: passenger });
+        tx = await appContract.claimInsurance.call(second_airline_name, default_initial_flight, { from: passenger });
     } catch (error) {
         caughtError = true;
     }
     const error3 = "Error: Claim went through, error was uncaught";
     assert.equal(caughtError, true, error3);
+    console.log({tx})
 });

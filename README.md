@@ -18,6 +18,10 @@ Web3.js v1.2.1
 
 In a dedicated terminal <code>(terminal 1)</code>, run the following:
 
+    npm install
+
+After the install is completed, run the following in the dedicated terminal <code>(terminal 1)</code>:
+
     npm run ganache
 
 In another dedicated terminal <code>(terminal 2)</code>, run the following:

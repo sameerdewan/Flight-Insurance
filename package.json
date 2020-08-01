@@ -12,6 +12,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate --reset --network rinkeby",
     "migrate-dev": "truffle migrate --reset --network development",
+    "reset": "rm -rf build",
     "test": "truffle test"
   },
   "author": "Sameer Dewan",

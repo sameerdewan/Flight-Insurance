@@ -10,6 +10,8 @@ Node v10.16.3
 
 Web3.js v1.2.1
 
+Ganache CLI v6.9.1 (ganache-core: 2.10.2)
+
 @openzeppelin/contracts - ^3.1.0
 
 @truffle/hdwallet-provider - ^1.0.40-4

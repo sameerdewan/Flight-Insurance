@@ -66,50 +66,64 @@ it('airline 1 should be able to vote for airline 2, immediately being approved',
     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(secondAirline, { from: owner });
     const error1 = "Error: Number of approvals should be 1";
     assert.equal(1, `${numberOfApprovals}`, error1);
-    const airlineStatus = `${await dataContract.getAirlineApprovalCount.call(secondAirline, { from: owner })}`;
+    const airlineStatus = `${await dataContract.getAirlineStatus.call(second_airline_name, { from: owner })}`;
     const error2 = "Error: Airline status is not: APPROVED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
 });
 
-it('airline 3 should be able to apply', async () => {
-    const third_airline_name = "THIRD_TEST_AIRLINE";
-    await appContract.applyAirline.sendTransaction(third_airline_name, { from: thirdAirline });
-    const airlineStatus = `${await dataContract.getAirlineStatus.call(third_airline_name, { from: owner })}`;
-    const error = "Error: Airline status is not: APPLIED";
-    assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
-});
+// it('airline 3 should be able to apply', async () => {
+//     const third_airline_name = "THIRD_TEST_AIRLINE";
+//     await appContract.applyAirline.sendTransaction(third_airline_name, { from: thirdAirline });
+//     const airlineStatus = `${await dataContract.getAirlineStatus.call(third_airline_name, { from: owner })}`;
+//     const error = "Error: Airline status is not: APPLIED";
+//     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
+// });
 
-it('airline 2 should be able to vote for airline 3, immediately being approved', async () => {
-    const third_airline_name = "THIRD_TEST_AIRLINE";
-    await appContract.voteAirline.sendTransaction(thirdAirline, third_airline_name, { from: secondAirline });
-    const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(thirdAirline, { from: owner });
-    const error1 = "Error: Number of approvals should be 1";
-    assert.equal(1, `${numberOfApprovals}`, error1);
-    const airlineStatus = `${await dataContract.getAirlineApprovalCount.call(thirdAirline, { from: owner })}`;
-    const error2 = "Error: Airline status is not: APPROVED";
-    assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
-});
+// it('airline 2 should be able to vote for airline 3, immediately being approved', async () => {
+//     const third_airline_name = "THIRD_TEST_AIRLINE";
+//     await appContract.voteAirline.sendTransaction(thirdAirline, third_airline_name, { from: secondAirline });
+//     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(thirdAirline, { from: owner });
+//     const error1 = "Error: Number of approvals should be 1";
+//     assert.equal(1, `${numberOfApprovals}`, error1);
+//     const airlineStatus = `${await dataContract.getAirlineApprovalCount.call(thirdAirline, { from: owner })}`;
+//     const error2 = "Error: Airline status is not: APPROVED";
+//     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
+// });
 
-it('airline 4 should be able to apply', async () => {
-    const fourth_airline_name = "FOURTH_TEST_AIRLINE";
-    await appContract.applyAirline.sendTransaction(fourth_airline_name, { from: fourthAirline });
-    const airlineStatus = `${await dataContract.getAirlineStatus.call(fourth_airline_name, { from: owner })}`;
-    const error = "Error: Airline status is not: APPLIED";
-    assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
-});
+// it('airline 4 should be able to apply', async () => {
+//     const fourth_airline_name = "FOURTH_TEST_AIRLINE";
+//     await appContract.applyAirline.sendTransaction(fourth_airline_name, { from: fourthAirline });
+//     const airlineStatus = `${await dataContract.getAirlineStatus.call(fourth_airline_name, { from: owner })}`;
+//     const error = "Error: Airline status is not: APPLIED";
+//     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
+// });
 
-it('airline 3 should be able to vote for airline 4, immediately being approved', async () => {
-    const fourth_airline_name = "FOURTH_TEST_AIRLINE";
-    await appContract.voteAirline.sendTransaction(fourthAirline, fourth_airline_name, { from: thirdAirline });
-    const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(fourthAirline, { from: owner });
-    const error1 = "Error: Number of approvals should be 1";
-    assert.equal(1, `${numberOfApprovals}`, error1);
-    const airlineStatus = `${await dataContract.getAirlineApprovalCount.call(fourthAirline, { from: owner })}`;
-    const error2 = "Error: Airline status is not: APPROVED";
-    assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
-});
+// it('airline 3 should be able to vote for airline 4, immediately being approved', async () => {
+//     const fourth_airline_name = "FOURTH_TEST_AIRLINE";
+//     await appContract.voteAirline.sendTransaction(fourthAirline, fourth_airline_name, { from: thirdAirline });
+//     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(fourthAirline, { from: owner });
+//     const error1 = "Error: Number of approvals should be 1";
+//     assert.equal(1, `${numberOfApprovals}`, error1);
+//     const airlineStatus = `${await dataContract.getAirlineApprovalCount.call(fourthAirline, { from: owner })}`;
+//     const error2 = "Error: Airline status is not: APPROVED";
+//     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
+// });
 
-it('airline 4 should be able to vote for airline 5, requiring 4 votes to be approved', async () => {
-    const fifth_airline_name = "FIFTH_TEST_AIRLINE";
+// it('airline 5 should be able to apply', async () => {
+//     const fifth_airline_name = "FIFTH_TEST_AIRLINE";
+//     await appContract.applyAirline.sendTransaction(fifth_airline_name, { from: fifthAirline });
+//     const airlineStatus = `${await dataContract.getAirlineStatus.call(fifth_airline_name, { from: owner })}`;
+//     const error = "Error: Airline status is not: APPLIED";
+//     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
+// });
 
-});
+// it('airline 4 should be able to vote for airline 5, requiring 4 votes to be approved', async () => {
+//     const fifth_airline_name = "FIFTH_TEST_AIRLINE";
+//     await appContract.voteAirline.sendTransaction(fifthAirline, fifth_airline_name, { from: fourthAirline });
+//     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(fifthAirline, { from: owner });
+//     const error1 = "Error: Number of approvals should be 1";
+//     assert.equal(1, `${numberOfApprovals}`, error1);
+//     const airlineStatus = `${await dataContract.getAirlineApprovalCount.call(fifthAirline, { from: owner })}`;
+//     const error2 = "Error: Airline status is not: APPROVED";
+//     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
+// });

@@ -31,7 +31,7 @@ module.exports = function(deployer) {
                     const dataContractinstance = new web3.eth.Contract(abi, address);
                     const { address: appAddress } = config.localhost.FlightSuretyApp; 
                     dataContractinstance.methods.wireApp(appAddress).call()
-                        .then(async () => {
+                        .then(() => {
                             console.log('<--WIRED APP-->');
                         }).catch(error => {
                             console.log({error});

@@ -10,7 +10,7 @@ contract FlightSuretyData {
     address private owner;
     address private app;
     bool private operational = true;
-    uint256 private numberOfAirlines;
+    uint256 private numberOfAirlines = 0;
     // CALLER => PERMISSION STATUS
     mapping(address => bool) private authorizedCallers;
     // AIRLINE ADDRESS => AIRLINE
@@ -239,21 +239,14 @@ contract FlightSuretyData {
 
     function voteAirline(address _address, address _voter, string memory _name) public
         isOperational() isCalledFromApp() isAuthorized(_voter) airlineExistsName(_name) airlineDidNotVote(_address, _voter) {
-            uint numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
-            uint numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
-            airlinesByAddress[_address]._numberOfApprovals = SafeMath.add(numberOfApprovals1, 1);
-            airlinesByName[_name]._numberOfApprovals = SafeMath.add(numberOfApprovals2, 1);
+            uint numberOfApprovals = airlinesByAddress[_address]._numberOfApprovals;
+            airlinesByAddress[_address]._numberOfApprovals = SafeMath.add(numberOfApprovals, 1);
+            airlinesByName[_name]._numberOfApprovals = SafeMath.add(numberOfApprovals, 1);
             airlinesByAddress[_address]._approvingAirlines[_voter] = true;
             airlinesByName[_name]._approvingAirlines[_voter] = true;
             emit AirlineVotedFor(_voter, _address, _name);
-            numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
-            numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
-            bool isApproved = numberOfApprovals1 > SafeMath.div(numberOfAirlines, 2) && numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
-            evaluateAirlineStatus(isApproved, _address, _name);
-    }
-
-    function evaluateAirlineStatus(bool isApproved, address _address, string memory _name) internal
-        isOperational() isAuthorized(msg.sender) {
+            uint numberOfApprovals2 = airlinesByAddress[_address]._numberOfApprovals;
+            bool isApproved = numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
             if (numberOfAirlines < 5 || isApproved) {
                 airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
                 airlinesByName[_name]._status = AirlineStatus.APPROVED;

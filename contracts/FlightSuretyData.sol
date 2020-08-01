@@ -186,10 +186,6 @@ contract FlightSuretyData {
     }
 
     // Utilities
-    function getWiredApp() external view isAuthorized(msg.sender) returns (address _app) {
-        _app = app;
-    }
-
     function getInsuredStatus(string memory _airline) external isAuthorized(msg.sender) returns (bool airlineIsFunded, uint funds) {
         airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
         funds = airlinesByName[_airline]._funds;
@@ -219,6 +215,12 @@ contract FlightSuretyData {
     function wireApp(address _app) external
         isOwner(msg.sender) {
             app = _app;
+            authorizedCallers[_app] = true;
+    }
+
+    function unwireApp(address _app) external
+        isOwner(msg.sender) {
+            authorizedCallers[_app] = false;
     }
 
     // Airline Functions

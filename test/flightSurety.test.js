@@ -61,5 +61,6 @@ it('airline 2 should be able to apply', async () => {
 });
 
 it('airline 1 should be able to vote for airline 2, immediately being approved', async () => {
+    const second_airline_name = "SECOND_TEST_AIRLINE";
     await appContract.voteAirline.call(secondAirline, second_airline_name, { from: firstAirline });
 });

@@ -205,8 +205,8 @@ it('airline 2 should be fundable and have appropriate funds post funding', async
     const tx = await appContract.fundAirline.sendTransaction(secondAirline, 
         { from: secondAirline, value: default_minimum_funding, gas: default_gas }
     );
-    // const newTx = truffleAssert.createTransactionResult(dataContract, tx.tx);
-    // truffleAssert.eventEmitted(newTx, 'AirlineFunded');
+    const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
+    truffleAssert.eventEmitted(newTx, 'AirlineFunded');
     // TEST AIRLINE INSURED STATUS
     const postInsuredState = await dataContract.getInsuredStatus.call(second_airline_name, { from: owner });
     const postInsuredState_BOOL = postInsuredState.airlineIsFunded;
@@ -224,8 +224,8 @@ it('airline 2 should be able to add a flight', async () => {
     const tx = await appContract.addFlight.sendTransaction(default_initial_flight, secondAirline, _timeOfFlightInSeconds, 
         { from: secondAirline, gas: default_gas }
     );
-    // const newTx = truffleAssert.createTransactionResult(dataContract, tx.tx);
-    // truffleAssert.eventEmitted(newTx, 'FlightAdded');
+    const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
+    truffleAssert.eventEmitted(newTx, 'FlightAdded');
     // TEST FLIGHT ADDED 
     const { name, airline, timeOfFlightInSeconds } = await dataContract.getFlight.call(second_airline_name, default_initial_flight, { from: owner });
     const expectedFlightState = [default_initial_flight, secondAirline, _timeOfFlightInSeconds];
@@ -241,8 +241,8 @@ it('passenger should be able to buy insurance for airline 2 initial flight', asy
     const tx = await appContract.buyInsurance.sendTransaction(second_airline_name, default_initial_flight, 
         { from: passenger, value, gas: default_gas  }
     );
-    // const newTx = truffleAssert.createTransactionResult(dataContract, tx.tx);
-    // truffleAssert.eventEmitted(newTx, 'InsuranceSold');
+    const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
+    truffleAssert.eventEmitted(newTx, 'InsuranceSold');
     // TEST PASSENGER INSURED STATE
     const { 
         insured, 

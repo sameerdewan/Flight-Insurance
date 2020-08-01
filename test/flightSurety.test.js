@@ -10,6 +10,9 @@ const third_airline_name = "THIRD_TEST_AIRLINE";
 const fourth_airline_name = "FOURTH_TEST_AIRLINE";
 const fifth_airline_name = "FIFTH_TEST_AIRLINE";
 
+const first_flight = "FIRST_TEST_FLIGHT";
+const second_flight = "SECOND_TEST_FLIGHT";
+
 let accounts;
 
 let owner;
@@ -202,4 +205,19 @@ it('airline 2 should be fundable and have appropriate funds post funding', async
     assert.deepEqual(expectedPostInsuredState, returnedPostInsuranceState, error2);
     const error3 = "Error: Airline Funded Event not Emitted";
     assert.equal(airiline_funded_event_emitted, true, error3);
+});
+
+it('airline 2 should be able to add a flight', async () => {
+    let airline_flight_added_event_emitted = false;
+    const _timeOfFlight = new Date(2021, 00, 01, 10, 30, 00, 0) // January 1, 2021 10:30
+    const _timeOfFlightInSeconds = _timeOfFlight.getTime() / 1000;
+    await dataContract.FlightAdded(() => airline_flight_added_event_emitted = true);
+    await appContract.addFlight.sendTransaction(first_flight, secondAirline, _timeOfFlightInSeconds, { from: secondAirline, gas: default_gas });
+    const { name, airline, timeOfFlightInSeconds } = await dataContract.getFlight.call(second_airline_name, first_flight, { from: owner });
+    const expectedFlightState = [first_flight, secondAirline, _timeOfFlightInSeconds];
+    const actualFlightState = [name, airline, Number(`${timeOfFlightInSeconds}`)];
+    const error1 = "Error: Unexpected Flight State";
+    assert.deepEqual(expectedFlightState, actualFlightState, error1);
+    const error2 = "Error: Flight Added Event not Emitted";
+    assert.equal(airline_flight_added_event_emitted, true, error2);
 });

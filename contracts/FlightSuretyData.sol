@@ -144,8 +144,7 @@ contract FlightSuretyData {
     }
 
     modifier flightExists(string memory flight, string memory airline) {
-        bool exists = airlinesByName[airline]._flights[flight]._exists;
-        require(exists == true, "Error: Flight does not exist.");
+        require(airlinesByName[airline]._flights[flight]._exists == true, "Error: Flight does not exist.");
         _;
     }
 
@@ -202,6 +201,22 @@ contract FlightSuretyData {
 
     function getAirlineApprovalCount(address _address) external view isAuthorized(msg.sender) returns (uint numApprovals) {
         numApprovals = airlinesByAddress[_address]._numberOfApprovals;
+    }
+
+    function getFlight(string memory _airline, string memory _flight) external view isAuthorized(msg.sender)
+        returns (
+            string memory name,
+            uint8 status,
+            bool exists,
+            address airline,
+            uint256 timeOfFlightInSeconds
+        ) {
+            Flight memory flight = airlinesByName[_airline]._flights[_flight];
+            name = flight._name;
+            status = flight._status;
+            exists = flight._exists;
+            airline = flight._airline;
+            timeOfFlightInSeconds = flight._timeOfFlightInSeconds;
     }
 
     // Contract Owner Functions

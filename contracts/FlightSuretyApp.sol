@@ -59,8 +59,8 @@ contract FlightSuretyApp {
         flightSuretyData.fundAirline{value: msg.value}(msg.sender, _address);
     }
 
-    function addFlight(string memory _flight, address _address) public {
-        flightSuretyData.addFlight(_flight, msg.sender, _address);
+    function addFlight(string memory _flight, address _address, uint256 timeOfFlightInSeconds) public {
+        flightSuretyData.addFlight(_flight, msg.sender, _address, timeOfFlightInSeconds);
     }
 
     // Passenger Functions

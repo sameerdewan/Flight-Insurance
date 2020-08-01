@@ -191,6 +191,11 @@ contract FlightSuretyData {
         }
     }
 
+    function getAirlineByName(string memory _airline) public view
+        isOperational() isCalledFromApp() airlineExistsName(_airline) returns(address _address) {
+            _address = airlinesByName[_airline]._address;
+    }
+
     function getAirlineStatus(string memory _airline) external view isAuthorized(msg.sender) returns (AirlineStatus status) {
         status = airlinesByName[_airline]._status;
     }
@@ -279,11 +284,6 @@ contract FlightSuretyData {
             string memory _name = airlinesByAddress[_airline]._name;
             airlinesByName[_name]._flights[_flight] = flight;
             emit FlightAdded(_name, _flight);
-    }
-
-    function getAirlineByName(string memory _airline) public view
-        isOperational() isCalledFromApp() airlineExistsName(_airline) returns(address _address) {
-            _address = airlinesByName[_airline]._address;
     }
 
     // // Passenger Functions

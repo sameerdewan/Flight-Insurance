@@ -14,6 +14,7 @@ Web3.js v1.2.1
 
 @truffle/hdwallet-provider - ^1.0.40-4
 ## How to Build the Project
+<span style="color:blue"><b>Note:</b> The commands <i>must</i> be run in order. Each step sequentially needs the previous to have run to completion.</span>
 In a dedicated terminal <code>(terminal 1)</code>, run the following:
 
     npm run ganache

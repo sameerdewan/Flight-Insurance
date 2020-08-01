@@ -134,6 +134,15 @@ it('airline 4 should be able to vote for airline 5, requiring 4 votes to be appr
 it('airline 2 should be fundable and have appropriate funds post funding', async () => {
     const initialInsuredState = await dataContract.getInsuredStatus.call(second_airline_name, { from: owner });
     const initialInsuredState_BOOL = initialInsuredState.airlineIsFunded;
-    const initialInsuredState_FUNDS = `${initialInsuredState.funds}`;
-    console.log({initialInsuredState_BOOL,initialInsuredState_FUNDS})
+    const initialInsuredState_FUNDS = Number(`${initialInsuredState.funds}`);
+    const expectedPreInsuredState = [false, 0];
+    const returnedPreInsuredState = [initialInsuredState_BOOL, initialInsuredState_FUNDS];
+    assert.deepEqual(expectedPreInsuredState, returnedPreInsuredState);
+    await appContract.fundAirline.sendTransaction(secondAirline, { from: secondAirline, value: default_minimum_funding, gas: default_gas });
+    const postInsuredState = await dataContract.getInsuredStatus.call(second_airline_name, { from: owner });
+    const postInsuredState_BOOL = postInsuredState.airlineIsFunded;
+    const postInsuredState_FUNDS = Number(`${postInsuredState.funds}`);
+    const expectedPostInsuredState = [true, Number(default_minimum_funding)];
+    const returnedPostInsuranceState = [postInsuredState_BOOL, postInsuredState_FUNDS];
+    assert.deepEqual(expectedPostInsuredState, returnedPostInsuranceState);
 });

@@ -12,7 +12,7 @@ interface FlightSuretyDataInterface {
     // Airline Functions
     function applyAirline(address _address, string memory _name) external;
     function voteAirline(address _address, address _voter, string memory _name) external;
-    function fundAirline(address _funder, address _airline, uint _funds) external;
+    function fundAirline(address _funder, address _airline) external payable;
     function addFlight(string memory _flight, address _caller, address _airline) external;
     function getAirlineByName(string memory _airline) external view returns(address _address);
 

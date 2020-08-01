@@ -256,14 +256,14 @@ contract FlightSuretyData {
             }
     }
 
-    function fundAirline(address _funder, address _airline, uint _funds) public
-        isOperational() isCalledFromApp() isAuthorized(_funder) callerAndAirlineEqual(_funder, _airline) minimumFunding(_airline, _funds) {
-            airlinesByAddress[_airline]._funds = SafeMath.add(airlinesByAddress[_airline]._funds, _funds);
+    function fundAirline(address _funder, address _airline) public payable
+        isOperational() isCalledFromApp() isAuthorized(_funder) callerAndAirlineEqual(_funder, _airline) minimumFunding(_airline, msg.value) {
+            airlinesByAddress[_airline]._funds = SafeMath.add(airlinesByAddress[_airline]._funds, msg.value);
             string memory _name = airlinesByAddress[_airline]._name;
-            airlinesByName[_name]._funds = SafeMath.add(airlinesByName[_name]._funds, _funds);
+            airlinesByName[_name]._funds = SafeMath.add(airlinesByName[_name]._funds, msg.value);
             uint fundedAmount = airlinesByAddress[msg.sender]._funds;
             bool sufficientFunds = fundedAmount >= 10 ether;
-            emit AirlineFunded(msg.sender, _name, _funds, fundedAmount, sufficientFunds);
+            emit AirlineFunded(msg.sender, _name, msg.value, fundedAmount, sufficientFunds);
     }
 
     function addFlight(string memory _flight, address _caller, address _airline, uint256 _timeOfFlightInSeconds) public

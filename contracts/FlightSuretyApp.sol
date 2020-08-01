@@ -56,8 +56,7 @@ contract FlightSuretyApp {
     }
 
     function fundAirline(address _address) public payable {
-        flightSuretyContractAddress.transfer(msg.value);
-        flightSuretyData.fundAirline(msg.sender, _address, msg.value);
+        flightSuretyData.fundAirline{value: msg.value}(msg.sender, _address);
     }
 
     function addFlight(string memory _flight, address _address) public {

@@ -161,15 +161,6 @@ contract FlightSuretyData {
         _;
     }
 
-    modifier isValidClaim(address passenger, string memory airline, string memory flight) {
-        uint statusCode = airlinesByName[airline]._flights[flight]._status;
-        if (statusCode != STATUS_CODE_LATE_AIRLINE) {
-            emit InvalidClaim(passenger, airline, flight);
-        }
-        require(statusCode == STATUS_CODE_LATE_AIRLINE, "Error: Claim invalid - Airline (flight) was not late.");
-        _;
-    }
-
     // Constructor
     constructor(string memory initialAirline) public payable {
         owner = msg.sender;
@@ -338,7 +329,12 @@ contract FlightSuretyData {
     }
 
     function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) public
-        isOperational() isCalledFromApp() isInsured(_passenger, _airline, _flight) isValidClaim(_passenger, _airline, _flight) {
+        isOperational() isCalledFromApp() isInsured(_passenger, _airline, _flight) {
+             uint statusCode = airlinesByName[_airline]._flights[_flight]._status;
+            if (statusCode != STATUS_CODE_LATE_AIRLINE) {
+                emit InvalidClaim(_passenger, _airline, _flight);
+                return;
+            }
             policies[_passenger][_airline][_flight]._paidOut = true;
             uint payoutBy = SafeMath.div(3, 2);
             uint funds = SafeMath.mul(policies[_passenger][_airline][_flight]._funds, payoutBy);

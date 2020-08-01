@@ -256,14 +256,10 @@ it('passenger should be able to buy insurance for airline 2 initial flight', asy
 });
 
 it('passenger should not be able to claim insurance if flight status not delayed on airline behalf', async () => {
-    let caughtError = false;
-    let tx;
-    try {
-        tx = await appContract.claimInsurance.call(second_airline_name, default_initial_flight, { from: passenger });
-    } catch (error) {
-        caughtError = true;
-    }
-    const error3 = "Error: Claim went through, error was uncaught";
-    assert.equal(caughtError, true, error3);
-    console.log({tx})
+    const tx = await appContract.claimInsurance.sendTransaction(second_airline_name, default_initial_flight, 
+        { from: passenger }
+    );
+    const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
+    truffleAssert.eventEmitted(newTx, 'InvalidClaim');
+    truffleAssert.eventNotEmitted(newTx, 'InsuranceClaimed');
 });

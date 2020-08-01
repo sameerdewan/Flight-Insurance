@@ -64,6 +64,9 @@ it('airline 1 should be able to vote for airline 2, immediately being approved',
     const second_airline_name = "SECOND_TEST_AIRLINE";
     await appContract.voteAirline.sendTransaction(secondAirline, second_airline_name, { from: firstAirline });
     const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(secondAirline, { from: owner });
-    const error = "Error: Number of approvals should be 1";
-    assert.equal(1, `${numberOfApprovals}`, error);
+    const error1 = "Error: Number of approvals should be 1";
+    assert.equal(1, `${numberOfApprovals}`, error1);
+    const airlineStatus = `${await dataContract.getAirlineApprovalCount.call(secondAirline, { from: owner })}`;
+    const error2 = "Error: Airline status is not: APPROVED";
+    assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error2);
 });

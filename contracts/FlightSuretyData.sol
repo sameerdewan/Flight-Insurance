@@ -121,12 +121,6 @@ contract FlightSuretyData {
         _;
     }
 
-    modifier airlineIsPetitioned(address airlineAddress, string memory airlineName) {
-        bool isPetitioned = airlinesByAddress[airlineAddress]._status == AirlineStatus.APPLIED;
-        require(isPetitioned == true, "Error: Airline is not applied.");
-        _;
-    }
-
     modifier airlineIsNotApproved(address airlineAddress, string memory airlineName) {
         bool isApproved1 = airlinesByAddress[airlineAddress]._status != AirlineStatus.APPLIED;
         bool isApproved2 = airlinesByName[airlineName]._status != AirlineStatus.APPLIED;
@@ -244,7 +238,7 @@ contract FlightSuretyData {
     }
 
     function voteAirline(address _address, address _voter, string memory _name) public
-        isOperational() isCalledFromApp() isAuthorized(_voter) airlineIsPetitioned(_address, _name) airlineDidNotVote(_address, _voter) {
+        isOperational() isCalledFromApp() isAuthorized(_voter) airlineExistsName(_name) airlineDidNotVote(_address, _voter) {
             uint numberOfApprovals1 = airlinesByAddress[_address]._numberOfApprovals;
             uint numberOfApprovals2 = airlinesByName[_name]._numberOfApprovals;
             airlinesByAddress[_address]._numberOfApprovals = SafeMath.add(numberOfApprovals1, 1);

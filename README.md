@@ -30,7 +30,7 @@ In another dedicated terminal <code>(terminal 3)</code>, run the following:
 
     npm run dapp
 
-In total, you will have <b>3</b> running open terminals. One will be dedicated to <i>ganache-cli</i>, the second to running the <i>server</i>, and the third for running the <i>client react app</i>.
+In total, you will have <b>3</b> running open terminals. One will be dedicated to <b>ganache-cli</b>, the second to running the <b>server</b>, and the third for running the <b>client react app</b>.
 
 ## How to Run Smart Contract Tests
 In a dedicated terminal <code>(terminal 1)</code>, run the following:

@@ -1,4 +1,5 @@
 const express = require('express');
+const Web3 = require('web3');
 const app = express();
 
 let oracle_history = [];

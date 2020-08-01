@@ -9,7 +9,7 @@ contract FlightSuretyData {
     // Global Variables
     address private owner;
     address private app;
-    bool private operational;
+    bool private operational = true;
     uint256 private numberOfAirlines;
     // CALLER => PERMISSION STATUS
     mapping(address => bool) private authorizedCallers;
@@ -186,7 +186,11 @@ contract FlightSuretyData {
     }
 
     // Utilities
-    function getInsuredStatus(string memory _airline) public returns (bool airlineIsFunded, uint funds) {
+    function getWiredApp() external view isAuthorized(msg.sender) returns (address _app) {
+        _app = app;
+    }
+
+    function getInsuredStatus(string memory _airline) external isAuthorized(msg.sender) returns (bool airlineIsFunded, uint funds) {
         airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
         funds = airlinesByName[_airline]._funds;
         if (airlineIsFunded == false) {
@@ -195,6 +199,10 @@ contract FlightSuretyData {
             airlinesByAddress[_address]._status = AirlineStatus.INSUFFICIENT_FUNDS;
             emit AirlineInsufficientFunds(_address, _airline, funds);
         }
+    }
+
+    function getAirlineStatus(string memory _airline) external view isAuthorized(msg.sender) returns (AirlineStatus status) {
+        status = airlinesByName[_airline]._status;
     }
 
     // Contract Owner Functions
@@ -208,7 +216,7 @@ contract FlightSuretyData {
             operational = true;
     }
 
-    function wireApp(address _app) public
+    function wireApp(address _app) external
         isOwner(msg.sender) {
             app = _app;
     }
@@ -244,8 +252,8 @@ contract FlightSuretyData {
             evaluateAirlineStatus(isApproved, _address, _name);
     }
 
-    function evaluateAirlineStatus(bool isApproved, address _address, string memory _name) public
-        isOperational() isCalledFromApp() isAuthorized(msg.sender) {
+    function evaluateAirlineStatus(bool isApproved, address _address, string memory _name) internal
+        isOperational() isAuthorized(msg.sender) {
             if (numberOfAirlines < 5 || isApproved) {
                 airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
                 airlinesByName[_name]._status = AirlineStatus.APPROVED;

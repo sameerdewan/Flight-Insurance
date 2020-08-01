@@ -38,10 +38,19 @@ contract('Flight Surety Tests', async (acc) => {
 before(async () => {
     dataContract = await FlightSuretyData.new(initial_airline_name, { from: owner, value: default_minimum_funding, gas: default_gas });
     appContract = await FlightSuretyApp.new(dataContract.address, { from: owner, gas: default_gas });
+    await dataContract.wireApp.call(appContract.address, { from: owner });
+    console.log(await dataContract.getWiredApp.call({ from: owner }));
+    console.log({address: appContract.address});
 });
 
 it('initial airline should have a balance of 10 ETH on deployment', async () => {
-   const { funds } = await dataContract.getInsuredStatus.call(initial_airline_name);
+   const { funds } = await dataContract.getInsuredStatus.call(initial_airline_name, { from: owner });
    const error = "Error: Initial airline does not have a balance of 10 ETH";
    assert.equal(web3.utils.fromWei(funds), web3.utils.fromWei(default_minimum_funding), error);
 });
+
+// it('airline should be able to apply', async () => {
+//     const second_airline_name = "SECOND_TEST_AIRLINE";
+//     await appContract.applyAirline.call(second_airline_name, { from: secondAirline });
+//     console.log(await dataContract.getAirlineStatus.call(second_airline_name, { from: owner }));
+// });

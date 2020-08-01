@@ -241,3 +241,18 @@ it('passenger should be able to buy insurance for airline 2 initial flight', asy
     const error2 = "Error: Insurance Sold Event not Emitted";
     assert.equal(insurance_sold_event_emitted, true, error2);
 });
+
+it('passenger should not be able to claim insurance if flight status not delayed on airline behalf', async () => {
+    let insurance_invalid_claim_event_emitted = false;
+    let caughtError = false;
+    await dataContract.InvalidClaim(() => insurance_invalid_claim_event_emitted = true);
+    try {
+        await appContract.claimInsurance.call(second_airline_name, default_initial_flight, { from: passenger });
+    } catch (error) {
+        caughtError = true;
+    }
+    const error1 = "Error: Invalid Claim Event was not Emitted";
+    assert.equal(insurance_invalid_claim_event_emitted, true, error1);
+    const error2 = "Error: Claim went through, error was uncaught";
+    assert.equal(caughtError, true, error2);
+});

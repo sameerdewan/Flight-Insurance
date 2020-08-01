@@ -73,6 +73,7 @@ contract FlightSuretyData {
     event InsuranceSold(address passengerAddress, string airlineName, string flightName, uint insuredValue);
     event InsuranceChangeSent(address passengerAddress, uint change);
     event FlightDelayed(string airlineName, string flightName, uint8 statusCode);
+    event InvalidClaim(address passenger, string airline, string flight);
     event InsuranceClaimed(string airlineName, string flightName, address passenger, uint funds);
 
     // Modifiers
@@ -330,6 +331,9 @@ contract FlightSuretyData {
     function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) public
         isOperational() isCalledFromApp() isInsured(_passenger, _airline, _flight) {
             uint statusCode = airlinesByName[_airline]._flights[_flight]._status;
+            if (statusCode != STATUS_CODE_UNKNOWN) {
+                emit InvalidClaim(_passenger, _airline, _flight);
+            }
             require(statusCode == STATUS_CODE_LATE_AIRLINE, "Error: Claim invalid - Airline (flight) was not late.");
             policies[_passenger][_airline][_flight]._paidOut = true;
             uint payoutBy = SafeMath.div(3, 2);

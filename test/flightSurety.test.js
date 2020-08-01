@@ -62,5 +62,8 @@ it('airline 2 should be able to apply', async () => {
 
 it('airline 1 should be able to vote for airline 2, immediately being approved', async () => {
     const second_airline_name = "SECOND_TEST_AIRLINE";
-    await appContract.voteAirline.call(secondAirline, second_airline_name, { from: firstAirline });
+    await appContract.voteAirline.sendTransaction(secondAirline, second_airline_name, { from: firstAirline });
+    const numberOfApprovals = await dataContract.getAirlineApprovalCount.call(secondAirline, { from: owner });
+    const error = "Error: Number of approvals should be 1";
+    assert.equal(1, `${numberOfApprovals}`, error);
 });

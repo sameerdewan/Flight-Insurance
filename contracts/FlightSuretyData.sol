@@ -201,6 +201,10 @@ contract FlightSuretyData {
         status = airlinesByName[_airline]._status;
     }
 
+    function getAirlineApprovalCount(address _address) external view isAuthorized(msg.sender) returns (uint numApprovals) {
+        numApprovals = airlinesByAddress[_address]._numberOfApprovals;
+    }
+
     // Contract Owner Functions
     function disableContract(address _address) public
         isOwner(_address) {

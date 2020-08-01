@@ -47,6 +47,8 @@ In another terminal <code>(terminal 2)</code>, run the following:
 
     npm run test
 
+In total, you will have <b>2</b> running open terminals. One will be dedicated to <b>ganache-cli</b>, the second to running the <b>solidity tests</b>.
+
 ## Troubleshooting
 If you are encountering trouble, check to make sure your build is removed, and the config files have been removed before re-trying the build steps. 
 

@@ -28,7 +28,7 @@ In another dedicated terminal <code>(terminal 2)</code>, run the following:
 
     npm run migrate-dev
 
-Following this command in the terminal <code>(terminal 2)</code>, run the next command:
+Following the migration to truffle, run this command in the terminal <code>(terminal 2)</code>, run the next command:
 
     npm run server
 

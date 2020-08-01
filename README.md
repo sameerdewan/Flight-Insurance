@@ -33,7 +33,11 @@ In another dedicated terminal (terminal 3), run the following:
 In total, you will have 3 running open terminals. One will be dedicated to ganache-cli, the second to running the server, and the third for running the client react app.
 
 ## How to Test the Project
-In a terminal, run the following:
+In a dedicated terminal (terminal 1), run the following:
+
+    npm run ganache
+
+In another terminal, run the following:
 
     npm run test
 

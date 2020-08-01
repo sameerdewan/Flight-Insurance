@@ -52,10 +52,14 @@ it('initial airline should have a balance of 10 ETH on deployment', async () => 
    assert.equal(web3.utils.fromWei(funds), web3.utils.fromWei(default_minimum_funding), error);
 });
 
-it('airline should be able to apply', async () => {
+it('airline 2 should be able to apply', async () => {
     const second_airline_name = "SECOND_TEST_AIRLINE";
     await appContract.applyAirline.call(second_airline_name, { from: secondAirline });
     const airlineStatus = `${await dataContract.getAirlineStatus.call(second_airline_name, { from: owner })}`;
     const error = "Error: Airline status is not: APPLIED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error);
+});
+
+it('airline 1 should be able to vote for airline 2, immediately being approved', async () => {
+    await appContract.voteAirline.call(secondAirline, second_airline_name, { from: firstAirline });
 });

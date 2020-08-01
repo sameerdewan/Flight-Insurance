@@ -33,7 +33,6 @@ module.exports = function(deployer) {
                     dataContractinstance.methods.wireApp(appAddress).call()
                         .then(async () => {
                             console.log('<--WIRED APP-->');
-                            console.log(await dataContractinstance.methods.getWiredApp.call())
                         }).catch(error => {
                             console.log({error});
                             console.log('!--FAILED TO WIRE APP--!');

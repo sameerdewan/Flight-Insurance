@@ -126,4 +126,10 @@ it('airline 4 should be able to vote for airline 5, requiring 4 votes to be appr
     const airlineStatus = `${await dataContract.getAirlineStatus.call(fifth_airline_name, { from: owner })}`;
     const error2 = "Error: Airline status is not: APPLIED";
     assert.equal(airlineStatus, AIRLINE_STATUS_ENUMS.APPLIED, error2);
+    await appContract.voteAirline.sendTransaction(fifthAirline, fifth_airline_name, { from: firstAirline });
+    await appContract.voteAirline.sendTransaction(fifthAirline, fifth_airline_name, { from: secondAirline });
+    await appContract.voteAirline.sendTransaction(fifthAirline, fifth_airline_name, { from: thirdAirline });
+    const after3MoreVotesAirlineStatus = `${await dataContract.getAirlineStatus.call(fifth_airline_name, { from: owner })}`;
+    const error3 = "Error: Airline status is not: APPROVED";
+    assert.equal(after3MoreVotesAirlineStatus, AIRLINE_STATUS_ENUMS.APPROVED, error3);
 });

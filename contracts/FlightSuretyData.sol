@@ -344,7 +344,7 @@ contract FlightSuretyData {
 
     // Oracle Functions
     function setFlightDelayed(string memory _airline, string memory _flight, uint8 _statusCode) external
-       isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) {
+       isOperational() isAuthorized(msg.sender) airlineExistsName(_airline) flightExists(_flight, _airline) {
            address _address = airlinesByName[_airline]._address;
            airlinesByName[_airline]._flights[_flight]._status = _statusCode;
            airlinesByAddress[_address]._flights[_flight]._status = _statusCode;

@@ -260,6 +260,30 @@ it('passenger should not be able to claim insurance if flight status not delayed
         { from: passenger }
     );
     const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);
+    // TEST EVENT INVALID CLAIM
     truffleAssert.eventEmitted(newTx, 'InvalidClaim');
+    // TEST EVENT INSURANCE CLAIMED
     truffleAssert.eventNotEmitted(newTx, 'InsuranceClaimed');
+});
+
+it('passenger should be able to claim insurance on flight status delayed on airline behalf', async () => {
+    const airline_fault_status_code = 20;
+    const tx1 = await dataContract.setFlightDelayed.sendTransaction(second_airline_name, default_initial_flight, airline_fault_status_code,
+        { from: owner }
+    );
+    // TEST EVENT FLIGHT DELAYED
+    truffleAssert.eventEmitted(tx1, 'FlightDelayed');
+    // TEST FLIGHT STATE
+    const { status } = await dataContract.getFlight.call(second_airline_name, default_initial_flight, { from: owner });
+    const error1 = "Error: Incorrect flight status code"
+    assert.equal(status, airline_fault_status_code, error1);
+    // TEST CLAIM INSURANCE
+    const tx2 = await appContract.claimInsurance.sendTransaction(second_airline_name, default_initial_flight, 
+        { from: passenger }
+    );
+    const newTx2 = await truffleAssert.createTransactionResult(dataContract, tx2.tx);
+    // TEST EVENT INVALID CLAIM
+    truffleAssert.eventNotEmitted(newTx2, 'InvalidClaim');
+    // TEST EVENT INSURANCE CLAIMED
+    truffleAssert.eventEmitted(newTx2, 'InsuranceClaimed');
 });

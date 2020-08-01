@@ -247,7 +247,7 @@ contract FlightSuretyData {
             emit AirlineVotedFor(_voter, _address, _name);
             uint numberOfApprovals2 = airlinesByAddress[_address]._numberOfApprovals;
             bool isApproved = numberOfApprovals2 > SafeMath.div(numberOfAirlines, 2);
-            if (numberOfAirlines < 5 || isApproved) {
+            if (numberOfAirlines < 4 || isApproved) {
                 airlinesByAddress[_address]._status = AirlineStatus.APPROVED;
                 airlinesByName[_name]._status = AirlineStatus.APPROVED;
                 numberOfAirlines = numberOfAirlines + 1;

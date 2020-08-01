@@ -27,6 +27,9 @@ module.exports = function(deployer) {
                     await new Promise(resolve => resolve(
                         fs.writeFileSync('../client/src/deployments.json', JSON.stringify(config, null, '\t'), 'utf-8'))
                     );
+                    await new Promise(resolve => resolve(
+                        fs.writeFileSync('../server/deployments.json', JSON.stringify(config, null, '\t'), 'utf-8'))
+                    );
                     const provider = new HDWalletProvider(mnemonic, infuraKey);
                     const web3 = new Web3(provider);
                     const { abi, address } = config.localhost.FlightSuretyData;

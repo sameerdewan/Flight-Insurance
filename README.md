@@ -14,30 +14,30 @@ Web3.js v1.2.1
 
 @truffle/hdwallet-provider - ^1.0.40-4
 ## How to Build the Project
-In a dedicated terminal <code>(terminal 1)</code>, run the following:
+In a dedicated terminal <pre>(terminal 1)</pre>, run the following:
 
     npm run ganache
 
-In another dedicated terminal <code>(terminal 2)</code>, run the following:
+In another dedicated terminal <pre>(terminal 2)</pre>, run the following:
 
     npm run migrate-dev
 
-Following this command in the terminal <code>(terminal 3)</code>, run the next command:
+Following this command in the terminal <pre>(terminal 3)</pre>, run the next command:
 
     npm run server
 
-In another dedicated terminal <code>(terminal 3)</code>, run the following:
+In another dedicated terminal <pre>(terminal 3)</pre>, run the following:
 
     npm run dapp
 
 In total, you will have <b>3</b> running open terminals. One will be dedicated to <i>ganache-cli</i>, the second to running the <i>server</i>, and the third for running the <i>client react app</i>.
 
-## How to Test the Project
-In a dedicated terminal <code>(terminal 1)</code>, run the following:
+## How to Run Smart Contract Tests
+In a dedicated terminal <pre>(terminal 1)</pre>, run the following:
 
     npm run ganache
 
-In another terminal <code>(terminal 2)</code>, run the following:
+In another terminal <pre>(terminal 2)</pre>, run the following:
 
     npm run test
 

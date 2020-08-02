@@ -6,7 +6,7 @@
     "test": "test"
   },
   "scripts": {
-    "clean": "rm -rf build && rm -rf ./server/deployments.json && rm -rf ./client/src/deployments.json",
+    "clean": "rm -rf node_modules && rm -rf build && rm -rf ./server/deployments.json && rm -rf ./client/src/deployments.json",
     "dapp": "cd client && npm start",
     "server": "node server/index.js",
     "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster' --allowUnlimitedContractSize  -l 10000000 -e 100000",
@@ -18,13 +18,13 @@
   "author": "Sameer Dewan",
   "license": "ISC",
   "devDependencies": {
-    "@openzeppelin/contracts": "^3.1.0",
-    "@truffle/hdwallet-provider": "^1.0.40-4",
-    "big-number": "^2.0.0",
-    "truffle-assertions": "^0.9.2",
-    "web3": "^1.2.11"
+    "@openzeppelin/contracts": "3.1.0",
+    "@truffle/hdwallet-provider": "1.0.40-4",
+    "big-number": "2.0.0",
+    "truffle-assertions": "0.9.2",
+    "web3": "1.2.11"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "4.17.1"
   }
 }

@@ -162,7 +162,7 @@ contract FlightSuretyData {
     }
 
     // Constructor
-    constructor(string memory initialAirline) public payable {
+    constructor(string memory initialAirline, string memory initialFlight, uint256 flightTime) public payable {
         owner = msg.sender;
         Airline memory airline = Airline({
             _name: initialAirline,
@@ -177,6 +177,16 @@ contract FlightSuretyData {
         numberOfAirlines = numberOfAirlines + 1;
         authorizedCallers[msg.sender] = true;
         emit AirlineApproved(msg.sender, initialAirline);
+        Flight memory flight = Flight({
+            _name: initialFlight,
+            _status: STATUS_CODE_UNKNOWN,
+            _airline: msg.sender,
+            _exists: true,
+            _timeOfFlightInSeconds: flightTime
+        });
+        airlinesByName[initialAirline]._flights[initialFlight] = flight;
+        airlinesByAddress[msg.sender]._flights[initialFlight] = flight;
+        emit FlightAdded(initialFlight, initialAirline);
     }
 
     // Utilities

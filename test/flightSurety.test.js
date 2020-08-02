@@ -5,6 +5,7 @@ const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 describe('Flight Surety Tests', () => {
     const default_gas = 9500000;
     const initial_airline_name = "INITIAL_TEST_AIRLINE";
+    const initial_flight_name = "INITIAL_TEST_FLIGHT";
     const default_minimum_funding = web3.utils.toWei("10");
 
     const second_airline_name = "SECOND_TEST_AIRLINE";
@@ -13,6 +14,9 @@ describe('Flight Surety Tests', () => {
     const fifth_airline_name = "FIFTH_TEST_AIRLINE";
 
     const default_initial_flight = "FIRST_TEST_FLIGHT";
+
+    const _timeOfFlight = new Date(2021, 00, 01, 10, 30, 00, 0) // January 1, 2021 10:30
+    const _timeOfFlightInSeconds = _timeOfFlight.getTime() / 1000;
 
     let accounts;
 
@@ -50,7 +54,9 @@ describe('Flight Surety Tests', () => {
     });
     
     before(async () => {
-        dataContract = await FlightSuretyData.new(initial_airline_name, { from: owner, value: default_minimum_funding, gas: default_gas });
+        dataContract = await FlightSuretyData.new(initial_airline_name, initial_flight_name, _timeOfFlightInSeconds,
+             { from: owner, value: default_minimum_funding, gas: default_gas }
+        );
         appContract = await FlightSuretyApp.new(dataContract.address, { from: owner, gas: default_gas });
         await dataContract.wireApp.sendTransaction(appContract.address, { from: owner });
     });
@@ -194,8 +200,6 @@ describe('Flight Surety Tests', () => {
     });
     
     it('airline 2 should be able to add a flight', async () => {
-        const _timeOfFlight = new Date(2021, 00, 01, 10, 30, 00, 0) // January 1, 2021 10:30
-        const _timeOfFlightInSeconds = _timeOfFlight.getTime() / 1000;
         // TEST EVENT EMITTED FLIGHT ADDED
         const tx = await appContract.addFlight.sendTransaction(default_initial_flight, secondAirline, _timeOfFlightInSeconds, 
             { from: secondAirline, gas: default_gas }

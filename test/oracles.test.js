@@ -10,6 +10,9 @@ describe('Oracle Tests', () => {
     const default_initial_flight = "FIRST_TEST_FLIGHT";
     const default_minimum_oracles = 30;
 
+    const _timeOfFlight = new Date(2021, 00, 01, 10, 30, 00, 0) // January 1, 2021 10:30
+    const _timeOfFlightInSeconds = _timeOfFlight.getTime() / 1000;
+
     let accounts;
 
     let owner;
@@ -22,7 +25,9 @@ describe('Oracle Tests', () => {
     });
     
     before(async () => {
-        dataContract = await FlightSuretyData.new(default_initial_airline_name, { from: owner, value: default_minimum_funding, gas: default_gas });
+        dataContract = await FlightSuretyData.new(default_initial_airline_name, default_initial_flight, _timeOfFlightInSeconds,
+            { from: owner, value: default_minimum_funding, gas: default_gas }
+        );
         appContract = await FlightSuretyApp.new(dataContract.address, { from: owner, gas: default_gas });
         await dataContract.wireApp.sendTransaction(appContract.address, { from: owner });
     });

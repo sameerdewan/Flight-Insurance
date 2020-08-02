@@ -14,3 +14,12 @@ let dataContract;
 let appContract;
 
 let firstAirline;
+
+let passenger;
+
+contract('Oracle Tests', async (acc) => {
+    accounts = acc;
+    owner = accounts[0];
+    firstAirline = accounts[0];
+    passenger = accounts[1];
+});

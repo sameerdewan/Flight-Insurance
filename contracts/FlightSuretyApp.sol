@@ -102,8 +102,11 @@ contract FlightSuretyApp {
     }
 
     // Oracle Events
+    event OracleRegistered(address oracleAddress);
+    event OracleInformationRequested(address caller, address oracle);
     event OracleRequest(uint8 index, string airline, string flight, uint256 timestamp);
     event OracleResponse(string airline, string flight, uint256 timestamp, uint8 statusCode);
+    event OracleSetFlightDelayed(address oracleAddress, string airline, string flight);
 
     // Oracle Modifiers
     modifier minimumRegistrationFee(uint fee) {
@@ -122,9 +125,11 @@ contract FlightSuretyApp {
         minimumRegistrationFee(msg.value) {
             uint8[3] memory indexes = generateIndexes(msg.sender);
             oracles[msg.sender] = indexes;
+            emit OracleRegistered(msg.sender);
     }
 
-    function getOracle(address account) external view isOwner() returns(uint8[3] memory) {
+    function getOracle(address account) external isOwner() returns(uint8[3] memory) {
+        emit OracleInformationRequested(msg.sender, account);
         return oracles[account];
     }
 
@@ -148,6 +153,7 @@ contract FlightSuretyApp {
             emit OracleResponse(airline, flight, timestamp, statusCode);
             if (oracleResponses[responseKey].responses[statusCode].length >= MIN_RESPONSES) {
                 flightSuretyData.setFlightDelayed(airline, flight, statusCode);
+                emit OracleSetFlightDelayed(msg.sender, airline, flight);
             }
     }
 

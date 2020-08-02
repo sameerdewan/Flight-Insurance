@@ -32,4 +32,7 @@ app.get('/api', (_, res) => {
 app.listen(5000, () => {
     console.log('Oracle Server App running on port 5000...');
     console.log('GET /api for Oracle Log History');
+    console.log('-----------------------------------------');
+    console.log('v               LOGS                    v');
+    console.log('-----------------------------------------');
 });

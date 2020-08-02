@@ -27,6 +27,13 @@ describe('Oracle Tests', () => {
         await dataContract.wireApp.sendTransaction(appContract.address, { from: owner });
     });
 
+    it('oracle should require registration fee', async () => {
+        const testOracle = accounts[40];
+        await truffleAssert.fails(
+            appContract.registerOracle.sendTransaction({ from: testOracle, value: web3.utils.toWei(".5") })
+        );
+    });
+
     it('oracles can register', async () => {
         let oracleCount = 0;
         const registrations = [];

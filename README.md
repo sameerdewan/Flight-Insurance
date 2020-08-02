@@ -30,7 +30,7 @@ In another dedicated terminal <code>(terminal 2)</code>, run the following:
 
     npm run migrate-dev
 
-Following the migration to truffle, run this command in the terminal <code>(terminal 2)</code>, run the next command:
+Following the migration to ganache, run this command in the terminal <code>(terminal 2)</code>, run the next command:
 
     npm run server
 
@@ -38,7 +38,7 @@ In another dedicated terminal <code>(terminal 3)</code>, run the following:
 
     npm run dapp
 
-In total, you will have <b>3</b> running open terminals. One will be dedicated to <b>ganache-cli</b>, the second to running the <b>server</b>, and the third for running the <b>client react app</b>.
+In total, you will have <b>3</b> running open terminals. One will be dedicated to <b>ganache-cli</b>, the second to running the <b>oracle server</b>, and the third for running the <b>client react app</b>.
 
 ## How to Run Smart Contract Tests
 In a dedicated terminal <code>(terminal 1)</code>, run the following:

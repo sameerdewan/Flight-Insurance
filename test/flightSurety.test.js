@@ -209,6 +209,16 @@ it('airline 2 should be able to add a flight', async () => {
     assert.deepEqual(expectedFlightState, actualFlightState, error1);
 });
 
+it('passenger should not be able to buy insurance for airline 2 initial flight pre-funding', async () => {
+    const value = web3.utils.toWei("5");
+    // TEST EVENT INSURANCE FAILED TO BE SOLD
+    await truffleAssert.fails(
+        appContract.buyInsurance.sendTransaction(second_airline_name, default_initial_flight, 
+            { from: passenger, value, gas: default_gas  }
+        )
+    );
+});
+
 it('airline 2 should be fundable and have appropriate funds post funding', async () => {
     // TEST AIRLINE INSURED STATUS
     const initialInsuredState = await dataContract.getInsuredStatus.call(second_airline_name, { from: owner });
@@ -234,7 +244,7 @@ it('airline 2 should be fundable and have appropriate funds post funding', async
     assert.deepEqual(expectedPostInsuredState, returnedPostInsuranceState, error2);
 });
 
-it('passenger should be able to buy insurance for airline 2 initial flight', async () => {
+it('passenger should be able to buy insurance for airline 2 initial flight post-funding', async () => {
     const value = web3.utils.toWei("5");
     const maxValue = web3.utils.toWei("1");
     // TEST EVENT INSURANCE SOLD

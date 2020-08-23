@@ -5,10 +5,18 @@ const { FlightSuretyApp, url } = require('./deployments.json').localhost;
 const refinedURL = url.replace('http', 'ws');
 
 /* GLOBAL VARS */
-const oracle_history = [];
+let oracle_history = [];
 const oracles = [];
 const MINIMUM_ORACLES = 21;
 const GAS = 9500000;
+
+/* UTILITIES */
+function pushEvent(event) {
+    const unformattedTime = new Date();
+    const time = unformattedTime.toLocaleString();
+    const addedEvent = { time, event };
+    oracle_history = [...oracle_history, addedEvent];
+}
 
 /* FLIGHT STATUS CODES */
 const FLIGHT = {
@@ -20,12 +28,54 @@ const FLIGHT = {
     "STATUS_CODE_LATE_OTHER": 50
 };
 
+const STATUSES = [
+    "STATUS_CODE_UNKNOWN", 
+    "STATUS_CODE_ON_TIME", 
+    "STATUS_CODE_LATE_AIRLINE",
+    "STATUS_CODE_LATE_WEATHER",
+    "STATUS_CODE_LATE_TECHNICAL",
+    "STATUS_CODE_LATE_OTHER"
+];
+const CODES = [0, 10, 20, 30, 40, 50];
+
+async function retrieveFlightStatus() {
+    const statusCode = Math.floor(Math.random() * 6) * 10;
+    const statusLabel = STATUSES.indexOf(statusCode);
+    return { statusCode, statusLabel };
+}
+
 /* WEB3 APP */
 const provider = new Web3.providers.WebsocketProvider(refinedURL);
 const web3 = new Web3(provider);
 const contractOwner = web3.eth.accounts[0];
 web3.eth.defaultAccount = contractOwner;
 const flightSurityApp = new web3.eth.Contract(FlightSuretyApp.abi, FlightSuretyApp.address);
+
+async function registerOracle(accounts) {
+    const oracleFee = await flightSurityApp.methods.ORACLE_REGISTRATION_FEE().call();
+    for (let i = 0; i < accounts.length; i++) {
+        const account = accounts[i];
+        const payload = {
+            from: account,
+            value: oracleFee,
+            gas: GAS
+        };
+        try {
+            await flightSurityApp.methods.registerOracle().send(payload);
+            const event = `SUCCESS: Registered oracle for account: ${account}.`
+            console.log(event);
+            pushEvent(event);
+        } catch (error) {
+            const event = `ERROR: ${error}`;
+            console.log(event);
+            pushEvent(event);
+        }
+    }
+}
+
+async function start() {
+    const accounts = await web3.eth.getAccounts();
+}
 
 /* SERVER APP */
 app.get('/api', (_, res) => {

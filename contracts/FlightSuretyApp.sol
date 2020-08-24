@@ -59,7 +59,7 @@ contract FlightSuretyApp {
     }
 
     function fundAirline(address _address) public payable {
-        flightSuretyData.fundAirline.value(msg.value)(msg.sender, _address);
+        flightSuretyData.fundAirline{value: msg.value}(msg.sender, _address);
     }
 
     function addFlight(string memory _flight, address _address, uint256 timeOfFlightInSeconds) public {
@@ -76,7 +76,7 @@ contract FlightSuretyApp {
             fundsToReturn = msg.value - 1 ether;
             funds = 1 ether;
         }
-        flightSuretyData.buyInsurance.value(funds)(msg.sender, _airline, _flight);
+        flightSuretyData.buyInsurance{value: funds}(msg.sender, _airline, _flight);
         if (fundsToReturn > 0 ether) {
             msg.sender.transfer(fundsToReturn);
             emit ChangeSent(msg.sender, fundsToReturn, _flight, _airline);

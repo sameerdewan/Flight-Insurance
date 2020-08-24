@@ -1,7 +1,9 @@
 const express = require('express');
 const Web3 = require('web3');
 const app = express();
-const { FlightSuretyApp, url } = require('./deployments.json').localhost;
+const url = 'http://localhost:8545';
+const FlightSuretyApp  = require('../build/contracts/FlightSuretyApp.json');
+const { address } = require('./deployments.json').localhost;
 const refinedURL = url.replace('http', 'ws');
 
 /* GLOBAL VARS */

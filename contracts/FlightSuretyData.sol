@@ -190,7 +190,7 @@ contract FlightSuretyData {
     }
 
     // Utilities
-    function getInsuredStatus(string memory _airline) external isAuthorized(msg.sender) returns (bool airlineIsFunded, uint funds) {
+    function getInsuredStatus(string calldata _airline) external isAuthorized(msg.sender) returns (bool airlineIsFunded, uint funds) {
         airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
         funds = airlinesByName[_airline]._funds;
         if (airlineIsFunded == false) {
@@ -201,7 +201,7 @@ contract FlightSuretyData {
         }
     }
 
-    function getInsuredPassenger(address _passenger, string memory _airline, string memory _flight) external view isAuthorized(msg.sender)
+    function getInsuredPassenger(address _passenger, string calldata _airline, string calldata _flight) external view isAuthorized(msg.sender)
         returns (
             bool insured,
             bool paidOut,
@@ -218,7 +218,7 @@ contract FlightSuretyData {
             _address = airlinesByName[_airline]._address;
     }
 
-    function getAirlineStatus(string memory _airline) external view isAuthorized(msg.sender) returns (AirlineStatus status) {
+    function getAirlineStatus(string calldata _airline) external view isAuthorized(msg.sender) returns (AirlineStatus status) {
         status = airlinesByName[_airline]._status;
     }
 
@@ -226,7 +226,7 @@ contract FlightSuretyData {
         numApprovals = airlinesByAddress[_address]._numberOfApprovals;
     }
 
-    function getFlight(string memory _airline, string memory _flight) external view isAuthorized(msg.sender)
+    function getFlight(string calldata _airline, string calldata _flight) external view isAuthorized(msg.sender)
         returns (
             string memory name,
             uint8 status,
@@ -353,7 +353,7 @@ contract FlightSuretyData {
     }
 
     // Oracle Functions
-    function setFlightDelayed(string memory _airline, string memory _flight, uint8 _statusCode) external
+    function setFlightDelayed(string calldata _airline, string calldata _flight, uint8 _statusCode) external
        isOperational() isAuthorized(msg.sender) airlineExistsName(_airline) flightExists(_flight, _airline) {
            address _address = airlinesByName[_airline]._address;
            airlinesByName[_airline]._flights[_flight]._status = _statusCode;

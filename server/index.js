@@ -58,7 +58,7 @@ const provider = new Web3.providers.WebsocketProvider(refinedURL);
 const web3 = new Web3(provider);
 const contractOwner = web3.eth.accounts[0];
 web3.eth.defaultAccount = contractOwner;
-const flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, FlightSuretyApp.address);
+const flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, address);
 
 async function registerOracles(accounts) {
     const event = 'STARTING TO REGISTER ORACLES';

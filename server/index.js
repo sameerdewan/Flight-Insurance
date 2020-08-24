@@ -47,7 +47,7 @@ async function retrieveFlightStatus() {
     const event = 'RETRIEVING FLIGHT STATUS';
     pushEvent(event);
     const statusCode = Math.floor(Math.random() * 6) * 10;
-    const statusLabel = STATUSES.indexOf(statusCode);
+    const statusLabel = STATUSES[CODES.indexOf(statusCode)];
     return { statusCode, statusLabel };
 }
 
@@ -56,7 +56,7 @@ const provider = new Web3.providers.WebsocketProvider(refinedURL);
 const web3 = new Web3(provider);
 const contractOwner = web3.eth.accounts[0];
 web3.eth.defaultAccount = contractOwner;
-const flightSurityApp = new web3.eth.Contract(FlightSuretyApp.abi, FlightSuretyApp.address);
+const flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, FlightSuretyApp.address);
 
 async function registerOracles(accounts) {
     const event = 'STARTING TO REGISTER ORACLES';
@@ -70,7 +70,7 @@ async function registerOracles(accounts) {
             value: '1000000000000000000',
             gas: GAS
         };
-        console.log({ flightSurityApp })
+        console.log(flightSuretyApp)
         // try {
         //     await flightSurityApp.methods.registerOracle.send(payload);
         //     oracles = [...oracles, account];

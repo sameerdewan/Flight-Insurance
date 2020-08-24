@@ -7,19 +7,19 @@ interface FlightSuretyDataInterface {
     function enableContract(address _address) external;
 
     // Utilities
-    function getInsuredStatus(string memory _airline) external returns (bool airlineIsFunded);
+    function getInsuredStatus(string calldata _airline) external returns (bool airlineIsFunded);
 
     // Airline Functions
-    function applyAirline(address _address, string memory _name) external;
-    function voteAirline(address _address, address _voter, string memory _name) external;
+    function applyAirline(address _address, string calldata _name) external;
+    function voteAirline(address _address, address _voter, string calldata _name) external;
     function fundAirline(address _funder, address _airline) external payable;
-    function addFlight(string memory _flight, address _caller, address _airline, uint256 timeOfFlightInSeconds) external;
-    function getAirlineByName(string memory _airline) external view returns(address _address);
+    function addFlight(string calldata _flight, address _caller, address _airline, uint256 timeOfFlightInSeconds) external;
+    function getAirlineByName(string calldata _airline) external view returns(address _address);
 
     // Passenger Functions
-    function buyInsurance(address _passenger, string memory _airline, string memory _flight) external payable;
-    function claimInsurance(address payable _passenger, string memory _airline, string memory _flight) external;
+    function buyInsurance(address _passenger, string calldata _airline, string calldata _flight) external payable;
+    function claimInsurance(address payable _passenger, string calldata _airline, string calldata _flight) external;
 
     // Oracle Functions
-    function setFlightDelayed(string memory _airline, string memory _flight, uint8 _statusCode) external;
+    function setFlightDelayed(string calldata _airline, string calldata _flight, uint8 _statusCode) external;
 }

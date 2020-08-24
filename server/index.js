@@ -6,14 +6,19 @@ const refinedURL = url.replace('http', 'ws');
 
 /* GLOBAL VARS */
 let oracle_history = [];
-const oracles = [];
+let oracles = [];
 const MINIMUM_ORACLES = 21;
 const GAS = 9500000;
 
 /* UTILITIES */
-function pushEvent(event) {
+function getTime() {
     const unformattedTime = new Date();
-    const time = unformattedTime.toLocaleString();
+    return unformattedTime.toLocaleString();
+}
+
+function pushEvent(event) {
+    console.log(event);
+    const time = getTime();
     const addedEvent = { time, event };
     oracle_history = [...oracle_history, addedEvent];
 }
@@ -39,6 +44,8 @@ const STATUSES = [
 const CODES = [0, 10, 20, 30, 40, 50];
 
 async function retrieveFlightStatus() {
+    const event = 'RETRIEVING FLIGHT STATUS';
+    pushEvent(event);
     const statusCode = Math.floor(Math.random() * 6) * 10;
     const statusLabel = STATUSES.indexOf(statusCode);
     return { statusCode, statusLabel };
@@ -51,35 +58,45 @@ const contractOwner = web3.eth.accounts[0];
 web3.eth.defaultAccount = contractOwner;
 const flightSurityApp = new web3.eth.Contract(FlightSuretyApp.abi, FlightSuretyApp.address);
 
-async function registerOracle(accounts) {
-    const oracleFee = await flightSurityApp.methods.ORACLE_REGISTRATION_FEE().call();
+async function registerOracles(accounts) {
+    const event = 'STARTING TO REGISTER ORACLES';
+    pushEvent(event);
     for (let i = 0; i < accounts.length; i++) {
         const account = accounts[i];
+        const event = `ATTEMPTING TO REGISTER ORACLE: ${account}`;
+        pushEvent(event);
         const payload = {
             from: account,
-            value: oracleFee,
+            value: '1000000000000000000',
             gas: GAS
         };
-        try {
-            await flightSurityApp.methods.registerOracle().send(payload);
-            const event = `SUCCESS: Registered oracle for account: ${account}.`
-            console.log(event);
-            pushEvent(event);
-        } catch (error) {
-            const event = `ERROR: ${error}`;
-            console.log(event);
-            pushEvent(event);
-        }
+        console.log({ flightSurityApp })
+        // try {
+        //     await flightSurityApp.methods.registerOracle.send(payload);
+        //     oracles = [...oracles, account];
+        //     const event = `SUCCESS: Registered oracle: ${account}.`
+        //     pushEvent(event);
+        // } catch (error) {
+        //     const event = `ERROR - FAILED TO REGISTER ORACLE: ${account}: ${error}`;
+        //     pushEvent(event);
+        // }
     }
 }
 
 async function start() {
     const accounts = await web3.eth.getAccounts();
+    await registerOracles(accounts);
 }
 
+start();
+
 /* SERVER APP */
-app.get('/api', (_, res) => {
+app.get('/logs', (_, res) => {
     res.json({ oracle_history });
+});
+
+app.get('/oracles', (_, res) => {
+    res.json({ oracles });
 });
 
 app.listen(5000, () => {

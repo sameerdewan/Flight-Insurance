@@ -3,7 +3,7 @@ const Web3 = require('web3');
 const app = express();
 const url = 'http://localhost:8545';
 const FlightSuretyApp  = require('../build/contracts/FlightSuretyApp.json');
-const { address } = require('./deployments.json').localhost;
+const { address } = require('./deployments.json').localhost.FlightSuretyApp;
 const refinedURL = url.replace('http', 'ws');
 
 /* GLOBAL VARS */
@@ -26,15 +26,6 @@ function pushEvent(event) {
 }
 
 /* FLIGHT STATUS CODES */
-const FLIGHT = {
-    "STATUS_CODE_UNKNOWN": 0,
-    "STATUS_CODE_ON_TIME": 10,
-    "STATUS_CODE_LATE_AIRLINE": 20,
-    "STATUS_CODE_LATE_WEATHER": 30,
-    "STATUS_CODE_LATE_TECHNICAL": 40,
-    "STATUS_CODE_LATE_OTHER": 50
-};
-
 const STATUSES = [
     "STATUS_CODE_UNKNOWN", 
     "STATUS_CODE_ON_TIME", 
@@ -61,36 +52,40 @@ web3.eth.defaultAccount = contractOwner;
 const flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, address);
 
 async function registerOracles(accounts) {
-    const event = 'STARTING TO REGISTER ORACLES';
+    const event = 'STARTING TO REGISTER ORACLES \n';
     pushEvent(event);
     for (let i = 0; i < accounts.length; i++) {
         const account = accounts[i];
-        const event = `ATTEMPTING TO REGISTER ORACLE: ${account}`;
+        const event = `ATTEMPTING TO REGISTER ORACLE: ${account} \n`;
         pushEvent(event);
         const payload = {
             from: account,
             value: '1000000000000000000',
             gas: GAS
         };
-        console.log(flightSuretyApp)
-        // try {
-        //     await flightSurityApp.methods.registerOracle.send(payload);
-        //     oracles = [...oracles, account];
-        //     const event = `SUCCESS: Registered oracle: ${account}.`
-        //     pushEvent(event);
-        // } catch (error) {
-        //     const event = `ERROR - FAILED TO REGISTER ORACLE: ${account}: ${error}`;
-        //     pushEvent(event);
-        // }
+        try {
+            await flightSuretyApp.methods.registerOracle().send(payload);
+            oracles = [...oracles, account];
+            const event = `SUCCESS: Registered oracle: ${account}. \n`
+            pushEvent(event);
+        } catch (error) {
+            const event = `ERROR - FAILED TO REGISTER ORACLE: ${account}: ${error} \n`;
+            pushEvent(event);
+        }
     }
+}
+
+async function respondToFetchFlightStatusRequest(index, airline, flight, timestamp ) {
+    const event = `Oracle Request Recieved: `
 }
 
 async function start() {
     const accounts = await web3.eth.getAccounts();
+    if (accounts.length < MINIMUM_ORACLES) {
+        throw new Error(`Insufficient amount of oracle accounts - needed ${MINIMUM_ORACLES}`);
+    }
     await registerOracles(accounts);
 }
-
-start();
 
 /* SERVER APP */
 app.get('/logs', (_, res) => {
@@ -102,8 +97,10 @@ app.get('/oracles', (_, res) => {
 });
 
 app.listen(5000, () => {
+    start();
     console.log('Oracle Server App running on port 5000...');
-    console.log('GET /api for Oracle Log History');
+    console.log('GET /logs for server log history');
+    console.log('GET /oracles for registered oracles');
     console.log('-----------------------------------------');
     console.log('v               LOGS                    v');
     console.log('-----------------------------------------');

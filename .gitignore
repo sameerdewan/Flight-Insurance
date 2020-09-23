@@ -4,3 +4,4 @@ node_modules
 build
 *deployments.json
 .vscode/
+package-lock.json

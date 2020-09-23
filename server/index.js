@@ -1,6 +1,7 @@
 const express = require('express');
 const Web3 = require('web3');
 const BigNumber = require('bignumber.js');
+const { forEach } = require('lodash');
 const app = express();
 const url = 'http://localhost:8545';
 const FlightSuretyApp  = require('../build/contracts/FlightSuretyApp.json');
@@ -87,6 +88,35 @@ async function respondToFetchFlightStatusRequest(index, airline, flight, timesta
 
     const passingOracles = [];
 
+    forEach(oracles, oracle => {
+        const index1Check = BigNumber(oracle.indexes[0]).isEqualTo(index);
+        const index2Check = BigNumber(oracle.indexes[1]).isEqualTo(index);
+        const index3Check = BigNumber(oracle.indexes[2]).isEqualTo(index);
+        const isPassing = index1Check || index2Check || index3Check;
+        if (isPassing) {
+            passingOracles.push(oracle);
+        }
+    });
+
+    if (passingOracles.length === 0) {
+        const event3 = 'No passing oracles found';
+        pushEvent(event3);
+        return;
+    }
+
+    const event4 = `Found passing oracles: ${passingOracles}`;
+    pushEvent(event4);
+
+    forEach(oracles, async oracle => {
+        try {
+            await flightSuretyApp.methods.submitOracleResponse(index, airline, flight, timestamp, oracle.statusCode).send({ from: oracle.address, gas: GAS });
+        } catch (error) {
+            const event5 = `Error Caught: ${error}`;
+            pushEvent(event5);
+        }
+        const event6 = `Oracle response successfully submited: address:${address}::statusCode:${oracle.statusCode}`;
+        pushEvent(event6);
+    });
 }
 
 async function start() {

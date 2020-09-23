@@ -1,5 +1,6 @@
 const express = require('express');
 const Web3 = require('web3');
+const BigNumber = require('bignumber.js');
 const app = express();
 const url = 'http://localhost:8545';
 const FlightSuretyApp  = require('../build/contracts/FlightSuretyApp.json');
@@ -76,7 +77,16 @@ async function registerOracles(accounts) {
 }
 
 async function respondToFetchFlightStatusRequest(index, airline, flight, timestamp ) {
-    const event = `Oracle Request Recieved: `
+    const event = `Oracle Request Recieved: index:${index}, airline:${airline}, flight:${flight}, timestamp:${timestamp}`;
+    pushEvent(event);
+    if (oracles.length < 1) {
+        const event2 = 'Oracle Request Denied: Not enough oracles.';
+        pushEvent(event2);
+        return;
+    }
+
+    const passingOracles = [];
+
 }
 
 async function start() {

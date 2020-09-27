@@ -127,8 +127,12 @@ async function start() {
     await registerOracles(accounts);
 
     flightSuretyApp.events.OracleRequest({fromBlock: 0}, (error, event) => {
-        if (error) return console.log(error);
-        if (!event.returnValues) return console.error("No returnValues");
+        if (error) {
+            return console.log(error);
+        }
+        if (!event.returnValues) {
+            return console.error("No returnValues");
+        }
 
         respondToFetchFlightStatus(
             event.returnValues.index,

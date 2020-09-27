@@ -1,7 +1,7 @@
 const express = require('express');
 const Web3 = require('web3');
 const BigNumber = require('bignumber.js');
-const { forEach } = require('lodash');
+const { forEach, isNil } = require('lodash');
 const app = express();
 const url = 'http://localhost:8545';
 const FlightSuretyApp  = require('../build/contracts/FlightSuretyApp.json');
@@ -125,6 +125,36 @@ async function start() {
         throw new Error(`Insufficient amount of oracle accounts - needed ${MINIMUM_ORACLES}`);
     }
     await registerOracles(accounts);
+
+    flightSuretyApp.events.OracleRequest({fromBlock: 0}, (error, event) => {
+        if (error) return console.log(error);
+        if (!event.returnValues) return console.error("No returnValues");
+
+        respondToFetchFlightStatus(
+            event.returnValues.index,
+            event.returnValues.airline,
+            event.returnValues.flight,
+            event.returnValues.timestamp
+        )
+    });
+
+    flightSuretyApp.events.OracleRequest({fromBlock: 0}, (err, event) => {
+        if (!isNil(err)) {
+            const event1 = `Error caught in Oracle Request event: ${err}`;
+            pushEvent(event1);
+            return;
+        }
+        if (isNil(event.returnValues)) {
+            const event2 = 'Error: No return values found for Oracle Request.';
+            pushEvent(event2);
+            return;
+        }
+
+        const { index, airline, flight, timestamp } = event.returnValues;
+
+        respondToFetchFlightStatusRequest(index, airline, flight, timestamp);
+    });
+
 }
 
 /* SERVER APP */

@@ -54,4 +54,14 @@ describe('Oracle Tests', () => {
             }
         });
     });
+    it('oracles can be pinged for requesting flight status', async () => {
+        const oracleRequest = await appContract.fetchFlightStatus(default_initial_airline_name, default_initial_flight);
+        truffleAssert.eventEmitted(oracleRequest, 'OracleRequest');    
+    });
+    it('oracles that are pinged are tested for the correct index being called', async () => {
+        const oracleRequest = await appContract.fetchFlightStatus(default_initial_airline_name, default_initial_flight);
+        truffleAssert.eventEmitted(oracleRequest, 'OracleRequest', event => {
+            return event.flight === default_initial_flight;
+        });   
+    });
 });

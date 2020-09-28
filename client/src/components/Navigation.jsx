@@ -1,19 +1,20 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
+import { BUY_FLIGHT_INSURANCE, CHECK_FLIGHT_STATUS, CLAIM_FLIGHT_INSURANCE } from '../router/routerPaths';
 import { changePath } from '../utils/routerFunctions';
 
 const TABS = [
     {
         label: 'Buy Flight Insurance',
-        path: '/'
+        path: BUY_FLIGHT_INSURANCE
     },
     {
         label: 'Check Flight Status',
-        path: '/flight-status'
+        path: CHECK_FLIGHT_STATUS
     },
     {
         label: 'Claim Flight Insurance',
-        path: '/claims'
+        path: CLAIM_FLIGHT_INSURANCE
     }
 ];
 

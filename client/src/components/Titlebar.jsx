@@ -1,12 +1,13 @@
 import React from 'react';
 import { Navbar } from 'react-bootstrap'; 
 import Logo from '../images/logo.png';
+import { HOME } from '../router/routerPaths'; 
 import { changePath } from '../utils/routerFunctions';
 
 export default function Titlebar() {
     return (
         <Navbar bg="dark" variant="dark">
-          <Navbar.Brand onClick={() => changePath('/')} style={{cursor: 'pointer'}}>
+          <Navbar.Brand onClick={() => changePath(HOME)} style={{cursor: 'pointer'}}>
             <img
               alt=""
               src={Logo}

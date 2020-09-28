@@ -20,13 +20,13 @@ const LoaderText = styled.h2`
     text-align: center;
 `;
 
-export default function Loader() {
+export default function Loader({ message }) {
     return (
         <React.Fragment>
             <LoaderContainer>
                 <LoaderWidget animation="border" variant="danger" size="lg" />
             </LoaderContainer>
-            <LoaderText className="text-danger">Awaiting Metamask...</LoaderText>
+            <LoaderText className="text-danger">{message}</LoaderText>
         </React.Fragment>
     );
 }

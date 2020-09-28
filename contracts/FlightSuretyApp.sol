@@ -91,7 +91,7 @@ contract FlightSuretyApp {
     uint256 public constant ORACLE_REGISTRATION_FEE = 1 ether;
     uint256 private constant MIN_RESPONSES = 3;
     uint8 private nonce = 0;
-    mapping(address => uint8[3]) private oracles;
+    mapping(address => Oracle) private oracles;
     mapping(bytes32 => ResponseInfo) private oracleResponses;
 
     // Oracle Structs
@@ -99,6 +99,11 @@ contract FlightSuretyApp {
         address _requester;
         bool _isOpen;
         mapping(uint8 => address[]) responses;
+    }
+
+    struct Oracle {
+        uint8[3] _indexes;
+        bool _valid;
     }
 
     // Oracle Events
@@ -115,8 +120,13 @@ contract FlightSuretyApp {
     }
 
     modifier indexMustMatchOracleRequest(uint8 index) {
-        bool indexMatchesOracleRequest = oracles[msg.sender][0] == index || oracles[msg.sender][1] == index || oracles[msg.sender][2] == index;
+        bool indexMatchesOracleRequest = oracles[msg.sender]._indexes[0] == index || oracles[msg.sender]._indexes[1] == index || oracles[msg.sender]._indexes[2] == index;
         require(indexMatchesOracleRequest == true, "Error: Index does not match oracle request.");
+        _;
+    }
+
+    modifier oracleMustBeRegistered(address oracle) {
+        require(oracles[oracle]._valid == true, 'Error: Not a registered oracle.');
         _;
     }
 
@@ -124,13 +134,13 @@ contract FlightSuretyApp {
     function registerOracle() external payable
         minimumRegistrationFee(msg.value) {
             uint8[3] memory indexes = generateIndexes(msg.sender);
-            oracles[msg.sender] = indexes;
+            oracles[msg.sender] = Oracle({_valid: true, _indexes: indexes});
             emit OracleRegistered(msg.sender);
     }
 
-    function getOracle(address account) external isOwner() returns(uint8[3] memory) {
+    function getOracle(address account) external isOwner() oracleMustBeRegistered(msg.sender) returns(uint8[3] memory) {
         emit OracleInformationRequested(msg.sender, account);
-        return oracles[account];
+        return oracles[account]._indexes;
     }
 
     function fetchFlightStatus(string memory airline, string memory flight) external {

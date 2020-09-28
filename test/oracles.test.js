@@ -1,3 +1,5 @@
+const { default: BigNumber } = require('bignumber.js');
+const { forEach } = require('lodash');
 const truffleAssert = require('truffle-assertions');
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const FlightSuretyApp = artifacts.require("FlightSuretyApp");
@@ -64,4 +66,29 @@ describe('Oracle Tests', () => {
             return event.flight === default_initial_flight;
         });   
     });
+    it('a minimum of 3 valid oracle responses are required', async () => {
+        const oracleRequest = await appContract.fetchFlightStatus(default_initial_airline_name, default_initial_flight);
+        let emittedIndex = undefined;
+        truffleAssert.eventEmitted(oracleRequest, 'OracleRequest', event => {
+            emittedIndex = event.index;
+            return event.flight === default_initial_flight;
+        });
+
+        const passingOracles = [];
+        forEach(accounts, oracle => {
+            const passingOracleIndex1 = BigNumber(oracle.indexes[0]).isEqualTo(emittedIndex);
+            const passingOracleIndex2 = BigNumber(oracle.indexes[1]).isEqualTo(emittedIndex);
+            const passingOracleIndex3 = BigNumber(oracle.indexes[2]).isEqualTo(emittedIndex);
+            
+            const isPassing = passingOracleIndex1 || passingOracleIndex2 || passingOracleIndex3;
+
+            if (isPassing) {
+                passingOracles.push(oracle);
+            }
+        });
+
+        const errorMessage = 'Not enough oracle responses';
+        assert.equal(passingOracles.length >= 3, true, errorMessage);
+    });
+    it('oracle response can be submitted and the event fired should contain the correct payload');
 });

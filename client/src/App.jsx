@@ -3,6 +3,7 @@ import Web3Context from './contexts/Web3';
 import Loader from './components/Loader';
 import Titlebar from './components/Titlebar';
 import Navigation from './components/Navigation';
+import Footer from './components/Footer';
 
 function App() {
   const { web3Enabled } = useContext(Web3Context);
@@ -18,6 +19,7 @@ function App() {
     <React.Fragment>
       <Titlebar />
       <Navigation />
+      <Footer />
     </React.Fragment>
   );
 }

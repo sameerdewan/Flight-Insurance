@@ -42,13 +42,13 @@ export function Web3Provider({ children }) {
         };
 
         (async () => {
-            const currentAccount = await web3.eth.getAccounts();
+            const accounts = await web3.eth.getAccounts();
             await connectDataContract();
             await connectAppContract();
-            setAccount(currentAccount);
+            setAccount(accounts[0]);
             setWeb3Enabled(true);
         })();
-    }, [web3])
+    }, [web3]);
 
     const values = {
         web3Enabled,

@@ -4,7 +4,7 @@ import Logo from '../images/logo.png';
 
 export default function Titlebar() {
     return (
-        <Navbar bg="light">
+        <Navbar bg="dark" variant="dark">
           <Navbar.Brand href="#home">
             <img
               alt=""

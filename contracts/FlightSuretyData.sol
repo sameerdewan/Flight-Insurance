@@ -248,6 +248,17 @@ contract FlightSuretyData {
             timeOfFlightInSeconds = flight._timeOfFlightInSeconds;
     }
 
+    function getFlightsLength() external view returns (uint) {
+        return flightKeys.length;
+    }
+
+    function getFlightByIndex(uint256 index) external view returns (address _airline, string memory _flight, uint256 _timestamp, uint8 _statusCode) {
+        _airline = allFlights[flightKeys[index]]._airline;
+        _flight = allFlights[flightKeys[index]]._name;
+        _timestamp = allFlights[flightKeys[index]]._timeOfFlightInSeconds;
+        _statusCode = allFlights[flightKeys[index]]._status;
+    }
+
     // Contract Owner Functions
     function disableContract(address _address) public
         isOwner(_address) {

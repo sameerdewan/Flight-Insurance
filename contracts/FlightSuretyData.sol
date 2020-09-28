@@ -196,6 +196,10 @@ contract FlightSuretyData {
     }
 
     // Utilities
+    function getContractOperationalStatus() external view returns (bool) {
+        return operational;
+    }
+
     function getInsuredStatus(string calldata _airline) external isAuthorized(msg.sender) returns (bool airlineIsFunded, uint funds) {
         airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
         funds = airlinesByName[_airline]._funds;

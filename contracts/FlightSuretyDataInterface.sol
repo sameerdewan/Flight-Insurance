@@ -8,6 +8,7 @@ interface FlightSuretyDataInterface {
 
     // Utilities
     function getInsuredStatus(string calldata _airline) external returns (bool airlineIsFunded);
+    function getContractOperationalStatus() external view returns (bool);
 
     // Airline Functions
     function applyAirline(address _address, string calldata _name) external;

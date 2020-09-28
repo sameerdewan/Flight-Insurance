@@ -45,8 +45,9 @@ contract FlightSuretyApp {
     }
 
     // Utility
-    function getContractOperationalStatus() public view returns(bool) {
-        return operational;
+    function getContractOperationalStatus() external view returns(bool appContractOperational, bool dataContractOperational) {
+        dataContractOperational = flightSuretyData.getContractOperationalStatus();
+        appContractOperational = operational;
     }
 
     // Airline Functions

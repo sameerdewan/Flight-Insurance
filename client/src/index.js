@@ -2,12 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import { Web3Provider } from './contexts/Web3';
+import { DappProvider } from './contexts/Dapp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 ReactDOM.render(
   <React.StrictMode>
     <Web3Provider>
-      <App />
+      <DappProvider>
+        <App />
+      </DappProvider>
     </Web3Provider>
   </React.StrictMode>,
   document.getElementById('root')

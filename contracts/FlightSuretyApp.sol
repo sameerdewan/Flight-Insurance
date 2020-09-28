@@ -28,11 +28,6 @@ contract FlightSuretyApp {
         _;
     }
 
-    // Utility
-    function getContractOperationalStatus() public view returns(bool) {
-        return operational;
-    }
-
     // Constructor
     constructor(address payable _dataContractAddress) public {
         owner = msg.sender;
@@ -47,6 +42,11 @@ contract FlightSuretyApp {
 
     function enableContract() public {
         flightSuretyData.enableContract(msg.sender);
+    }
+
+    // Utility
+    function getContractOperationalStatus() public view returns(bool) {
+        return operational;
     }
 
     // Airline Functions

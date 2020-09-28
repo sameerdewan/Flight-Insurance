@@ -1,3 +1,4 @@
+import React from 'react';
 import { Web3Context } from '../contexts/Web3';
 
 module.exports = {

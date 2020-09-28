@@ -16,12 +16,12 @@ export function Web3Provider({ children }) {
     const connectDataContract = useCallback(async () => {
         const { abi, address } = FlightSuretyData; 
         setDataContract(new web3.eth.Contract(abi, address));
-    }, [window.ethereum]);
+    }, [web3.eth.Contract]);
 
     const connectAppContract = useCallback(async () => {
         const { abi, address } = FlightSuretyApp;
         setAppContract(new web3.eth.Contract(abi, address));
-    }, [window.ethereum]);
+    }, [web3.eth.Contract]);
 
     const enableWeb3 = useCallback(async () => {
         await window.ethereum.enable();
@@ -30,14 +30,14 @@ export function Web3Provider({ children }) {
         await connectAppContract();
         setAccount(currentAccount);
         setWeb3Enabled(true);
-    }, [window.ethereum]);
+    }, [web3.eth, connectAppContract, connectDataContract]);
 
     useEffect(() => {
         if (window.ethereum && !web3) {
             setWeb3(new Web3(window.etheruem));
             enableWeb3();
         }
-    }, [window.ethereum]);
+    }, [enableWeb3, web3]);
 
     const values = {
         web3Enabled,

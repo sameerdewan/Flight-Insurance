@@ -1,10 +1,12 @@
+import { Web3Context } from '../contexts/Web3';
+
 module.exports = {
-    withContext(Component) {
+    withWeb3(Component) {
         return function contextComponent(props) {
             return (
-                <Context.Consumer>
+                <Web3Context.Consumer>
                     {context => <Component {...{...props, ...context}} />}
-                </Context.Consumer>
+                </Web3Context.Consumer>
             )
         }
     }

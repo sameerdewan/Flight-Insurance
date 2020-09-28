@@ -19,6 +19,9 @@ contract FlightSuretyData {
     mapping(string => Airline) private airlinesByName;
     // PASSENGER ADDRESS => AIRLINE NAME => FLIGHT NAME => INSURANCE POLICY
     mapping(address => mapping(string => mapping(string => Insurance))) policies;
+    // FLIGHT KEY => FLIGHT
+    mapping(bytes32 => Flight) private allFlights;
+    bytes32[] private flightKeys;
 
     // Flight Status Codes
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
@@ -186,6 +189,9 @@ contract FlightSuretyData {
         });
         airlinesByName[initialAirline]._flights[initialFlight] = flight;
         airlinesByAddress[msg.sender]._flights[initialFlight] = flight;
+        bytes32 flightKey = keccak256(abi.encodePacked(initialAirline, initialFlight, flightTime));
+        flightKeys.push(flightKey);
+        allFlights[flightKey] = flight;
         emit FlightAdded(initialFlight, initialAirline);
     }
 

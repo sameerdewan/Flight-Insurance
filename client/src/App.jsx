@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import Web3Context from './contexts/Web3';
-import DappContext from './contexts/Dapp';
 import Loader from './components/Loader';
 import Titlebar from './components/Titlebar';
 import Navigation from './components/Navigation';
@@ -9,7 +8,6 @@ import Footer from './components/Footer';
 
 function App() {
   const { web3Enabled } = useContext(Web3Context);
-  const { getContractOperationalStatus } = useContext(DappContext);
 
   if (!web3Enabled) {
     return (
@@ -23,7 +21,6 @@ function App() {
     <React.Fragment>
       <Titlebar />
       <Navigation />
-      <button onClick={getContractOperationalStatus}>test</button>
       <Router />
       <Footer />
     </React.Fragment>

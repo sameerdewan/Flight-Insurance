@@ -13,7 +13,7 @@ export function Web3Provider({ children }) {
     const [web3, setWeb3] = useState(undefined);
     const [account, setAccount] = useState(undefined);
     const [dataContract, setDataContract] = useState(undefined);
-    const [appContract, setAppContract] = useState(undefined);
+    const [appContract, setAppContract] = useState({ methods: {} });
 
     useEffect(() => {
         const enableWeb3 = async () => {

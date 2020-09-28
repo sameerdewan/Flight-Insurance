@@ -82,26 +82,27 @@ describe('Oracle Tests', () => {
             localOracles.push(appContract.getOracleIndexes({ from: oracles[count] }));
             count += 1;
         }
-
         const responses = await Promise.all(localOracles);
-        console.log({responses})
+        const passingOracles = [];
+        forEach(responses, response => {
+            truffleAssert.eventEmitted(response, 'OracleInformationRequested', event => {
+                const { indexes, oracle } = event;
 
-        // const passingOracles = [];
-        // forEach(oracles, async oracle => {
-        //     const _indexes = await appContract.getOracle(oracle);
+                const passingOracleIndex1 = BigNumber(indexes[0]).isEqualTo(emittedIndex);
+                const passingOracleIndex2 = BigNumber(indexes[1]).isEqualTo(emittedIndex);
+                const passingOracleIndex3 = BigNumber(indexes[2]).isEqualTo(emittedIndex);
 
-        //     const passingOracleIndex1 = BigNumber(_indexes[0]).isEqualTo(emittedIndex);
-        //     const passingOracleIndex2 = BigNumber(_indexes[1]).isEqualTo(emittedIndex);
-        //     const passingOracleIndex3 = BigNumber(_indexes[2]).isEqualTo(emittedIndex);
-            
-        //     const isPassing = passingOracleIndex1 || passingOracleIndex2 || passingOracleIndex3;
+                const isPassing = passingOracleIndex1 || passingOracleIndex2 || passingOracleIndex3;
 
-        //     if (isPassing) {
-        //         passingOracles.push(oracle);
-        //     }
-        // });
-        // const errorMessage = 'Not enough oracle responses';
-        // assert.equal(passingOracles.length >= 3, true, errorMessage);
+                if (isPassing) {
+                    passingOracles.push(oracle);
+                }
+
+                return true;
+            });
+        });
+        const errorMessage = 'Not enough oracle responses';
+        assert.equal(passingOracles.length >= 3, true, errorMessage);
     });
     it('oracle response can be submitted and the event fired should contain the correct payload');
 });

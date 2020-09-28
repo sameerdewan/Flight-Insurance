@@ -14,6 +14,7 @@ describe('Oracle Tests', () => {
 
     const _timeOfFlight = new Date(2021, 00, 01, 10, 30, 00, 0) // January 1, 2021 10:30
     const _timeOfFlightInSeconds = _timeOfFlight.getTime() / 1000;
+    const oracles = [];
 
     let accounts;
 

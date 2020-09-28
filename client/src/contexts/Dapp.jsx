@@ -7,8 +7,9 @@ export default DappContext;
 
 export function DappProvider({ children }) {
     const [isOperational, setOperationalStatus] = useState(false);
+    const [allFlights, setFlights] = useState([]);
 
-    const { web3Enabled, appContract } = useContext(Web3Context);
+    const { web3Enabled, appContract, dataContract } = useContext(Web3Context);
 
     const methods = {
     };
@@ -21,10 +22,26 @@ export function DappProvider({ children }) {
             const response = await appContract.methods.getContractOperationalStatus().call();
             setOperationalStatus(response);
         })();
-    }, [web3Enabled, appContract.methods]);
+    }, [web3Enabled, appContract, appContract.methods]);
+
+    useEffect(() => {
+        (async () => {
+            if (!web3Enabled || !dataContract) {
+                return;
+            }
+            const amountOfFlights = await dataContract.methods.getFlightsLength().call();
+            const flights = [];
+            for (let flightIndex = 0; flightIndex < amountOfFlights.length; flightIndex++) {
+                const flight = await dataContract.methods.getFlightByIndex(flightIndex).call();
+                flights.push(flight);
+            }
+            setFlights(flights);
+        })();
+    }, [dataContract, web3Enabled]);
 
     const state = {
-        isOperational
+        isOperational,
+        allFlights
     };
 
     return (

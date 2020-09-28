@@ -193,6 +193,19 @@ contract FlightSuretyData {
         flightKeys.push(flightKey);
         allFlights[flightKey] = flight;
         emit FlightAdded(initialFlight, initialAirline);
+        Flight memory flight2 = Flight({
+            _name: 'Contract Created Flight',
+            _status: STATUS_CODE_UNKNOWN,
+            _airline: msg.sender,
+            _exists: true,
+            _timeOfFlightInSeconds: flightTime
+        });
+        airlinesByName[initialAirline]._flights['Contract Created Flight'] = flight2;
+        airlinesByAddress[msg.sender]._flights['Contract Created Flight'] = flight2;
+        bytes32 flight2Key = keccak256(abi.encodePacked(initialAirline, 'Contract Created Flight', flightTime));
+        flightKeys.push(flight2Key);
+        allFlights[flight2Key] = flight2;
+        emit FlightAdded('Contract Created Flight', initialAirline);
     }
 
     // Utilities

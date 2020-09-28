@@ -1,10 +1,10 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import Web3 from 'web3';
 import { localhost } from '../deployments.json'; 
 
-const { FlightSuretyData, FlightSuretyApp } = localhost;
+const { FlightSuretyData, FlightSuretyApp, url } = localhost;
 
-const Web3Context = createContext();
+const Web3Context = createContext({ web3Enabled: false });
 
 export default Web3Context;
 
@@ -15,31 +15,40 @@ export function Web3Provider({ children }) {
     const [dataContract, setDataContract] = useState(undefined);
     const [appContract, setAppContract] = useState(undefined);
 
-    const connectDataContract = useCallback(async () => {
-        const { abi, address } = FlightSuretyData; 
-        setDataContract(new web3.eth.Contract(abi, address));
-    }, [web3.eth.Contract]);
-
-    const connectAppContract = useCallback(async () => {
-        const { abi, address } = FlightSuretyApp;
-        setAppContract(new web3.eth.Contract(abi, address));
-    }, [web3.eth.Contract]);
-
-    const enableWeb3 = useCallback(async () => {
-        await window.ethereum.enable();
-        const currentAccount = await web3.eth.getAccounts();
-        await connectDataContract();
-        await connectAppContract();
-        setAccount(currentAccount);
-        setWeb3Enabled(true);
-    }, [web3.eth, connectAppContract, connectDataContract]);
-
     useEffect(() => {
+        const enableWeb3 = async () => {
+            await window.ethereum.enable();
+            const localWeb3 = new Web3(window.etheruem);
+            localWeb3.setProvider(new Web3.providers.HttpProvider(url));
+            setWeb3(localWeb3);
+        };
         if (window.ethereum && !web3) {
-            setWeb3(new Web3(window.etheruem));
             enableWeb3();
         }
-    }, [enableWeb3, web3]);
+    });
+
+    useEffect(() => {
+        if (!web3) {
+            return;
+        }
+        const connectDataContract = async () => {
+            const { abi, address } = FlightSuretyData; 
+            setDataContract(new web3.eth.Contract(abi, address));
+        };
+    
+        const connectAppContract = async () => {
+            const { abi, address } = FlightSuretyApp;
+            setAppContract(new web3.eth.Contract(abi, address));
+        };
+
+        (async () => {
+            const currentAccount = await web3.eth.getAccounts();
+            await connectDataContract();
+            await connectAppContract();
+            setAccount(currentAccount);
+            setWeb3Enabled(true);
+        })();
+    }, [web3])
 
     const values = {
         web3Enabled,

@@ -28,7 +28,7 @@ function Tab({ tab }) {
 export default function Navigation() {
     return (
         <Nav variant="tabs" defaultActiveKey={TABS[0].label}>
-          { TABS.map(tab => <Tab tab={tab} />) }
+          { TABS.map(tab => <Tab tab={tab} key={tab.label} />) }
         </Nav>
     );
 }

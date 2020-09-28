@@ -4,7 +4,9 @@ import { localhost } from '../deployments.json';
 
 const { FlightSuretyData, FlightSuretyApp } = localhost;
 
-export const Web3Context = createContext();
+const Web3Context = createContext();
+
+export default Web3Context;
 
 export function Web3Provider({ children }) {
     const [web3Enabled, setWeb3Enabled] = useState(false);
@@ -48,7 +50,7 @@ export function Web3Provider({ children }) {
     };
 
     return (
-        <Web3Context.Provider values={values}>
+        <Web3Context.Provider value={values}>
             { children }
         </Web3Context.Provider>
     );

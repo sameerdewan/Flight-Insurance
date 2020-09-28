@@ -138,7 +138,7 @@ contract FlightSuretyApp {
             emit OracleRegistered(msg.sender);
     }
 
-    function getOracle(address account) external oracleMustBeRegistered(msg.sender) returns(uint8[3] memory) {
+    function getOracle(address account) external isOwner() oracleMustBeRegistered(msg.sender) returns(uint8[3] memory) {
         emit OracleInformationRequested(msg.sender, account);
         return oracles[account]._indexes;
     }

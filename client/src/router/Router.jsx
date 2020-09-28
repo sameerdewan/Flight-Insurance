@@ -2,7 +2,8 @@ import React, { lazy, Suspense } from 'react';
 import { HashRouter, Switch, Route } from 'react-router-dom'; 
 import { HOME, BUY_FLIGHT_INSURANCE, CHECK_FLIGHT_STATUS, CLAIM_FLIGHT_INSURANCE } from './routerPaths';
 import Loader from '../components/Loader';
-import BuyFlightInsurance from '../components/BuyFlightInsurance';
+
+const BuyFlightInsurance = lazy(() => import('../components/BuyFlightInsurance'));
 
 export default function Router() {
     return (

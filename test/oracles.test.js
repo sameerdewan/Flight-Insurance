@@ -104,5 +104,123 @@ describe('Oracle Tests', () => {
         const errorMessage = 'Not enough oracle responses';
         assert.equal(passingOracles.length >= 3, true, errorMessage);
     });
-    it('oracle response can be submitted and the event fired should contain the correct payload');
+    it('oracle responses can be submitted and the correct event is fired in the contract', async () => {
+        const oracleRequest = await appContract.fetchFlightStatus(default_initial_airline_name, default_initial_flight);
+        let emittedIndex = undefined;
+        let emmitedTimestamp = undefined;
+        truffleAssert.eventEmitted(oracleRequest, 'OracleRequest', event => {
+            emittedIndex = event.index;
+            emmitedTimestamp = event.timestamp;
+            return event.flight === default_initial_flight;
+        });
+
+        const localOracles = [];
+        let count = 0;
+        while (count < oracles.length) {
+            localOracles.push(appContract.getOracleIndexes({ from: oracles[count] }));
+            count += 1;
+        }
+        const responses = await Promise.all(localOracles);
+        const passingOracles = [];
+        forEach(responses, response => {
+            truffleAssert.eventEmitted(response, 'OracleInformationRequested', event => {
+                const { indexes, oracle } = event;
+
+                const passingOracleIndex1 = BigNumber(indexes[0]).isEqualTo(emittedIndex);
+                const passingOracleIndex2 = BigNumber(indexes[1]).isEqualTo(emittedIndex);
+                const passingOracleIndex3 = BigNumber(indexes[2]).isEqualTo(emittedIndex);
+
+                const isPassing = passingOracleIndex1 || passingOracleIndex2 || passingOracleIndex3;
+
+                if (isPassing) {
+                    passingOracles.push(oracle);
+                }
+
+                return true;
+            });
+        });
+
+        const STATUS_CODE_LATE_AIRLINE = 20;
+
+        const oracleResponse = await appContract.submitOracleResponse(
+            emittedIndex, 
+            default_initial_airline_name, 
+            default_initial_flight, 
+            emmitedTimestamp,
+            STATUS_CODE_LATE_AIRLINE,
+            {from: passingOracles[0]}
+        );
+
+        truffleAssert.eventEmitted(oracleResponse, 'OracleResponse');
+    });
+    it('oracle responses can be submitted, and if 3 are submitted, the proper event to indicate a success is fired', async () => {
+        const oracleRequest = await appContract.fetchFlightStatus(default_initial_airline_name, default_initial_flight);
+        let emittedIndex = undefined;
+        let emmitedTimestamp = undefined;
+        truffleAssert.eventEmitted(oracleRequest, 'OracleRequest', event => {
+            emittedIndex = event.index;
+            emmitedTimestamp = event.timestamp;
+            return event.flight === default_initial_flight;
+        });
+
+        const localOracles = [];
+        let count = 0;
+        while (count < oracles.length) {
+            localOracles.push(appContract.getOracleIndexes({ from: oracles[count] }));
+            count += 1;
+        }
+        const responses = await Promise.all(localOracles);
+        const passingOracles = [];
+        forEach(responses, response => {
+            truffleAssert.eventEmitted(response, 'OracleInformationRequested', event => {
+                const { indexes, oracle } = event;
+
+                const passingOracleIndex1 = BigNumber(indexes[0]).isEqualTo(emittedIndex);
+                const passingOracleIndex2 = BigNumber(indexes[1]).isEqualTo(emittedIndex);
+                const passingOracleIndex3 = BigNumber(indexes[2]).isEqualTo(emittedIndex);
+
+                const isPassing = passingOracleIndex1 || passingOracleIndex2 || passingOracleIndex3;
+
+                if (isPassing) {
+                    passingOracles.push(oracle);
+                }
+
+                return true;
+            });
+        });
+
+        const STATUS_CODE_LATE_AIRLINE = 20;
+
+        const oracleResponse1 = await appContract.submitOracleResponse(
+            emittedIndex, 
+            default_initial_airline_name, 
+            default_initial_flight, 
+            emmitedTimestamp,
+            STATUS_CODE_LATE_AIRLINE,
+            {from: passingOracles[0]}
+        );
+
+        const oracleResponse2 = await appContract.submitOracleResponse(
+            emittedIndex, 
+            default_initial_airline_name, 
+            default_initial_flight, 
+            emmitedTimestamp,
+            STATUS_CODE_LATE_AIRLINE,
+            {from: passingOracles[1]}
+        );
+
+        const oracleResponse3 = await appContract.submitOracleResponse(
+            emittedIndex, 
+            default_initial_airline_name, 
+            default_initial_flight, 
+            emmitedTimestamp,
+            STATUS_CODE_LATE_AIRLINE,
+            {from: passingOracles[2]}
+        );
+
+        truffleAssert.eventEmitted(oracleResponse1, 'OracleResponse');
+        truffleAssert.eventEmitted(oracleResponse2, 'OracleResponse');
+        truffleAssert.eventEmitted(oracleResponse3, 'OracleResponse');
+        truffleAssert.eventEmitted(oracleResponse3, 'OracleSetFlightDelayed');
+    });
 });

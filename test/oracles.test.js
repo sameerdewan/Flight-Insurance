@@ -79,7 +79,7 @@ describe('Oracle Tests', () => {
         const localOracles = [];
         let count = 0;
         while (count < oracles.length) {
-            localOracles.push(appContract.getOracle(oracles[count]));
+            localOracles.push(appContract.getOracleIndexes({ from: oracles[count] }));
             count += 1;
         }
 

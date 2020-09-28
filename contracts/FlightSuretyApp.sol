@@ -108,7 +108,7 @@ contract FlightSuretyApp {
 
     // Oracle Events
     event OracleRegistered(address oracleAddress);
-    event OracleInformationRequested(address oracle);
+    event OracleInformationRequested(address oracle, uint8[3] indexes);
     event OracleRequest(uint8 index, string airline, string flight, uint256 timestamp);
     event OracleResponse(string airline, string flight, uint256 timestamp, uint8 statusCode);
     event OracleSetFlightDelayed(address oracleAddress, string airline, string flight);
@@ -139,7 +139,7 @@ contract FlightSuretyApp {
     }
 
     function getOracleIndexes() external oracleMustBeRegistered(msg.sender) returns(uint8[3] memory) {
-        emit OracleInformationRequested(msg.sender);
+        emit OracleInformationRequested(msg.sender, oracles[msg.sender]._indexes);
         return oracles[msg.sender]._indexes;
     }
 

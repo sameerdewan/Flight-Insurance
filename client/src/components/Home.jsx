@@ -1,11 +1,12 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Tab, Row, Col, ListGroup, Badge, Button } from 'react-bootstrap'; 
 import styled from 'styled-components';
+import { get } from 'lodash';
 import DappContext from '../contexts/Dapp';
 
-function ListItem({ flight }) {
+function ListItem({ flight, setActiveKey }) {
     return (
-        <ListGroup.Item action eventKey={flight._flight}>
+        <ListGroup.Item action eventKey={flight._flight} onClick={() => setActiveKey(flight._flight)}>
             {flight._flight}
         </ListGroup.Item>
     );
@@ -42,7 +43,7 @@ function StatusCodeBadge({ statusCode }) {
     );
 }
 
-const BuyInsuranceButton = styled(Button)`
+const FlightSuretyButton = styled(Button)`
     margin-top: 100px;
     width: 99%;
 `;
@@ -72,9 +73,9 @@ function ListItemContent({ flight }) {
                 <ListGroup.Item><b>Flight Time: </b>{flightDate} {flightTime}</ListGroup.Item>
                 <ListGroup.Item><b>Flight Status: </b><StatusCodeBadge statusCode={flight._statusCode} /></ListGroup.Item>
             </ListGroup>
-            <BuyInsuranceButton variant="dark" size="lg" block onClick={() => buyFlightInsurance(flight._airline, flight._flight)}>
+            <FlightSuretyButton variant="dark" size="lg" block onClick={() => buyFlightInsurance(flight._airline, flight._flight)}>
                 Buy Flight Insurance
-            </BuyInsuranceButton>
+            </FlightSuretyButton>
             <BuyInsuranceTextContainer>
                 <BuyInsuranceSubText>1 ETH</BuyInsuranceSubText>
                 <BuyInsuranceSubText>for {flight._flight}</BuyInsuranceSubText>
@@ -83,18 +84,19 @@ function ListItemContent({ flight }) {
     );
 }
 
-export default function BuyFlightInsurance() {
+export default function Home() {
     const { state } = useContext(DappContext);
     const { allFlights } = state;
+    const [activeKey, setActiveKey] = useState(undefined);
 
     return (
         <React.Fragment>
             <br />
-            <Tab.Container>
+            <Tab.Container activeKey={activeKey || get(allFlights, '[0]._flight')}>
                 <Row>
                     <Col sm={4}>
                         <ListGroup>
-                            {allFlights.map(f => <ListItem flight={f} key={f._flight} />)}
+                            {allFlights.map(f => <ListItem setActiveKey={setActiveKey} flight={f} key={f._flight} />)}
                         </ListGroup>
                     </Col>
                     <Col sm={8}>

@@ -3,24 +3,25 @@ const Web3 = require('web3');
 const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const fs = require('fs');
+const path = require('path');
 const { mnemonic, infuraKey, initialAirline, initialFlight, getInitialFlightTime } = require('../constants');
 
 module.exports = function(deployer) {
 
     deployer.deploy(FlightSuretyData, initialAirline, initialFlight, getInitialFlightTime())
-    .then(() => {
+    .then(flightSuretyDataInstance => {
         return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
-                .then(async () => {
+                .then(async flightSuretyAppInstance => {
                     let config = {
                         localhost: {
                             url: 'http://localhost:8545',
                             FlightSuretyData: {
-                                address: FlightSuretyData.address,
-                                abi: FlightSuretyData.abi
+                                address: flightSuretyDataInstance.address,
+                                abi: flightSuretyDataInstance.abi
                             },
                             FlightSuretyApp: {
-                                address: FlightSuretyApp.address,
-                                abi: FlightSuretyData.abi
+                                address: flightSuretyAppInstance.address,
+                                abi: flightSuretyAppInstance.abi
                             }
                         }
                     };

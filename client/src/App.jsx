@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { ToastContainer } from 'react-toastify';
 import Web3Context from './contexts/Web3';
 import Loader from './components/Loader';
 import Titlebar from './components/Titlebar';
@@ -23,6 +24,7 @@ function App() {
       <Navigation />
       <Router />
       <Footer />
+      <ToastContainer />
     </React.Fragment>
   );
 }

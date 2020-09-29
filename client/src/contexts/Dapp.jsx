@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { toast } from 'react-toastify';
 import Web3Context from './Web3';
 
 const DappContext = createContext();
@@ -17,7 +18,12 @@ export function DappProvider({ children }) {
                 from: account,
                 value: web3.utils.toWei("1")
             };
-            await appContract.methods.appBuyInsurance(airline, flight).send(payload);
+            try {
+                await appContract.methods.appBuyInsurance(airline, flight).send(payload);
+                toast.success(`Success: Bought insurance for flight ${flight}`);
+            } catch (error) {
+                toast.error(`Error: Failed to purchase insurance for flight ${flight}`);
+            }
         }
     };
 

@@ -94,12 +94,12 @@ export default function BuyFlightInsurance() {
                 <Row>
                     <Col sm={4}>
                         <ListGroup>
-                            {allFlights.map(f => <ListItem flight={f} />)}
+                            {allFlights.map(f => <ListItem flight={f} key={f._flight} />)}
                         </ListGroup>
                     </Col>
                     <Col sm={8}>
                         <Tab.Content>
-                            {allFlights.map(f => <ListItemContent flight={f} />)}
+                            {allFlights.map(f => <ListItemContent flight={f} key={f._flight} />)}
                         </Tab.Content>
                     </Col>
                 </Row>

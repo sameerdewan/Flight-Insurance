@@ -17,7 +17,7 @@ export function DappProvider({ children }) {
                 from: account,
                 value: web3.utils.toWei("1")
             };
-            await appContract.methods.buyInsurance(airline, flight).send(payload);
+            console.log(appContract.methods)
         }
     };
 

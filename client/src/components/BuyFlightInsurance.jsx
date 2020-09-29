@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { Tab, Row, Col, ListGroup, Badge } from 'react-bootstrap'; 
+import { Tab, Row, Col, ListGroup, Badge, Button } from 'react-bootstrap'; 
+import styled from 'styled-components';
 import DappContext from '../contexts/Dapp';
 
 function ListItem({ flight }) {
@@ -41,7 +42,26 @@ function StatusCodeBadge({ statusCode }) {
     );
 }
 
+const BuyInsuranceButton = styled(Button)`
+    margin-top: 100px;
+    width: 99%;
+`;
+
+const BuyInsuranceTextContainer = styled.div`
+    width: 100%;
+    text-align: center;
+`;
+
+const BuyInsuranceSubText = styled.code`
+    color: black;
+    font-size: 12px;
+    display: block;
+`;
+
 function ListItemContent({ flight }) {
+    const { methods } = useContext(DappContext);
+    const { buyFlightInsurance } = methods;
+
     const flightDate = new Date(flight._timestamp * 1000).toDateString();
     const flightTime = new Date(flight._timestamp * 1000).toTimeString();
     return (
@@ -52,6 +72,13 @@ function ListItemContent({ flight }) {
                 <ListGroup.Item><b>Flight Time: </b>{flightDate} {flightTime}</ListGroup.Item>
                 <ListGroup.Item><b>Flight Status: </b><StatusCodeBadge statusCode={flight._statusCode} /></ListGroup.Item>
             </ListGroup>
+            <BuyInsuranceButton variant="dark" size="lg" block onClick={() => buyFlightInsurance(flight._airline, flight._flight)}>
+                Buy Flight Insurance
+            </BuyInsuranceButton>
+            <BuyInsuranceTextContainer>
+                <BuyInsuranceSubText>1 ETH</BuyInsuranceSubText>
+                <BuyInsuranceSubText>for {flight._flight}</BuyInsuranceSubText>
+            </BuyInsuranceTextContainer>
         </Tab.Pane>
     );
 }

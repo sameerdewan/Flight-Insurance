@@ -68,7 +68,7 @@ contract FlightSuretyApp {
     }
 
     // Passenger Functions
-    function buyInsurance(string memory _airline, string memory _flight) public payable {
+    function appBuyInsurance(string memory _airline, string memory _flight) public payable {
         bool airlineIsFunded = flightSuretyData.getInsuredStatus(_airline);
         require(airlineIsFunded == true, "Error: Airline does not meet funding requirements.");
         uint funds = msg.value;

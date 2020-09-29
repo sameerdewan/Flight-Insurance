@@ -9,9 +9,16 @@ export function DappProvider({ children }) {
     const [isOperational, setOperationalStatus] = useState(false);
     const [allFlights, setFlights] = useState([]);
 
-    const { web3Enabled, appContract, dataContract } = useContext(Web3Context);
+    const { web3Enabled, appContract, dataContract, account, web3 } = useContext(Web3Context);
 
     const methods = {
+        async buyFlightInsurance(airline, flight) {
+            const payload = {
+                from: account,
+                value: web3.utils.toWei("1")
+            };
+            await appContract.methods.buyInsurance(airline, flight).send(payload);
+        }
     };
 
     useEffect(() => {

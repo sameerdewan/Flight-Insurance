@@ -218,7 +218,7 @@ describe('Flight Surety Tests', () => {
         const value = web3.utils.toWei("5");
         // TEST EVENT INSURANCE FAILED TO BE SOLD
         await truffleAssert.fails(
-            appContract.buyInsurance.sendTransaction(second_airline_name, default_initial_flight, 
+            appContract.appBuyInsurance.sendTransaction(second_airline_name, default_initial_flight, 
                 { from: passenger, value, gas: default_gas  }
             )
         );
@@ -253,7 +253,7 @@ describe('Flight Surety Tests', () => {
         const value = web3.utils.toWei("5");
         const maxValue = web3.utils.toWei("1");
         // TEST EVENT INSURANCE SOLD
-        const tx = await appContract.buyInsurance.sendTransaction(second_airline_name, default_initial_flight, 
+        const tx = await appContract.appBuyInsurance.sendTransaction(second_airline_name, default_initial_flight, 
             { from: passenger, value, gas: default_gas  }
         );
         const newTx = await truffleAssert.createTransactionResult(dataContract, tx.tx);

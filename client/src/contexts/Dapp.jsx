@@ -31,7 +31,7 @@ export function DappProvider({ children }) {
             }
             const amountOfFlights = await dataContract.methods.getFlightsLength().call();
             const flights = [];
-            for (let flightIndex = 0; flightIndex < amountOfFlights.length; flightIndex++) {
+            for (let flightIndex = 0; flightIndex < amountOfFlights.length + 1; flightIndex++) {
                 const flight = await dataContract.methods.getFlightByIndex(flightIndex).call();
                 flights.push(flight);
             }

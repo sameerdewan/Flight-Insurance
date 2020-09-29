@@ -68,8 +68,9 @@ contract FlightSuretyApp {
     }
 
     // Passenger Functions
-    function appBuyInsurance(string memory _airline, string memory _flight) external payable {
-        bool airlineIsFunded = flightSuretyData.getInsuredStatus(_airline);
+    function appBuyInsurance(address _airline, string memory _flight) external payable {
+        string memory airlineName = flightSuretyData.getAirlineByAddress(_airline);
+        bool airlineIsFunded = flightSuretyData.getInsuredStatus(airlineName);
         require(airlineIsFunded == true, "Error: Airline does not meet funding requirements.");
         uint funds = msg.value;
         uint fundsToReturn = 0;
@@ -77,10 +78,10 @@ contract FlightSuretyApp {
             fundsToReturn = msg.value - 1 ether;
             funds = 1 ether;
         }
-        flightSuretyData.buyInsurance{value: funds}(msg.sender, _airline, _flight);
+        flightSuretyData.buyInsurance{value: funds}(msg.sender, airlineName, _flight);
         if (fundsToReturn > 0 ether) {
             msg.sender.transfer(fundsToReturn);
-            emit ChangeSent(msg.sender, fundsToReturn, _flight, _airline);
+            emit ChangeSent(msg.sender, fundsToReturn, _flight, airlineName);
         }
     }
 

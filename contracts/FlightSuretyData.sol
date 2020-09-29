@@ -125,6 +125,12 @@ contract FlightSuretyData {
         _;
     }
 
+    modifier airlineExistsAddress(address airline) {
+        bool airlineExists = airlinesByAddress[airline]._exists;
+        require(airlineExists == true, "Error: Airline with address does not exist.");
+        _;
+    }
+
     modifier airlineIsNotApproved(address airlineAddress, string memory airlineName) {
         bool isApproved1 = airlinesByAddress[airlineAddress]._status != AirlineStatus.APPLIED;
         bool isApproved2 = airlinesByName[airlineName]._status != AirlineStatus.APPLIED;
@@ -213,7 +219,7 @@ contract FlightSuretyData {
         return operational;
     }
 
-    function getInsuredStatus(string calldata _airline) external isAuthorized(msg.sender) returns (bool airlineIsFunded, uint funds) {
+    function getInsuredStatus(string calldata _airline) external returns (bool airlineIsFunded, uint funds) {
         airlineIsFunded = airlinesByName[_airline]._funds >= 10 ether;
         funds = airlinesByName[_airline]._funds;
         if (airlineIsFunded == false) {
@@ -239,6 +245,11 @@ contract FlightSuretyData {
     function getAirlineByName(string memory _airline) public view
         isOperational() isCalledFromApp() airlineExistsName(_airline) returns(address _address) {
             _address = airlinesByName[_airline]._address;
+    }
+
+    function getAirlineByAddress(address _airline) public view
+        isOperational() airlineExistsAddress(_airline) returns(string memory _name) {
+            _name = airlinesByAddress[_airline]._name;
     }
 
     function getAirlineStatus(string calldata _airline) external view isAuthorized(msg.sender) returns (AirlineStatus status) {

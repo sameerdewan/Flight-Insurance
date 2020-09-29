@@ -3,12 +3,15 @@ const Web3 = require('web3');
 const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const fs = require('fs');
-const path = require('path');
 const { mnemonic, infuraKey, initialAirline, initialFlight, getInitialFlightTime } = require('../constants');
 
-module.exports = function(deployer) {
+module.exports = async function(deployer) {
+    const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+    const accounts = await web3.eth.getAccounts();
+    owner = accounts[0];
+    value = web3.utils.toWei("100");
 
-    deployer.deploy(FlightSuretyData, initialAirline, initialFlight, getInitialFlightTime())
+    deployer.deploy(FlightSuretyData, initialAirline, initialFlight, getInitialFlightTime(), {from: owner, value})
     .then(flightSuretyDataInstance => {
         return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
                 .then(async flightSuretyAppInstance => {

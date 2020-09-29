@@ -16,6 +16,7 @@ interface FlightSuretyDataInterface {
     function fundAirline(address _funder, address _airline) external payable;
     function addFlight(string calldata _flight, address _caller, address _airline, uint256 timeOfFlightInSeconds) external;
     function getAirlineByName(string calldata _airline) external view returns(address _address);
+    function getAirlineByAddress(address _airline) external view returns(string memory _name);
 
     // Passenger Functions
     function buyInsurance(address _passenger, string calldata _airline, string calldata _flight) external payable;

@@ -360,7 +360,7 @@ contract FlightSuretyData {
 
     // // Passenger Functions
     function buyInsurance(address _passenger, string memory _airline, string memory _flight) public payable
-        isOperational() isCalledFromApp() airlineExistsName(_airline) flightExists(_flight, _airline) flightHasNotLeft(_flight, _airline) {
+        isOperational() isCalledFromApp() flightExists(_flight, _airline) flightHasNotLeft(_flight, _airline) {
         policies[_passenger][_airline][_flight] = Insurance({
             _insured: true,
             _funds: msg.value,
@@ -388,7 +388,7 @@ contract FlightSuretyData {
 
     // Oracle Functions
     function setFlightDelayed(string calldata _airline, string calldata _flight, uint8 _statusCode) external
-       isOperational() isAuthorized(msg.sender) airlineExistsName(_airline) flightExists(_flight, _airline) {
+       isOperational() isAuthorized(msg.sender) flightExists(_flight, _airline) {
            address _address = airlinesByName[_airline]._address;
            airlinesByName[_airline]._flights[_flight]._status = _statusCode;
            airlinesByAddress[_address]._flights[_flight]._status = _statusCode;

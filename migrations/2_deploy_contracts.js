@@ -9,9 +9,9 @@ module.exports = async function(deployer) {
     const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
     const accounts = await web3.eth.getAccounts();
     owner = accounts[0];
-    value = web3.utils.toWei("100");
+    value = web3.utils.toWei("11");
 
-    deployer.deploy(FlightSuretyData, initialAirline, initialFlight, getInitialFlightTime(), {from: owner, value})
+    await deployer.deploy(FlightSuretyData, initialAirline, initialFlight, getInitialFlightTime(), {from: owner, value})
     .then(flightSuretyDataInstance => {
         return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
                 .then(async flightSuretyAppInstance => {

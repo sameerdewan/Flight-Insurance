@@ -22,6 +22,7 @@ export function DappProvider({ children }) {
                 await appContract.methods.appBuyInsurance(airline, flight).send(payload);
                 toast.success(`Success: Bought insurance for flight ${flight}`);
             } catch (error) {
+                console.log({error});
                 toast.error(`Error: Failed to purchase insurance for flight ${flight}`);
             }
         }

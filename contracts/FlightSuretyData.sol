@@ -17,8 +17,8 @@ contract FlightSuretyData {
     mapping(address => Airline) private airlinesByAddress;
     // AIRLINE NAME => AIRLINE
     mapping(string => Airline) private airlinesByName;
-    // PASSENGER ADDRESS => AIRLINE NAME => FLIGHT NAME => INSURANCE POLICY
-    mapping(address => mapping(string => mapping(string => Insurance))) policies;
+    // KECCKACK HASH(PASSENGER ADDRESS => AIRLINE NAME => FLIGHT NAME) => INSURANCE POLICY
+    mapping(bytes32 => Insurance) policies;
     // FLIGHT KEY => FLIGHT
     mapping(bytes32 => Flight) private allFlights;
     bytes32[] private flightKeys;
@@ -165,7 +165,7 @@ contract FlightSuretyData {
     }
 
     modifier isInsured(address passenger, string memory airline, string memory flight) {
-        bool insured = policies[passenger][airline][flight]._insured;
+        bool insured = policies[keccak256(abi.encodePacked(passenger, airline, flight))]._insured;
         require(insured == true, "Error: Insurance Policy does not exist.");
         _;
     }
@@ -236,7 +236,7 @@ contract FlightSuretyData {
             bool paidOut,
             uint funds
         ) {
-            Insurance memory insurance = policies[_passenger][_airline][_flight];
+            Insurance memory insurance = policies[keccak256(abi.encodePacked(_passenger, _airline, _flight))];
             insured = insurance._insured;
             paidOut = insurance._paidOut;
             funds = insurance._funds;
@@ -371,11 +371,12 @@ contract FlightSuretyData {
 
     // // Passenger Functions
     function buyInsurance(address _passenger, string memory _airline, string memory _flight) public payable
-        isOperational() isCalledFromApp() flightExists(_flight, _airline) flightHasNotLeft(_flight, _airline) {
-        policies[_passenger][_airline][_flight] = Insurance({
+        isOperational() flightExists(_flight, _airline) flightHasNotLeft(_flight, _airline) {
+        bytes32 key = keccak256(abi.encodePacked(_passenger, _airline, _flight));
+        policies[key] = Insurance({
             _insured: true,
-            _funds: msg.value,
-            _paidOut: false
+            _paidOut: false,
+            _funds: msg.value
         });
         airlinesByName[_airline]._funds = SafeMath.add(airlinesByName[_airline]._funds, msg.value);
         address _address = airlinesByName[_airline]._address;
@@ -390,9 +391,9 @@ contract FlightSuretyData {
                 emit InvalidClaim(_passenger, _airline, _flight);
                 return;
             }
-            policies[_passenger][_airline][_flight]._paidOut = true;
+            policies[keccak256(abi.encodePacked(_passenger, _airline, _flight))]._paidOut = true;
             uint payoutBy = SafeMath.div(3, 2);
-            uint funds = SafeMath.mul(policies[_passenger][_airline][_flight]._funds, payoutBy);
+            uint funds = SafeMath.mul(policies[keccak256(abi.encodePacked(_passenger, _airline, _flight))]._funds, payoutBy);
             _passenger.transfer(funds);
             emit InsuranceClaimed(_airline, _flight, _passenger, funds);
     }

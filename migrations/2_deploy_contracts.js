@@ -13,7 +13,7 @@ module.exports = async function(deployer) {
 
     await deployer.deploy(FlightSuretyData, initialAirline, initialFlight, getInitialFlightTime(), {from: owner, value})
     .then(flightSuretyDataInstance => {
-        return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
+        return deployer.deploy(FlightSuretyApp, FlightSuretyData.address, {from: owner})
                 .then(async flightSuretyAppInstance => {
                     let config = {
                         localhost: {
@@ -39,7 +39,7 @@ module.exports = async function(deployer) {
                     const { abi, address } = config.localhost.FlightSuretyData;
                     const dataContractinstance = new web3.eth.Contract(abi, address);
                     const { address: appAddress } = config.localhost.FlightSuretyApp; 
-                    dataContractinstance.methods.wireApp(appAddress).call()
+                    await dataContractinstance.methods.wireApp(appAddress).call({ from: owner })
                         .then(() => {
                             console.log('<--WIRED APP-->');
                         }).catch(error => {

@@ -20,7 +20,7 @@ contract Data {
 
     mapping(string => AIRLINE) private MAPPED_AIRLINES;
     string[] public AIRLINES;
-    uint256 TOTAL_AIRLINES = 0;
+    uint256 public TOTAL_AIRLINES = 0;
 
     struct AIRLINE {
         address ADDRESS;
@@ -40,7 +40,7 @@ contract Data {
 
     mapping(bytes32 => FLIGHT) private MAPPED_FLIGHTS;
     string[2][] public FLIGHTS;
-    uint256 TOTAL_FLIGHTS = 0;
+    uint256 public TOTAL_FLIGHTS = 0;
 
     struct FLIGHT {
         bool EXISTS;
@@ -151,6 +151,11 @@ contract Data {
         flightExists = MAPPED_FLIGHTS[flightKey].EXISTS;
         flightTimestamp = MAPPED_FLIGHTS[flightKey].TIMESTAMP;
         flightStatus = MAPPED_FLIGHTS[flightKey].STATUS;
+    }
+
+    function getFlightAtIndex(uint256 flightIndex) external view returns(string memory airlineName, string memory flightName) {
+        airlineName = FLIGHTS[0][flightIndex];
+        flightName = FLIGHTS[1][flightIndex];
     }
 
     function updateFlight(string memory airlineName, string memory flightName, string memory flightStatus) external 

@@ -1,12 +1,20 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
-import { HOME } from '../router/routerPaths';
+import { HOME, FLIGHTS, ADMIN } from '../router/routerPaths';
 import { changePath } from '../utils/routerFunctions';
 
 const TABS = [
     {
         label: 'Home',
         path: HOME
+    },
+    {
+        label: 'Flights',
+        path: FLIGHTS
+    },
+    {
+        label: 'Admin',
+        path: ADMIN
     }
 ];
 

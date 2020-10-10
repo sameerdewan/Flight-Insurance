@@ -12,28 +12,28 @@ export function DappProvider({ children }) {
 
     const { web3Enabled, appContract, dataContract, account, web3 } = useContext(Web3Context);
 
-    const methods = {
-        async buyFlightInsurance(airline, flight) {
-            const payload = {
-                from: account,
-                value: web3.utils.toWei("1")
-            };
-            try {
-                await appContract.methods.appBuyInsurance(airline, flight).send(payload);
-                toast.success(`Success: Bought insurance for flight ${flight}`);
-            } catch (error) {
-                console.log({error});
-                toast.error(`Error: Failed to purchase insurance for flight ${flight}`);
-            }
-        }
-    };
+    // const methods = {
+    //     async buyFlightInsurance(airline, flight) {
+    //         const payload = {
+    //             from: account,
+    //             value: web3.utils.toWei("1")
+    //         };
+    //         try {
+    //             await appContract.methods.appBuyInsurance(airline, flight).send(payload);
+    //             toast.success(`Success: Bought insurance for flight ${flight}`);
+    //         } catch (error) {
+    //             console.log({error});
+    //             toast.error(`Error: Failed to purchase insurance for flight ${flight}`);
+    //         }
+    //     }
+    // };
 
     useEffect(() => {
         (async () => {
             if (!web3Enabled || !appContract) {
                 return;
             }
-            const response = await appContract.methods.getContractOperationalStatus().call();
+            const response = await appContract.methods.APP_OPERATIONAL().call();
             setOperationalStatus(response);
         })();
     }, [web3Enabled, appContract, appContract.methods]);
@@ -43,10 +43,10 @@ export function DappProvider({ children }) {
             if (!web3Enabled || !dataContract) {
                 return;
             }
-            const amountOfFlights = await dataContract.methods.getFlightsLength().call();
+            const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
             const flights = [];
             for (let flightIndex = 0; flightIndex < amountOfFlights.length + 1; flightIndex++) {
-                const flight = await dataContract.methods.getFlightByIndex(flightIndex).call();
+                const flight = await dataContract.methods.getFlightAtIndex(flightIndex).call();
                 flights.push(flight);
             }
             setFlights(flights);
@@ -59,7 +59,7 @@ export function DappProvider({ children }) {
     };
 
     return (
-        <DappContext.Provider value={{ methods, state }}>
+        <DappContext.Provider value={{state}}>
             { children }
         </DappContext.Provider>
     );

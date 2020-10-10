@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import Web3 from 'web3';
 import { localhost } from '../deployments.json'; 
 
-const { FlightSuretyData, FlightSuretyApp, url } = localhost;
+const { Data, App, url } = localhost;
 
 const Web3Context = createContext({ web3Enabled: false });
 
@@ -32,12 +32,12 @@ export function Web3Provider({ children }) {
             return;
         }
         const connectDataContract = async () => {
-            const { abi, address } = FlightSuretyData; 
+            const { abi, address } = Data; 
             setDataContract(new web3.eth.Contract(abi, address));
         };
     
         const connectAppContract = async () => {
-            const { abi, address } = FlightSuretyApp;
+            const { abi, address } = App;
             setAppContract(new web3.eth.Contract(abi, address));
         };
 

@@ -7,7 +7,7 @@ module.exports = async function (deployer) {
     await deployer.deploy(App)
         .then(async app => {
             await deployer.deploy(Data)
-                .then(data => {
+                .then(async data => {
                     await deployer.deploy(Oracle)
                         .then(oracle => {
                             let config = {

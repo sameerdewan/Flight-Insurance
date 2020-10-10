@@ -1,0 +1,197 @@
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.4.21 <0.7.0;
+
+import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
+import "./Interfaces/DataInterface.sol";
+import "./Interfaces/OracleInterface.sol";
+
+contract App {
+    using SafeMath for uint256;
+    
+    address public OWNER_ADDRESS;
+
+    address public APP_ADDRESS;
+    bool public APP_OPERATIONAL = false;
+    uint256 public APP_FUNDS = 0;
+
+    DataInterface DATA;
+    address public DATA_ADDRESS;
+    bool public DATA_OPERATIONAL = false;
+
+    OracleInterface ORACLE;
+    address public ORACLE_ADDRESS;
+    bool public ORACLE_OPERATIONAL = false;
+
+    uint256 public MINIMUM_AIRLINE_REGISTRATION_FEE = 100000000000000000; // .10 ETH
+    uint256 public MINIMUM_ORACLE_REGISTRATION_FEE = 100000000000000000; // .10 ETH
+    uint256 public MINIMUM_PASSENGER_INSURANCE_FEE = 10000000000000000; // .01 ETH
+    uint256 public MAXIMUM_PASSENGER_INSURANCE_FEE = 40000000000000000; // .04 ETH
+
+    event AIRLINE_APPLIED(address airlinelineAddress, string airlineName);
+    event AIRLINE_VOTED_FOR(string airlineName, address voter);
+    event AIRLINE_APPROVED(string airlineName, address airlineAddress);
+    event AIRLINE_FUNDED(address fundingAddress, string airlineName);
+    event FLIGHT_ADDED(address airlineAddress, string airlineName, string flightName, uint256 timestamp);
+    event INSURANCE_BOUGHT(address passenger, uint256 insuranceFunds, string airlineName, string flightName);
+    event INSURANCE_CLAIMED(address passenger, uint256 claimedValue, string airlineName, string flightName);
+    event ORACLE_REGISTERED(address oracle);
+    event ORACLE_REQUEST(uint8 oracleIndex, uint256 oracleTimestamp, string airlineName, string flightName);
+    event POLICY_UPDATED(address passenger, string airlineName, string flightName, bool policyActive, uint256 policyFunds, bool payoutAvailable);
+    event ORACLE_RESPONDED(uint8 oracleIndex, string oracleName, string airlineName, string flightName, string flightStatus);
+    event FLIGHT_UPDATED(string airlineName, string flightName, string flightStatus);
+
+    constructor() public {
+        OWNER_ADDRESS = msg.sender;
+        APP_ADDRESS = address(this);
+    }
+
+    modifier isOwner() {
+        require(msg.sender == OWNER_ADDRESS, 'Error: Only the OWNER can access this function.');
+        _;
+    }
+
+    modifier isOracleContract() {
+        require(msg.sender == ORACLE_ADDRESS, 'Error: Only the ORACLE CONTRACT can access this function.');
+        _;
+    }
+
+    modifier isOperational() {
+        require(APP_OPERATIONAL == true, 'Error: The APP CONTRACT is not operational.');
+        _;
+    }
+
+    function setAppOperational() external
+        isOwner() {
+            require(DATA_OPERATIONAL == true, 'Error: DATA CONTRACT is not registered.');
+            require(ORACLE_OPERATIONAL == true, 'Error: ORACLE CONTRACT is not registered.');
+            APP_OPERATIONAL = true;
+    }
+
+    function registerDataContract(address dataContractAddress) external 
+        isOwner() {
+            DATA_ADDRESS = dataContractAddress;
+            DATA = DataInterface(dataContractAddress);
+            DATA.registerAppContract(APP_ADDRESS);
+            DATA_OPERATIONAL = true;
+    }
+
+    function registerOracleContract(address oracleContractAddress) external 
+        isOwner() {
+            ORACLE_ADDRESS = oracleContractAddress;
+            ORACLE = OracleInterface(oracleContractAddress);
+            ORACLE.registerAppContract(APP_ADDRESS);
+            ORACLE_OPERATIONAL = true;
+    }
+
+    function applyAirline(string memory airlineName) external 
+        isOperational() {
+            DATA.applyAirline(airlineName, msg.sender);
+            emit AIRLINE_APPLIED(msg.sender, airlineName);
+    }
+
+    function voteForAirline(string memory airlineName, string memory voterAirlineName) external 
+        isOperational() {
+            (address voterAirlineAddress, string memory voterAirlineStatus, ,) = DATA.getAirline(voterAirlineName);
+            require(voterAirlineAddress == msg.sender, 'Error: Invalid request.');
+            require(keccak256(abi.encodePacked(voterAirlineStatus)) == keccak256(abi.encodePacked('AIRLINE_APPROVED')), 'Error: You are not an approved airline.');
+            bool hasVoted = DATA.getVoter(airlineName, msg.sender);
+            require(hasVoted == false, 'Error: You have already voted for this airline.');
+            bool approved = DATA.voteForAirline(airlineName, msg.sender);
+            emit AIRLINE_VOTED_FOR(airlineName, msg.sender);
+            if (approved == true) {
+                (address airlineAddress, , ,) = DATA.getAirline(airlineName);
+                emit AIRLINE_APPROVED(airlineName, airlineAddress);
+            }
+    }
+
+    function fundAirline(string memory airlineName) external payable 
+        isOperational() {
+            require(msg.value > MINIMUM_AIRLINE_REGISTRATION_FEE, 'Error: MINIMUM_AIRLINE_REGISTRATION_FEE');
+            DATA.fundAirline(airlineName, msg.value);
+            APP_FUNDS = SafeMath.add(APP_FUNDS, msg.value);
+            emit AIRLINE_FUNDED(msg.sender, airlineName);
+    }
+
+    function addFlight(string memory flightName, uint256 flightTimestamp, string memory airlineName) external 
+        isOperational() {
+            (address airlineAddress, string memory airlineStatus, ,) = DATA.getAirline(airlineName);
+            require(airlineAddress == msg.sender, 'Error: Invalid request.');
+            require(keccak256(abi.encodePacked(airlineStatus)) == keccak256(abi.encodePacked('AIRLINE_FUNDED')), 'Error: Airline is not funded.');
+            DATA.addFlight(msg.sender, flightName, flightTimestamp);
+            emit FLIGHT_ADDED(msg.sender, airlineName, flightName, flightTimestamp); 
+    }
+
+    function buyInsurance(string memory airlineName, string memory flightName) external payable 
+        isOperational() {
+            (, string memory airlineStatus, uint256 funds,) = DATA.getAirline(airlineName);
+            require(keccak256(abi.encodePacked(airlineStatus)) == keccak256(abi.encodePacked('AIRLINE_FUNDED')), 'Error: Airline is not funded.');
+            require(funds > MINIMUM_AIRLINE_REGISTRATION_FEE, 'Error: MINIMUM_AIRLINE_REGISTRATION_FEE');
+            (bool flightExists, uint256 flightTimestamp,) = DATA.getFlight(airlineName, flightName);
+            require(flightExists == true, 'Error: Flight does not exist.');
+            require(block.timestamp < flightTimestamp, 'Error: Flight has already left.');
+            require(msg.value > MINIMUM_PASSENGER_INSURANCE_FEE, 'Error: Minimum insurance fee required.');
+            require(msg.value > MAXIMUM_PASSENGER_INSURANCE_FEE, 'Error: Maximum insurance fee enforced.');
+            APP_FUNDS = SafeMath.add(APP_FUNDS, msg.value);
+            DATA.buyInsurance(msg.sender, msg.value, airlineName, flightName);
+            emit INSURANCE_BOUGHT(msg.sender, msg.value, airlineName, flightName);
+    }
+
+    function checkFlightStatus(string memory airlineName, string memory flightName) external
+        isOperational() {
+            (bool flightExists, , string memory flightStatus) = DATA.getFlight(airlineName, flightName);
+            require(flightExists == true, 'Error: Flight does not exist.');
+            bytes32 flightStatusHash = keccak256(abi.encodePacked(flightStatus));
+            bytes32 unknownStatusHash = keccak256(abi.encodePacked('FLIGHT_STATUS_CODE_UNKNOWN'));
+            require(flightStatusHash == unknownStatusHash, 'Error: Flight status is already available.');
+            (uint8 oracleIndex, uint256 oracleTimestamp) = ORACLE.fireOracleFlightStatusRequest(airlineName, flightName);
+            emit ORACLE_REQUEST(oracleIndex, oracleTimestamp, airlineName, flightName);
+    }
+
+    function fireOracleResponded(uint8 oracleIndex, string memory oracleName, string memory airlineName, string memory flightName, string memory flightStatus) external 
+        isOperational() isOracleContract() {
+            emit ORACLE_RESPONDED(oracleIndex, oracleName, airlineName, flightName, flightStatus);
+    }
+    
+    function fireFlightUpdate(string memory airlineName, string memory flightName, string memory flightStatus) external 
+        isOperational() isOracleContract() {
+            emit FLIGHT_UPDATED(airlineName, flightName, flightStatus);
+    }
+
+    function checkPolicy(string memory airlineName, string memory flightName) external
+        isOperational() returns(bool payoutAvailable) {
+            (bool policyActive, uint256 policyFunds,) = DATA.getPolicy(msg.sender, airlineName, flightName);
+            require(policyActive == true, 'Error: Policy not active.');
+            require(policyFunds > 0, 'Error: No funds available to withdraw for policy.'); 
+            (, , string memory flightStatus) = DATA.getFlight(airlineName, flightName);
+            bytes32 flightStatusHash = keccak256(abi.encodePacked(flightStatus));
+            bytes32 airlineAtFaultStatusHash = keccak256(abi.encodePacked('FLIGHT_STATUS_CODE_LATE_AIRLINE'));
+            if (flightStatusHash == airlineAtFaultStatusHash) {
+                payoutAvailable = true;
+                DATA.updatePolicy(msg.sender, airlineName, flightName, policyActive, policyFunds, true);
+                emit POLICY_UPDATED(msg.sender, airlineName, flightName, policyActive, policyFunds, true);
+            }
+    }
+
+    function claimInsurance(string memory airlineName, string memory flightName) external
+        isOperational() {
+            (bool policyActive, uint256 policyFunds, bool payoutAvailable) = DATA.getPolicy(msg.sender, airlineName, flightName); 
+            require(policyActive == true, 'Error: Policy not active.');
+            require(payoutAvailable == true, 'Error: No payout available.');
+            require(policyFunds > 0, 'Error: No funds available to withdraw for policy.');
+            uint256 insurancePayout = SafeMath.mul(policyFunds, 2);
+            require(APP_FUNDS >= insurancePayout, 'Error: Not enough funds to fill claim.');
+            DATA.updatePolicy(msg.sender, airlineName, flightName, false, 0, false);
+            emit POLICY_UPDATED(msg.sender, airlineName, flightName, false, 0, false);
+            APP_FUNDS = SafeMath.sub(APP_FUNDS, insurancePayout);
+            msg.sender.transfer(insurancePayout);
+            emit INSURANCE_CLAIMED(msg.sender, insurancePayout, airlineName, flightName);
+    }
+
+    function registerOracle(string memory oracleName) external payable 
+        isOperational() {
+            require(msg.value >= MINIMUM_ORACLE_REGISTRATION_FEE, 'Error: Oracle registration fee not high enough.');
+            ORACLE.registerOracle(msg.sender, oracleName);
+            APP_FUNDS = SafeMath.add(APP_FUNDS, msg.value);
+            emit ORACLE_REGISTERED(msg.sender);
+    }
+}

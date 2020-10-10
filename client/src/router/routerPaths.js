@@ -1,3 +1,4 @@
 export const HOME = '/';
-export const FLIGHTS = '/flights';
-export const ADMIN = '/admin';
+export const BUY_INSURANCE = '/buy-insurance';
+export const AIRLINE_ADMIN = '/airline-administration';
+export const CONTRACT_ADMIN = '/contract-administration';

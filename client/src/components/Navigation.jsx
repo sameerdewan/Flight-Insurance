@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
-import { HOME, FLIGHTS, ADMIN } from '../router/routerPaths';
+import { HOME, BUY_INSURANCE, AIRLINE_ADMIN, CONTRACT_ADMIN } from '../router/routerPaths';
 import { changePath } from '../utils/routerFunctions';
 import { upperFirst } from 'lodash';
 
@@ -10,12 +10,16 @@ const TABS = [
         path: HOME
     },
     {
-        label: 'Flights',
-        path: FLIGHTS
+        label: 'Buy Insurance',
+        path: BUY_INSURANCE
     },
     {
-        label: 'Admin',
-        path: ADMIN
+        label: 'Airline Administration',
+        path: AIRLINE_ADMIN
+    },
+    {
+        label: 'Contract Administration',
+        path: CONTRACT_ADMIN
     }
 ];
 
@@ -46,7 +50,7 @@ export default function Navigation() {
     const [label, setLabel] = useState(TABS[0].label);
     const hash = useHashRouter();
     useEffect(() => {
-        let _label = upperFirst(hash.replace('#/', ''));
+        let _label = hash.replace('#/', '').split('-').map(w => upperFirst(w)).join(' ');
         if (_label === "") {
             _label = TABS[0].label;
         }

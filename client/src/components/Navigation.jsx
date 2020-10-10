@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Nav } from 'react-bootstrap';
-import { HOME, BUY_INSURANCE, AIRLINE_ADMIN, CONTRACT_ADMIN } from '../router/routerPaths';
+import { HOME, BUY_INSURANCE, CLAIM_INSURANCE, AIRLINE_ADMIN, CONTRACT_ADMIN } from '../router/routerPaths';
 import { changePath } from '../utils/routerFunctions';
 import { upperFirst } from 'lodash';
+import DappContext from '../contexts/Dapp';
 
 const TABS = [
     {
@@ -12,6 +13,10 @@ const TABS = [
     {
         label: 'Buy Insurance',
         path: BUY_INSURANCE
+    },
+    {
+        label: 'Claim Insurance',
+        path: CLAIM_INSURANCE
     },
     {
         label: 'Airline Administration',
@@ -24,9 +29,12 @@ const TABS = [
 ];
 
 function Tab({ tab }) {
+    const { state } = useContext(DappContext);
+    const { isOperational } = state;
+    const isDisabled = !(tab.label === 'Home' || tab.label === 'Contract Administration');
     return (
         <Nav.Item>
-            <Nav.Link onClick={() => changePath(tab.path)} eventKey={tab.label}>{tab.label}</Nav.Link>
+            <Nav.Link disabled={isDisabled === true && isOperational === false} onClick={() => changePath(tab.path)} eventKey={tab.label}>{tab.label}</Nav.Link>
         </Nav.Item>
     );
 }

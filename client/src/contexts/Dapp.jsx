@@ -49,7 +49,9 @@ export function DappProvider({ children }) {
         const overallOperationalStatus = !allOperationalStatuses.includes(false);
         setOperationalStatus(overallOperationalStatus);
         if (overallOperationalStatus === true) {
-            toast.dark('🎉 Block Airline Insurance is Operational');
+            setTimeout(() => {
+                toast.dark('🎉 Block Airline Insurance is Operational');
+            }, 1000)
         }
     }, [
         wiredDataToApp,

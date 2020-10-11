@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { Form, Alert, Spinner, Badge } from 'react-bootstrap';
 import DappContext from '../contexts/Dapp';
-import Web3Context from '../contexts/Web3';
 
 const Container = styled.div`
     width: 100%;
@@ -22,7 +21,7 @@ const SwitchLoader = styled(Badge)`
     left: 340px;
 `;
 
-function ContractSwitch({ label, onClick, status = false, loading = false }) {
+function ContractSwitch({ label, onClick, state }) {
     return (
         <SwitchContainer>
             <Form.Check 
@@ -30,11 +29,12 @@ function ContractSwitch({ label, onClick, status = false, loading = false }) {
                 id={label}
                 label={label}
                 onClick={onClick}
-                checked={status}
+                checked={state?.status}
                 variant="danger"
+                disabled={state?.status}
             />
           {
-            loading && <SwitchLoader variant="warning">
+            state?.loading === true && <SwitchLoader variant="warning">
                 <Spinner size="sm" animation="border" variant="danger" />
                 <span>&nbsp;loading...</span>
             </SwitchLoader>
@@ -43,22 +43,23 @@ function ContractSwitch({ label, onClick, status = false, loading = false }) {
     );
 }
 
-const contractOptions = [
-    { label: 'Wire Data Contract ➡ App Contract', onClick: () => console.log('app > data') },
-    { label: 'Wire Oracle Contract ➡ App Contract', onClick: () => console.log('app > oracle') },
-    { label: 'Set App Contract Operational 💡', onClick: () => console.log('app >>> opp') },
-    { label: 'Wire App Contract ➡ Data Contract', onClick: () => console.log('app+data') },
-    { label: 'Wire Oracle Contract ➡ Data Contract', onClick: () => console.log('app+data') },
-    { label: 'Set Data Contract Operational 💡', onClick: () => console.log('app >>> opp') },
-    { label: 'Wire App Contract ➡ Oracle Contract', onClick: () => console.log('oracle > app') },
-    { label: 'Wire Data Contract ➡ Oracle Contract', onClick: () => console.log('oracle > data') },
-    { label: 'Set Oracle Contract Operational 💡', onClick: () => console.log('oracle >>> opp') },
-];
-
 export default function ContractAdmin() {
+    const { wiredDataToApp, operationalMethods } = useContext(DappContext);
+    console.log({ wiredDataToApp })
+    const contractOptions = [
+        { label: 'Wire Data Contract ➡ App Contract', onClick: operationalMethods.wireDataToApp, state: wiredDataToApp },
+        // { label: 'Wire Oracle Contract ➡ App Contract', onClick: () => console.log('app > oracle') },
+        // { label: 'Set App Contract Operational 💡', onClick: () => console.log('app >>> opp') },
+        // { label: 'Wire App Contract ➡ Data Contract', onClick: () => console.log('app+data') },
+        // { label: 'Wire Oracle Contract ➡ Data Contract', onClick: () => console.log('app+data') },
+        // { label: 'Set Data Contract Operational 💡', onClick: () => console.log('app >>> opp') },
+        // { label: 'Wire App Contract ➡ Oracle Contract', onClick: () => console.log('oracle > app') },
+        // { label: 'Wire Data Contract ➡ Oracle Contract', onClick: () => console.log('oracle > data') },
+        // { label: 'Set Oracle Contract Operational 💡', onClick: () => console.log('oracle >>> opp') },
+    ];
     return (
         <Container>
-            {contractOptions.map(cO => <ContractSwitch label={cO.label} onClick={cO.onClick} key={cO.label} />)}
+            {contractOptions.map(cO => <ContractSwitch label={cO.label} onClick={cO.onClick} state={cO.state} key={cO.label} />)}
         </Container>
     );
 }

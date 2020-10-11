@@ -43,9 +43,9 @@ export function DappProvider({ children }) {
             const local_wiredOracleToApp = await appContract.methods.ORACLE_OPERATIONAL().call();
             const local_appIsOperational = await appContract.methods.APP_OPERATIONAL().call();
 
-            setWiredDataToApp(local_wiredDataToApp);
-            setWiredOracleToApp(local_wiredOracleToApp);
-            setAppIsOperational(local_appIsOperational);
+            setWiredDataToApp({ status: local_wiredDataToApp, loading: false });
+            setWiredOracleToApp({ status: local_wiredOracleToApp, loading: false });
+            setAppIsOperational({ status: local_appIsOperational, loading: false });
 
             const local_wiredAppToData = await dataContract.methods.APP_OPERATIONAL().call();
             const local_wiredOracleToData = await dataContract.methods.ORACLE_OPERATIONAL().call();
@@ -105,12 +105,23 @@ export function DappProvider({ children }) {
     const DEFAULT_GAS_SETTINGS = { gas: 4712388, gasPrice: 100000000000 };
 
     const operationalMethods = {
-        async wireDataToApp() {
+        wireDataToApp() {
+            setWiredDataToApp({status: false, loading: true});
             const DATA_CONTRACT_REGISTERED = appContract.events.DATA_CONTRACT_REGISTERED();
             DATA_CONTRACT_REGISTERED
-                .on('data', () => toast.success('✅ Data Contract wired'))
-                .on('error', () => toast.error('❌ Failed to wire Data Contract'));
-            await appContract.methods.registerDataContract(dataContractAddress).send({ from: account, ...DEFAULT_GAS_SETTINGS });
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success('✅ Data Contract wired');
+                        setWiredDataToApp({loading: false, status: true});
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Data Contract');
+                        setWiredDataToApp({loading: false, status: false});
+                    }, 1000);
+                });
+            appContract.methods.registerDataContract(dataContractAddress).send({ from: account, ...DEFAULT_GAS_SETTINGS });
         },
         async wireOracleToApp() {
             await appContract.methods.registerOracleContract(oracleContractAddress).send({ from: account });
@@ -135,13 +146,25 @@ export function DappProvider({ children }) {
         }
     };
 
+    const operationalStatuses = {
+        wiredDataToApp,
+        wiredOracleToApp,
+        appIsOperational,
+        wiredAppToData,
+        wiredOracleToData,
+        dataIsOperational,
+        wiredAppToOracle,
+        wirdeDataToOracle,
+        oracleIsOperational
+    };
+
     const state = {
         isOperational,
         allFlights
     };
 
     return (
-        <DappContext.Provider value={{state, operationalMethods}}>
+        <DappContext.Provider value={{state, operationalMethods, wiredDataToApp}}>
             { children }
         </DappContext.Provider>
     );

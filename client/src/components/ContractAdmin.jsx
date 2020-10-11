@@ -58,6 +58,10 @@ export default function ContractAdmin() {
     ];
     return (
         <Container>
+            <Alert variant="warning">
+                The owner of this contract application (deploying address) is the only address that can use this page. 
+                &nbsp;<b>All actions are <u><i>irreversible</i></u> and the contract must be <u><i>redeployed</i></u> to reset</b>.
+            </Alert>
             {contractOptions.map(cO => <ContractSwitch label={cO.label} onClick={cO.onClick} state={cO.state} key={cO.label} />)}
         </Container>
     );

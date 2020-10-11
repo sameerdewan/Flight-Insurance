@@ -7,9 +7,15 @@ contract Data {
     using SafeMath for uint256;
 
     address public OWNER_ADDRESS;
+
     address public DATA_ADDRESS;
+    bool public DATA_OPERATIONAL = false;
+
     address public ORACLE_ADDRESS;
+    bool public ORACLE_OPERATIONAL = false;
+
     address public APP_ADDRESS;
+    bool public APP_OPERATIONAL = false;
 
     uint256 MINIMUM_AIRLINE_APPROVERS = 4;
     
@@ -66,6 +72,11 @@ contract Data {
         _;
     }
 
+    modifier isOperational() {
+        require(DATA_OPERATIONAL == true, 'Error: The DATA CONTRACT is not operational.');
+        _;
+    }
+
     modifier isAppContract() {
         require(msg.sender == APP_ADDRESS, 'Error: Only the APP CONTRACT can access this function.');
         _;
@@ -76,14 +87,23 @@ contract Data {
         _;
     }
 
-    function registerAppContract(address appContractAddress) external 
+    function setDataOperational() external
         isOwner() {
-            APP_ADDRESS = appContractAddress;
+            require(APP_OPERATIONAL == true, 'Error: APP CONTRACT is not registered.');
+            require(ORACLE_OPERATIONAL == true, 'Error: ORACLE CONTRACT is not registered.');
+            DATA_OPERATIONAL = true;
     }
 
-    function registerOracleContract(address oracleContractAddress) external
-        isOwner() {
-            ORACLE_ADDRESS = oracleContractAddress;
+    function registerAppContract(address appContractAddress) external {
+        require(tx.origin == OWNER_ADDRESS, 'Error: tx.origin is not OWNER.');
+        APP_ADDRESS = appContractAddress;
+        APP_OPERATIONAL = true;
+    }
+
+    function registerOracleContract(address oracleContractAddress) external {
+        require(tx.origin == OWNER_ADDRESS, 'Error: tx.origin is not OWNER.');
+        ORACLE_ADDRESS = oracleContractAddress;
+        ORACLE_OPERATIONAL = true;
     }
 
     function applyAirline(string memory airlineName, address airlineAddress) external 
@@ -101,12 +121,12 @@ contract Data {
     }
 
     function getVoter(string memory airlineName, address voter) external view
-        isAppContract() returns(bool) {
+        isAppContract() isOperational() returns(bool) {
             return MAPPED_AIRLINES[airlineName].VOTERS[voter];
     }
 
     function voteForAirline(string memory airlineName, address voter) external
-        isAppContract() returns(bool) {
+        isAppContract() isOperational() returns(bool) {
             MAPPED_AIRLINES[airlineName].VOTERS[voter] = true;
             MAPPED_AIRLINES[airlineName].VOTES = SafeMath.add(MAPPED_AIRLINES[airlineName].VOTES, 1);
             bool approved = checkForApproval(airlineName);
@@ -122,7 +142,7 @@ contract Data {
     }
 
     function fundAirline(string memory airlineName, uint256 fundingValue) external
-        isAppContract() {
+        isAppContract() isOperational() {
             MAPPED_AIRLINES[airlineName].FUNDS = SafeMath.add(MAPPED_AIRLINES[airlineName].FUNDS, fundingValue);
     }
 
@@ -134,7 +154,7 @@ contract Data {
     }
 
     function addFlight(string memory airlineName, string memory flightName, uint256 flightTimestamp) external
-        isAppContract() {
+        isAppContract() isOperational() {
              bytes32 flightKey = keccak256(abi.encodePacked(airlineName, flightName));
              FLIGHT memory flight = FLIGHT({
                  EXISTS: true,
@@ -159,13 +179,13 @@ contract Data {
     }
 
     function updateFlight(string memory airlineName, string memory flightName, string memory flightStatus) external 
-        isOracleContract() {
+        isOracleContract() isOperational() {
             bytes32 flightKey = keccak256(abi.encodePacked(airlineName, flightName));
             MAPPED_FLIGHTS[flightKey].STATUS = flightStatus;
     }
 
     function buyInsurance(address passenger, uint256 insuranceFunds, string memory airlineName, string memory flightName) external payable 
-        isAppContract() {
+        isAppContract() isOperational() {
             bytes32 policyKey = keccak256(abi.encodePacked(passenger, airlineName, flightName));
             POLICY memory policy = POLICY({
                 ACTIVE: true,
@@ -176,7 +196,7 @@ contract Data {
     }
 
     function updatePolicy(address passenger, string memory airlineName, string memory flightName, bool policyActive, uint256 policyFunds, bool payoutAvailable) external
-        isAppContract() {
+        isAppContract() isOperational() {
             bytes32 policyKey = keccak256(abi.encodePacked(passenger, airlineName, flightName));
             MAPPED_POLICIES[policyKey].ACTIVE = policyActive;
             MAPPED_POLICIES[policyKey].FUNDS = policyFunds;

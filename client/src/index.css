@@ -1,0 +1,4 @@
+.custom-control-input:checked~.custom-control-label::before {
+    border-color: tomato !important;
+    background-color: tomato !important;
+}

@@ -5,6 +5,7 @@ import { Web3Provider } from './contexts/Web3';
 import { DappProvider } from './contexts/Dapp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
+import './index.css';
 
 ReactDOM.render(
   <React.StrictMode>

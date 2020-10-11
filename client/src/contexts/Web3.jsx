@@ -23,7 +23,7 @@ export function Web3Provider({ children }) {
         const enableWeb3 = async () => {
             await window.ethereum.enable();
             const localWeb3 = new Web3(window.etheruem);
-            localWeb3.setProvider(new Web3.providers.HttpProvider(url));
+            localWeb3.setProvider(new Web3.providers.WebsocketProvider(url.replace('http', 'ws')));
             setWeb3(localWeb3);
         };
         if (window.ethereum && !web3) {

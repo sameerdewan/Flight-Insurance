@@ -8,6 +8,7 @@ import AddFlight from '../images/add_flight.png';
 import DappContext from '../contexts/Dapp';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import SwitchLoaderComponent from './Reusables';
 
 const Column = styled(Col)`
     border-right: 1px dashed lightgrey;
@@ -43,6 +44,8 @@ export default function AirlineAdmin() {
                         </Form.Text>
                         <br/>
                         <center><Button style={{marginTop: 61}} variant='dark'>📝 Apply Airline</Button></center>
+                        <br/>
+                        <center><SwitchLoaderComponent /></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={VoteAirline} name='Vote for Airline'>
@@ -55,6 +58,8 @@ export default function AirlineAdmin() {
                         </Form.Text>
                         <br/>
                         <center><Button style={{marginTop: 61}} variant='dark'>🗳️ Vote for Airline</Button></center>
+                        <br/>
+                        <center><SwitchLoaderComponent /></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={FundAirline} name='Fund Airline'>
@@ -67,6 +72,8 @@ export default function AirlineAdmin() {
                         </Form.Text>
                         <br/>
                         <center><Button style={{marginTop: 61}} variant='dark'>💰 Fund Airline</Button></center>
+                        <br/>
+                        <center><SwitchLoaderComponent /></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={AddFlight} name='Add Flight'>
@@ -86,6 +93,8 @@ export default function AirlineAdmin() {
                     </Form.Text>
                     <br/>
                     <center><Button variant='dark'>✈️ Add Flight</Button></center>
+                    <br/>
+                    <center><SwitchLoaderComponent /></center>
                 </AirlineAdminColumn>
             </Row>
         </Container>

@@ -23,6 +23,11 @@ export function DappProvider({ children }) {
     const [wiredDataToOracle, setWiredDataToOracle] = useState({ status: false, loading: false });
     const [oracleIsOperational, setOracleIsOperational] = useState({ status: false, loading: false });
 
+    const [airlineApplyIsLoading, setAirlineApplyIsLoading] = useState(false);
+    const [airlineVoteIsLoading, setAirlineVoteIsLoading] = useState(false);
+    const [airlineFundIsLoading, setAirlineFundIsLoading] = useState(false);
+    const [airlineAddFlightIsLoading, setAirlineAddFlightIsLoading] = useState(false); 
+
     const { 
         web3Enabled, 
         appContract, 
@@ -137,6 +142,36 @@ export function DappProvider({ children }) {
 
     const DEFAULT_GAS_SETTINGS = { gas: 4712388, gasPrice: 100000000000 };
     const DEFAULT_PAYLOAD = { from: account, ...DEFAULT_GAS_SETTINGS };
+
+    const airlineMethods = {
+        applyAirline(airlineName) {
+            setAirlineApplyIsLoading(true);
+            const AIRLINE_APPLIED = appContract.events.AIRLINE_APPLIED();
+            AIRLINE_APPLIED
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success(`✅ Airline: ${airlineName} successfully applied`);
+                        setAirlineApplyIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`❌ Failed to apply airline: ${airlineName}`);
+                        setAirlineApplyIsLoading(false);
+                    }, 1000);
+                });
+            appContract.methods.applyAirline(airlineName).send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`❌ Failed to apply airline: ${airlineName}`);
+                        setAirlineApplyIsLoading(false);
+                    }, 1000);
+                });
+        },
+        voteAirline() {},
+        fundAirline() {},
+        addFlight() {}
+    };
 
     const operationalMethods = {
         wireDataToApp() {
@@ -357,8 +392,15 @@ export function DappProvider({ children }) {
         MINIMUM_PARTNER_FEE
     };
 
+    const airlineStates = {
+        airlineApplyIsLoading,
+        airlineVoteIsLoading,
+        airlineFundIsLoading,
+        airlineAddFlightIsLoading,
+    };
+
     return (
-        <DappContext.Provider value={{state, operationalMethods, operationalStatuses}}>
+        <DappContext.Provider value={{state, operationalMethods, operationalStatuses, airlineMethods, airlineStates}}>
             { children }
         </DappContext.Provider>
     );

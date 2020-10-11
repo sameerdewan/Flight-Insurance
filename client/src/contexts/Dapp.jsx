@@ -1,3 +1,4 @@
+import { set } from 'lodash';
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
 import Web3Context from './Web3';
@@ -9,6 +10,7 @@ export default DappContext;
 export function DappProvider({ children }) {
     const [isOperational, setOperationalStatus] = useState(false);
     const [allFlights, setFlights] = useState([]);
+    const [MINIMUM_PARTNER_FEE, setPartnerFee] = useState(undefined);
 
     const [wiredDataToApp, setWiredDataToApp] = useState({ status: false, loading: false });
     const [wiredOracleToApp, setWiredOracleToApp] = useState({ status: false, loading: false });
@@ -108,6 +110,9 @@ export function DappProvider({ children }) {
 
             const overallOperationalStatus = !allOperationalStatuses.includes(false);
             setOperationalStatus(overallOperationalStatus);
+
+            const partnerFee = await appContract.methods.MINIMUM_PARTNER_FEE().call();
+            setPartnerFee(partnerFee);
         })();
     }, [web3,
         web3Enabled, 
@@ -349,7 +354,8 @@ export function DappProvider({ children }) {
 
     const state = {
         isOperational,
-        allFlights
+        allFlights,
+        MINIMUM_PARTNER_FEE
     };
 
     return (

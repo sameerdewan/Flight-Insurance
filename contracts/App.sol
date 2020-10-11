@@ -61,6 +61,18 @@ contract App {
         _;
     }
 
+    modifier isValidVoter(string memory airlineName, string memory voterAirlineName) {
+        if (msg.sender == OWNER_ADDRESS) {
+            _;
+        } else {
+            (address voterAirlineAddress, string memory voterAirlineStatus, ,) = DATA.getAirline(voterAirlineName);
+            require(voterAirlineAddress == msg.sender, 'Error: Invalid request.');
+            require(keccak256(abi.encodePacked(voterAirlineStatus)) == keccak256(abi.encodePacked('AIRLINE_APPROVED')), 'Error: You are not an approved airline.');
+            bool hasVoted = DATA.getVoter(airlineName, msg.sender);
+            require(hasVoted == false, 'Error: You have already voted for this airline.');
+        }
+    }
+
     function setAppOperational() external
         isOwner() {
             require(DATA_OPERATIONAL == true, 'Error: DATA CONTRACT is not registered.');
@@ -94,12 +106,7 @@ contract App {
     }
 
     function voteForAirline(string memory airlineName, string memory voterAirlineName) external 
-        isOperational() {
-            (address voterAirlineAddress, string memory voterAirlineStatus, ,) = DATA.getAirline(voterAirlineName);
-            require(voterAirlineAddress == msg.sender, 'Error: Invalid request.');
-            require(keccak256(abi.encodePacked(voterAirlineStatus)) == keccak256(abi.encodePacked('AIRLINE_APPROVED')), 'Error: You are not an approved airline.');
-            bool hasVoted = DATA.getVoter(airlineName, msg.sender);
-            require(hasVoted == false, 'Error: You have already voted for this airline.');
+        isOperational() isValidVoter(airlineName, voterAirlineName) {
             bool approved = DATA.voteForAirline(airlineName, msg.sender);
             emit AIRLINE_VOTED_FOR(airlineName, msg.sender);
             if (approved == true) {

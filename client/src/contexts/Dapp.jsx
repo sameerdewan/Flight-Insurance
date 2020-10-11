@@ -51,7 +51,7 @@ export function DappProvider({ children }) {
         if (overallOperationalStatus === true) {
             setTimeout(() => {
                 toast.dark('🎉 Block Airline Insurance is Operational');
-            }, 1000)
+            }, 1000);
         }
     }, [
         wiredDataToApp,

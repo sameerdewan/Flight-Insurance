@@ -22,8 +22,7 @@ contract App {
     address public ORACLE_ADDRESS;
     bool public ORACLE_OPERATIONAL = false;
 
-    uint256 public MINIMUM_AIRLINE_REGISTRATION_FEE = 100000000000000000; // .10 ETH
-    uint256 public MINIMUM_ORACLE_REGISTRATION_FEE = 100000000000000000; // .10 ETH
+    uint256 public MINIMUM_PARTNER_FEE = 100000000000000000; // .10 ETH
     uint256 public MINIMUM_PASSENGER_INSURANCE_FEE = 10000000000000000; // .01 ETH
     uint256 public MAXIMUM_PASSENGER_INSURANCE_FEE = 40000000000000000; // .04 ETH
 
@@ -34,8 +33,6 @@ contract App {
     event FLIGHT_ADDED(address airlineAddress, string airlineName, string flightName, uint256 timestamp);
     event INSURANCE_BOUGHT(address passenger, uint256 insuranceFunds, string airlineName, string flightName);
     event INSURANCE_CLAIMED(address passenger, uint256 claimedValue, string airlineName, string flightName);
-    event ORACLE_REGISTERED(address oracle);
-    event ORACLE_REQUEST(uint8 oracleIndex, uint256 oracleTimestamp, string airlineName, string flightName);
     event POLICY_UPDATED(address passenger, string airlineName, string flightName, bool policyActive, uint256 policyFunds, bool payoutAvailable);
     event ORACLE_RESPONDED(uint8 oracleIndex, string oracleName, string airlineName, string flightName, string flightStatus);
     event FLIGHT_UPDATED(string airlineName, string flightName, string flightStatus);
@@ -113,7 +110,7 @@ contract App {
 
     function fundAirline(string memory airlineName) external payable 
         isOperational() {
-            require(msg.value > MINIMUM_AIRLINE_REGISTRATION_FEE, 'Error: MINIMUM_AIRLINE_REGISTRATION_FEE');
+            require(msg.value > MINIMUM_PARTNER_FEE, 'Error: MINIMUM_AIRLINE_REGISTRATION_FEE');
             DATA.fundAirline(airlineName, msg.value);
             APP_FUNDS = SafeMath.add(APP_FUNDS, msg.value);
             emit AIRLINE_FUNDED(msg.sender, airlineName);
@@ -132,7 +129,7 @@ contract App {
         isOperational() {
             (, string memory airlineStatus, uint256 funds,) = DATA.getAirline(airlineName);
             require(keccak256(abi.encodePacked(airlineStatus)) == keccak256(abi.encodePacked('AIRLINE_FUNDED')), 'Error: Airline is not funded.');
-            require(funds > MINIMUM_AIRLINE_REGISTRATION_FEE, 'Error: MINIMUM_AIRLINE_REGISTRATION_FEE');
+            require(funds > MINIMUM_PARTNER_FEE, 'Error: MINIMUM_AIRLINE_REGISTRATION_FEE');
             (bool flightExists, uint256 flightTimestamp,) = DATA.getFlight(airlineName, flightName);
             require(flightExists == true, 'Error: Flight does not exist.');
             require(block.timestamp < flightTimestamp, 'Error: Flight has already left.');
@@ -150,8 +147,7 @@ contract App {
             bytes32 flightStatusHash = keccak256(abi.encodePacked(flightStatus));
             bytes32 unknownStatusHash = keccak256(abi.encodePacked('FLIGHT_STATUS_CODE_UNKNOWN'));
             require(flightStatusHash == unknownStatusHash, 'Error: Flight status is already available.');
-            (uint8 oracleIndex, uint256 oracleTimestamp) = ORACLE.fireOracleFlightStatusRequest(airlineName, flightName);
-            emit ORACLE_REQUEST(oracleIndex, oracleTimestamp, airlineName, flightName);
+            ORACLE.fireOracleFlightStatusRequest(airlineName, flightName);
     }
 
     function fireOracleResponded(uint8 oracleIndex, string memory oracleName, string memory airlineName, string memory flightName, string memory flightStatus) external 
@@ -196,9 +192,8 @@ contract App {
 
     function registerOracle(string memory oracleName) external payable 
         isOperational() {
-            require(msg.value >= MINIMUM_ORACLE_REGISTRATION_FEE, 'Error: Oracle registration fee not high enough.');
+            require(msg.value >= MINIMUM_PARTNER_FEE, 'Error: Oracle registration fee not high enough.');
             ORACLE.registerOracle(msg.sender, oracleName);
             APP_FUNDS = SafeMath.add(APP_FUNDS, msg.value);
-            emit ORACLE_REGISTERED(msg.sender);
     }
 }

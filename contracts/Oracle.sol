@@ -45,6 +45,8 @@ contract Oracle {
 
     event DATA_CONTRACT_REGISTERED();
     event ORACLE_CONTRACT_OPERATIONAL();
+    event ORACLE_REGISTERED(address oracle);
+    event ORACLE_REQUEST(uint8 oracleIndex, uint256 oracleTimestamp, string airlineName, string flightName);
 
     constructor() public {
         OWNER_ADDRESS = msg.sender;
@@ -124,19 +126,21 @@ contract Oracle {
                 VALID: true,
                 NAME: oracleName
             });
+            emit ORACLE_REGISTERED(msg.sender);
     }
 
     function fireOracleFlightStatusRequest(string memory airlineName, string memory flightName) external
-        isOperational() returns(uint8 oracleIndex, uint256 oracleTimestamp) {
+        isOperational() {
             (address airlineAddress, , ,) = DATA.getAirline(airlineName);
-            oracleTimestamp = block.timestamp;
-            oracleIndex = getRandomIndex(airlineAddress);
+            uint256 oracleTimestamp = block.timestamp;
+            uint8 oracleIndex = getRandomIndex(airlineAddress);
             bytes32 oracleKey = keccak256(abi.encodePacked(oracleIndex, oracleTimestamp, airlineName, flightName));
             ORACLE_RESPONSE memory oracleResponse = ORACLE_RESPONSE({
                 REQUEST_ORIGIN: msg.sender,
                 OPEN: true
             });
             ORACLE_RESPONSES[oracleKey] = oracleResponse;
+            emit ORACLE_REQUEST(oracleIndex, oracleTimestamp, airlineName, flightName);
     }
 
     function submitOracleResponse(uint8 oracleIndex, uint256 oracleTimestamp, string memory airlineName, string memory flightName, string memory flightStatus) external

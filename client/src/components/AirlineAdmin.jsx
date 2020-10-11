@@ -42,7 +42,7 @@ export default function AirlineAdmin() {
                             Current account address will be made airline address
                         </Form.Text>
                         <br/>
-                        <center><Button style={{marginTop: 61}} variant='dark'>Apply Airline</Button></center>
+                        <center><Button style={{marginTop: 61}} variant='dark'>📝 Apply Airline</Button></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={VoteAirline} name='Vote for Airline'>
@@ -54,7 +54,7 @@ export default function AirlineAdmin() {
                             Current account address must be owner/airline
                         </Form.Text>
                         <br/>
-                        <center><Button style={{marginTop: 61}} variant='dark'>Vote for Airline</Button></center>
+                        <center><Button style={{marginTop: 61}} variant='dark'>🗳️ Vote for Airline</Button></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={FundAirline} name='Fund Airline'>
@@ -66,7 +66,7 @@ export default function AirlineAdmin() {
                             Minimum funding is currently {MINIMUM_PARTNER_FEE + ' wei'}
                         </Form.Text>
                         <br/>
-                        <center><Button style={{marginTop: 61}} variant='dark'>Fund Airline</Button></center>
+                        <center><Button style={{marginTop: 61}} variant='dark'>💰 Fund Airline</Button></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={AddFlight} name='Add Flight'>
@@ -85,7 +85,7 @@ export default function AirlineAdmin() {
                         Example: [MIA, FL {">"} LA, CA]
                     </Form.Text>
                     <br/>
-                    <center><Button variant='dark'>Add Flight</Button></center>
+                    <center><Button variant='dark'>✈️ Add Flight</Button></center>
                 </AirlineAdminColumn>
             </Row>
         </Container>

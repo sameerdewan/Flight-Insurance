@@ -3,12 +3,12 @@ const Data = artifacts.require("Data");
 const Oracle = artifacts.require("Oracle");
 const fs = require('fs');
 
-module.exports = async function (deployer) {
-    await deployer.deploy(App)
+module.exports = async function (deployer, network, accounts) {
+    await deployer.deploy(App, { from: accounts[0] })
         .then(async app => {
-            await deployer.deploy(Data)
+            await deployer.deploy(Data, { from: accounts[0] })
                 .then(async data => {
-                    await deployer.deploy(Oracle)
+                    await deployer.deploy(Oracle, { from: accounts[0] })
                         .then(oracle => {
                             let config = {
                                 localhost: {

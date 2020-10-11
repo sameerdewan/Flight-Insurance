@@ -4,6 +4,7 @@ import { HOME, CLAIM_INSURANCE, BUY_INSURANCE, CONTRACT_ADMIN, AIRLINE_ADMIN } f
 import Loader from '../components/Loader';
 
 const BuyInsurance = lazy(() => import('../components/BuyInsurance'));
+const ContractAdmin = lazy(() => import('../components/ContractAdmin'));
 
 export default function Router() {
     return (
@@ -14,7 +15,7 @@ export default function Router() {
                     <Route exact path={BUY_INSURANCE} component={BuyInsurance} />
                     <Route exact path={CLAIM_INSURANCE} component={() => <div>CLAIM INSURANCE!</div>} />
                     <Route exact path={AIRLINE_ADMIN} component={() => <div>AIRLINE ADMIN!</div>} />
-                    <Route exact path={CONTRACT_ADMIN} component={() => <div>CONTRACT ADMIN!</div>} />
+                    <Route exact path={CONTRACT_ADMIN} component={ContractAdmin} />
                 </Switch>
             </HashRouter>
         </Suspense>

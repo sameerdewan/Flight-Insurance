@@ -40,6 +40,10 @@ contract App {
     event ORACLE_RESPONDED(uint8 oracleIndex, string oracleName, string airlineName, string flightName, string flightStatus);
     event FLIGHT_UPDATED(string airlineName, string flightName, string flightStatus);
 
+    event APP_IS_OPERATIONAL();
+    event DATA_CONTRACT_REGISTERED();
+    event ORACLE_CONTRACT_REGISTERED();
+
     constructor() public {
         OWNER_ADDRESS = msg.sender;
         APP_ADDRESS = address(this);
@@ -65,6 +69,7 @@ contract App {
             require(DATA_OPERATIONAL == true, 'Error: DATA CONTRACT is not registered.');
             require(ORACLE_OPERATIONAL == true, 'Error: ORACLE CONTRACT is not registered.');
             APP_OPERATIONAL = true;
+            emit APP_IS_OPERATIONAL();
     }
 
     function registerDataContract(address dataContractAddress) external 
@@ -73,6 +78,7 @@ contract App {
             DATA = DataInterface(dataContractAddress);
             DATA.registerAppContract(APP_ADDRESS);
             DATA_OPERATIONAL = true;
+            emit DATA_CONTRACT_REGISTERED();
     }
 
     function registerOracleContract(address oracleContractAddress) external 
@@ -81,6 +87,7 @@ contract App {
             ORACLE = OracleInterface(oracleContractAddress);
             ORACLE.registerAppContract(APP_ADDRESS);
             ORACLE_OPERATIONAL = true;
+            emit ORACLE_CONTRACT_REGISTERED();
     }
 
     function applyAirline(string memory airlineName) external 

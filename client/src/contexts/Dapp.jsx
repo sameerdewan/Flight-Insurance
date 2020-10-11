@@ -10,7 +10,17 @@ export function DappProvider({ children }) {
     const [isOperational, setOperationalStatus] = useState(false);
     const [allFlights, setFlights] = useState([]);
 
-    const { web3Enabled, appContract, dataContract, account, web3 } = useContext(Web3Context);
+    const { 
+        web3Enabled, 
+        appContract, 
+        appContractAddress, 
+        dataContract, 
+        dataContractAddress, 
+        oracleContract,
+        oracleContractAddress,
+        account, 
+        web3 
+    } = useContext(Web3Context);
 
     // const methods = {
     //     async buyFlightInsurance(airline, flight) {
@@ -27,6 +37,40 @@ export function DappProvider({ children }) {
     //         }
     //     }
     // };
+
+    const operationalMethods = {
+        async wireDataToApp() {
+            console.log(await appContract.methods.OWNER_ADDRESS().call());
+            console.log(account);
+            // const DATA_CONTRACT_REGISTERED = appContract.events.DATA_CONTRACT_REGISTERED();
+            // DATA_CONTRACT_REGISTERED
+            //     .on('data', event => console.log({event}, 'data'))
+            //     .on('changed', event => console.log({event}, 'changed'))
+            //     .on('error', error => console.log({error}, 'error'));
+            await appContract.methods.registerDataContract(dataContractAddress).send({ from: account });
+        },
+        async wireOracleToApp() {
+            await appContract.methods.registerOracleContract(oracleContractAddress).send({ from: account });
+        },
+        async setAppOperational() {
+            await appContract.methods.setAppOperational().send({ from: account });
+        },
+        async wireAppToData() {
+            await dataContract.methods.registerAppContract(appContractAddress).send({ from: account });
+        },
+        async wireOracleToData() {
+            await dataContract.methods.registerOracleContract(oracleContractAddress).send({ from: account });
+        },
+        async wireAppToOracle() {
+            await oracleContract.methods.registerAppContract(appContractAddress).send({ from: account });
+        },
+        async wireDataToOracle() {
+            await oracleContract.methods.registerDataContract(dataContractAddress).send({ from: account });
+        },
+        async setOracleOperational() {
+            await oracleContract.methods.setOracleOperational().send({ from: account });
+        }
+    };
 
     useEffect(() => {
         (async () => {
@@ -59,7 +103,7 @@ export function DappProvider({ children }) {
     };
 
     return (
-        <DappContext.Provider value={{state}}>
+        <DappContext.Provider value={{state, operationalMethods}}>
             { children }
         </DappContext.Provider>
     );

@@ -113,6 +113,18 @@ contract Data {
 
     function applyAirline(string memory airlineName, address airlineAddress) external 
         isAppContract() {
+            if (TOTAL_AIRLINES <= 4) {
+                AIRLINE memory airline = AIRLINE({
+                    ADDRESS: airlineAddress,
+                    STATUS: AIRLINE_APPROVED,
+                    EXISTS: true,
+                    FUNDS: 0,
+                    VOTES: 3
+                });
+                MAPPED_AIRLINES[airlineName] = airline;
+                AIRLINES.push(airlineName);
+                TOTAL_AIRLINES = SafeMath.add(TOTAL_AIRLINES, 1);
+            } else {
             AIRLINE memory airline = AIRLINE({
                 ADDRESS: airlineAddress,
                 STATUS: AIRLINE_APPLIED,
@@ -123,6 +135,7 @@ contract Data {
             MAPPED_AIRLINES[airlineName] = airline;
             AIRLINES.push(airlineName);
             TOTAL_AIRLINES = SafeMath.add(TOTAL_AIRLINES, 1);
+        }
     }
 
     function getVoter(string memory airlineName, address voter) external view

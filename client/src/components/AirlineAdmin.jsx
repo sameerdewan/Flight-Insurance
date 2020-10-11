@@ -10,7 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Column = styled(Col)`
-    border-right: 1px dotted lightgrey;
+    border-right: 1px dashed lightgrey;
     height: calc(100vh - 150px);
 `;
 

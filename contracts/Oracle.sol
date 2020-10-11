@@ -43,6 +43,9 @@ contract Oracle {
         mapping(string => address[]) RESPONSES;
     }
 
+    event DATA_CONTRACT_REGISTERED();
+    event ORACLE_CONTRACT_OPERATIONAL();
+
     constructor() public {
         OWNER_ADDRESS = msg.sender;
         ORACLE_ADDRESS = address(this);
@@ -68,20 +71,22 @@ contract Oracle {
             require(DATA_OPERATIONAL == true, 'Error: Error: DATA CONTRACT is not operational.');
             require(APP_OPERATIONAL == true, 'Error: Error: APP CONTRACT is not operational.');
             ORACLE_OPERATIONAL = true;
+            emit ORACLE_CONTRACT_OPERATIONAL();
     }
 
-    function registerAppContract(address appContractAddress) external 
-        isOwner() {
-            APP_ADDRESS = appContractAddress;
-            APP = AppInterface(appContractAddress);
-            APP_OPERATIONAL = true;
+    function registerAppContract(address appContractAddress) external {
+        require(tx.origin == OWNER_ADDRESS, 'Error: tx.origin is not OWNER.');
+        APP_ADDRESS = appContractAddress;
+        APP = AppInterface(appContractAddress);
+        APP_OPERATIONAL = true;
     }
 
-    function registerDataContract(address dataContractAddress) external
+    function registerDataContract(address dataContractAddress) external 
         isOwner() {
             DATA_ADDRESS = dataContractAddress;
             DATA = DataInterface(dataContractAddress);
             DATA_OPERATIONAL = true;
+            emit DATA_CONTRACT_REGISTERED();
     }
 
     function generateIndexes(address account) internal returns(uint8[3] memory indexes) {

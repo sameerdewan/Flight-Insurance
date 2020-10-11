@@ -62,6 +62,9 @@ contract Data {
         bool PAYOUT_AVAILABLE;
     }
 
+    event ORACLE_CONTRACT_REGISTERED();
+    event DATA_CONTRACT_OPERATIONAL();
+
     constructor() public {
         OWNER_ADDRESS = msg.sender;
         DATA_ADDRESS = address(this);
@@ -92,6 +95,7 @@ contract Data {
             require(APP_OPERATIONAL == true, 'Error: APP CONTRACT is not registered.');
             require(ORACLE_OPERATIONAL == true, 'Error: ORACLE CONTRACT is not registered.');
             DATA_OPERATIONAL = true;
+            emit DATA_CONTRACT_OPERATIONAL();
     }
 
     function registerAppContract(address appContractAddress) external {
@@ -100,10 +104,11 @@ contract Data {
         APP_OPERATIONAL = true;
     }
 
-    function registerOracleContract(address oracleContractAddress) external {
-        require(tx.origin == OWNER_ADDRESS, 'Error: tx.origin is not OWNER.');
-        ORACLE_ADDRESS = oracleContractAddress;
-        ORACLE_OPERATIONAL = true;
+    function registerOracleContract(address oracleContractAddress) external 
+        isOwner() {
+            ORACLE_ADDRESS = oracleContractAddress;
+            ORACLE_OPERATIONAL = true;
+            emit ORACLE_CONTRACT_REGISTERED();
     }
 
     function applyAirline(string memory airlineName, address airlineAddress) external 

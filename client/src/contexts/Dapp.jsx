@@ -19,7 +19,7 @@ export function DappProvider({ children }) {
     const [dataIsOperational, setDataIsOperational] = useState({ status: false, loading: false });
 
     const [wiredAppToOracle, setWiredAppToOracle] = useState({ status: false, loading: false });
-    const [wirdeDataToOracle, setWiredDataToOracle] = useState({ status: false, loading: false });
+    const [wiredDataToOracle, setWiredDataToOracle] = useState({ status: false, loading: false });
     const [oracleIsOperational, setOracleIsOperational] = useState({ status: false, loading: false });
 
     const { 
@@ -33,6 +33,35 @@ export function DappProvider({ children }) {
         account, 
         web3 
     } = useContext(Web3Context);
+
+    useEffect(() => {
+        const allOperationalStatuses = [
+            wiredDataToApp.status,
+            wiredOracleToApp.status,
+            appIsOperational.status,
+            wiredAppToData.status,
+            wiredOracleToData.status, 
+            dataIsOperational.status, 
+            wiredAppToOracle.status,
+            wiredDataToOracle.status, 
+            oracleIsOperational.status
+        ];
+        const overallOperationalStatus = !allOperationalStatuses.includes(false);
+        setOperationalStatus(overallOperationalStatus);
+        if (overallOperationalStatus === true) {
+            toast.success('🎉 Block Airline Insurance is Operational');
+        }
+    }, [
+        wiredDataToApp,
+        wiredOracleToApp,
+        appIsOperational,
+        wiredAppToData,
+        wiredOracleToData, 
+        dataIsOperational, 
+        wiredAppToOracle,
+        wiredDataToOracle, 
+        oracleIsOperational
+    ]);
 
     useEffect(() => {
         (async () => {
@@ -51,17 +80,17 @@ export function DappProvider({ children }) {
             const local_wiredOracleToData = await dataContract.methods.ORACLE_OPERATIONAL().call();
             const local_dataIsOperational = await dataContract.methods.DATA_OPERATIONAL().call();
 
-            setWiredAppToData(local_wiredAppToData);
-            setWiredOracleToData(local_wiredOracleToData);
-            setDataIsOperational(local_dataIsOperational);
+            setWiredAppToData({ status: local_wiredAppToData, loading: false });
+            setWiredOracleToData({ status: local_wiredOracleToData, loading: false });
+            setDataIsOperational({ status: local_dataIsOperational, loading: false });
 
             const local_wiredAppToOracle = await oracleContract.methods.APP_OPERATIONAL().call();
-            const local_wirdeDataToOracle = await oracleContract.methods.ORACLE_OPERATIONAL().call();
+            const local_wiredDataToOracle = await oracleContract.methods.DATA_OPERATIONAL().call();
             const local_oracleIsOperational = await oracleContract.methods.ORACLE_OPERATIONAL().call();
 
-            setWiredAppToOracle(local_wiredAppToOracle);
-            setWiredDataToOracle(local_wirdeDataToOracle);
-            setOracleIsOperational(local_oracleIsOperational);
+            setWiredAppToOracle({ status: local_wiredAppToOracle, loading: false });
+            setWiredDataToOracle({ status: local_wiredDataToOracle, loading: false });
+            setOracleIsOperational({ status: local_oracleIsOperational, loading: false });
 
             const allOperationalStatuses = [
                 local_wiredDataToApp,
@@ -71,7 +100,7 @@ export function DappProvider({ children }) {
                 local_wiredOracleToData,
                 local_dataIsOperational,
                 local_wiredAppToOracle,
-                local_wirdeDataToOracle,
+                local_wiredDataToOracle,
                 local_oracleIsOperational
             ];
 
@@ -103,6 +132,7 @@ export function DappProvider({ children }) {
     }, [dataContract, web3Enabled]);
 
     const DEFAULT_GAS_SETTINGS = { gas: 4712388, gasPrice: 100000000000 };
+    const DEFAULT_PAYLOAD = { from: account, ...DEFAULT_GAS_SETTINGS };
 
     const operationalMethods = {
         wireDataToApp() {
@@ -111,38 +141,197 @@ export function DappProvider({ children }) {
             DATA_CONTRACT_REGISTERED
                 .on('data', () => {
                     setTimeout(() => {
-                        toast.success('✅ Data Contract wired');
+                        toast.success('✅ Data Contract wired to App Contract');
                         setWiredDataToApp({loading: false, status: true});
                     }, 2000);
                 })
                 .on('error', () => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Data Contract');
+                        toast.error('❌ Failed to wire Data Contract to App Contract');
                         setWiredDataToApp({loading: false, status: false});
                     }, 1000);
                 });
-            appContract.methods.registerDataContract(dataContractAddress).send({ from: account, ...DEFAULT_GAS_SETTINGS });
+            appContract.methods.registerDataContract(dataContractAddress).send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Data Contract to App Contract');
+                        setWiredDataToApp({loading: false, status: false});
+                    }, 1000);
+                });
         },
-        async wireOracleToApp() {
-            await appContract.methods.registerOracleContract(oracleContractAddress).send({ from: account });
+        wireOracleToApp() {
+            setWiredOracleToApp({ status: false, loading: true });
+            const ORACLE_CONTRACT_REGISTERED = appContract.events.ORACLE_CONTRACT_REGISTERED();
+            ORACLE_CONTRACT_REGISTERED
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success('✅ Oracle Contract wired to App Contract');
+                        setWiredOracleToApp({ loading: false, status: true });
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Oracle Contract to App Contract');
+                        setWiredOracleToApp({ loading: false, status: false });
+                    }, 1000);
+                });
+            appContract.methods.registerOracleContract(oracleContractAddress).send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Oracle Contract to App Contract');
+                        setWiredOracleToApp({ loading: false, status: false });
+                    }, 1000);
+                });
         },
-        async setAppOperational() {
-            await appContract.methods.setAppOperational().send({ from: account });
+        setAppOperational() {
+            setAppIsOperational({ status: false, loading: true });
+            const APP_IS_OPERATIONAL = appContract.events.APP_IS_OPERATIONAL();
+            APP_IS_OPERATIONAL
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success('✅ App Contract set to Operational');
+                        setAppIsOperational({ status: true, loading: false });
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to set App Contract to Operational');
+                        setAppIsOperational({ status: false, loading: false });
+                    }, 1000);
+                });
+            appContract.methods.setAppOperational().send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to set App Contract to Operational');
+                        setAppIsOperational({ status: false, loading: false });
+                    }, 1000);
+                });
         },
         async wireAppToData() {
-            await dataContract.methods.registerAppContract(appContractAddress).send({ from: account });
+            setWiredAppToData({ status: false, loading: true });
+            const isWired = await dataContract.methods.APP_OPERATIONAL().call();
+            if (isWired === true) {
+                setTimeout(() => {
+                    toast.success('✅ App Contract wired to Data Contract');
+                    setWiredAppToData({ status: true, loading: false });
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    toast.error('Failed to wire App Contract to Data Contract');
+                    setWiredAppToData({ status: false, loading: false });
+                }, 1000);
+            }
         },
         async wireOracleToData() {
-            await dataContract.methods.registerOracleContract(oracleContractAddress).send({ from: account });
+            setWiredOracleToData({ status: false, loading: true });
+            const ORACLE_CONTRACT_REGISTERED = dataContract.events.ORACLE_CONTRACT_REGISTERED();
+            ORACLE_CONTRACT_REGISTERED
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success('✅ Oracle Contract wired to Data Contract');
+                        setWiredOracleToData({ status: true, loading: false });
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Oracle Contract to Data Contract');
+                        setWiredOracleToData({ loading: false, status: false });
+                    }, 1000);
+                });
+            dataContract.methods.registerOracleContract(oracleContractAddress).send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Oracle Contract to Data Contract');
+                        setWiredOracleToData({ loading: false, status: false });
+                    }, 1000);
+                });
+        },
+        setDataOperational() {
+            setDataIsOperational({ status: false, loading: true });
+            const DATA_CONTRACT_OPERATIONAL = dataContract.events.DATA_CONTRACT_OPERATIONAL();
+            DATA_CONTRACT_OPERATIONAL
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success('✅ Data Contract set to Operational');
+                        setDataIsOperational({ status: true, loading: false });
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to set Data Contract to Operational');
+                        setDataIsOperational({ loading: false, status: false });
+                    }, 1000);
+                });
+            dataContract.methods.setDataOperational().send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to set Data Contract to Operational');
+                        setDataIsOperational({ loading: false, status: false });
+                    }, 1000);
+                });
         },
         async wireAppToOracle() {
-            await oracleContract.methods.registerAppContract(appContractAddress).send({ from: account });
+            setWiredAppToOracle({ status: false, loading: true });
+            const isWired = await oracleContract.methods.APP_OPERATIONAL().call();
+            if (isWired === true) {
+                setTimeout(() => {
+                    toast.success('✅ App Contract wired to Oracle Contract');
+                    setWiredAppToOracle({ status: true, loading: false });
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    toast.error('Failed to wire App Contract to Oracle Contract');
+                    setWiredAppToOracle({ status: false, loading: false });
+                }, 1000);
+            }
         },
-        async wireDataToOracle() {
-            await oracleContract.methods.registerDataContract(dataContractAddress).send({ from: account });
+        wireDataToOracle() {
+            setWiredDataToOracle({ status: false, loading: true });
+            const DATA_CONTRACT_REGISTERED = oracleContract.events.DATA_CONTRACT_REGISTERED();
+            DATA_CONTRACT_REGISTERED
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success('✅ Data Contract wired to Oracle Contract');
+                        setWiredDataToOracle({ status: true, loading: false });
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Data Contract to Oracle Contract');
+                        setWiredDataToOracle({ loading: false, status: false });
+                    }, 1000);
+                });
+            oracleContract.methods.registerDataContract(oracleContractAddress).send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to wire Data Contract to Oracle Contract');
+                        setWiredDataToOracle({ loading: false, status: false });
+                    }, 1000);
+                });
         },
-        async setOracleOperational() {
-            await oracleContract.methods.setOracleOperational().send({ from: account });
+        setOracleOperational() {
+            setOracleIsOperational({ status: false, loading: true });
+            const ORACLE_CONTRACT_OPERATIONAL = oracleContract.events.ORACLE_CONTRACT_OPERATIONAL();
+            ORACLE_CONTRACT_OPERATIONAL
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success('✅ Oracle Contract set to Operational');
+                        setOracleIsOperational({ status: true, loading: false });
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to set Oracle Contract to Operational');
+                        setOracleIsOperational({ loading: false, status: false });
+                    }, 1000);
+                });
+            oracleContract.methods.setOracleOperational().send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error('❌ Failed to set Oracle Contract to Operational');
+                        setOracleIsOperational({ loading: false, status: false });
+                    }, 1000);
+                });
         }
     };
 
@@ -154,7 +343,7 @@ export function DappProvider({ children }) {
         wiredOracleToData,
         dataIsOperational,
         wiredAppToOracle,
-        wirdeDataToOracle,
+        wiredDataToOracle,
         oracleIsOperational
     };
 
@@ -164,7 +353,7 @@ export function DappProvider({ children }) {
     };
 
     return (
-        <DappContext.Provider value={{state, operationalMethods, wiredDataToApp}}>
+        <DappContext.Provider value={{state, operationalMethods, operationalStatuses}}>
             { children }
         </DappContext.Provider>
     );

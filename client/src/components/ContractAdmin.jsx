@@ -44,18 +44,17 @@ function ContractSwitch({ label, onClick, state }) {
 }
 
 export default function ContractAdmin() {
-    const { wiredDataToApp, operationalMethods } = useContext(DappContext);
-    console.log({ wiredDataToApp })
+    const { operationalStatuses, operationalMethods } = useContext(DappContext);
     const contractOptions = [
-        { label: 'Wire Data Contract ➡ App Contract', onClick: operationalMethods.wireDataToApp, state: wiredDataToApp },
-        // { label: 'Wire Oracle Contract ➡ App Contract', onClick: () => console.log('app > oracle') },
-        // { label: 'Set App Contract Operational 💡', onClick: () => console.log('app >>> opp') },
-        // { label: 'Wire App Contract ➡ Data Contract', onClick: () => console.log('app+data') },
-        // { label: 'Wire Oracle Contract ➡ Data Contract', onClick: () => console.log('app+data') },
-        // { label: 'Set Data Contract Operational 💡', onClick: () => console.log('app >>> opp') },
-        // { label: 'Wire App Contract ➡ Oracle Contract', onClick: () => console.log('oracle > app') },
-        // { label: 'Wire Data Contract ➡ Oracle Contract', onClick: () => console.log('oracle > data') },
-        // { label: 'Set Oracle Contract Operational 💡', onClick: () => console.log('oracle >>> opp') },
+        { label: 'Wire Data Contract ➡ App Contract', onClick: operationalMethods.wireDataToApp, state: operationalStatuses.wiredDataToApp },
+        { label: 'Wire Oracle Contract ➡ App Contract', onClick: operationalMethods.wireOracleToApp, state: operationalStatuses.wiredOracleToApp },
+        { label: 'Set App Contract Operational 💡', onClick: operationalMethods.setAppOperational, state: operationalStatuses.appIsOperational },
+        { label: 'Wire App Contract ➡ Data Contract', onClick: operationalMethods.wireAppToData, state: operationalStatuses.wiredAppToData },
+        { label: 'Wire Oracle Contract ➡ Data Contract', onClick: operationalMethods.wireOracleToData, state: operationalStatuses.wiredOracleToData },
+        { label: 'Set Data Contract Operational 💡', onClick: operationalMethods.setDataOperational, state: operationalStatuses.dataIsOperational },
+        { label: 'Wire App Contract ➡ Oracle Contract', onClick: operationalMethods.wireAppToOracle, state: operationalStatuses.wiredAppToOracle },
+        { label: 'Wire Data Contract ➡ Oracle Contract', onClick: operationalMethods.wireDataToOracle, state: operationalStatuses.wiredDataToOracle },
+        { label: 'Set Oracle Contract Operational 💡', onClick: operationalMethods.setOracleOperational, state: operationalStatuses.oracleIsOperational },
     ];
     return (
         <Container>

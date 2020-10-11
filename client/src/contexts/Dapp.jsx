@@ -107,13 +107,11 @@ export function DappProvider({ children }) {
             const overallOperationalStatus = !allOperationalStatuses.includes(false);
             setOperationalStatus(overallOperationalStatus);
         })();
-    }, [web3Enabled, 
+    }, [web3,
+        web3Enabled, 
         appContract, 
-        appContract?.methods, 
         dataContract, 
-        dataContract?.methods, 
-        oracleContract, 
-        oracleContract?.methods]
+        oracleContract]
     );
 
     useEffect(() => {

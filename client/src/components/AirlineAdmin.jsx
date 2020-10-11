@@ -6,6 +6,8 @@ import VoteAirline from '../images/vote_airline.png';
 import FundAirline from '../images/fund_airline.png';
 import AddFlight from '../images/add_flight.png';
 import DappContext from '../contexts/Dapp';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Column = styled(Col)`
     border-right: 1px dotted lightgrey;
@@ -40,7 +42,7 @@ export default function AirlineAdmin() {
                             Current account address will be made airline address
                         </Form.Text>
                         <br/>
-                        <center><Button>Apply Airline</Button></center>
+                        <center><Button style={{marginTop: 61}} variant='dark'>Apply Airline</Button></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={VoteAirline} name='Vote for Airline'>
@@ -52,7 +54,7 @@ export default function AirlineAdmin() {
                             Current account address must be owner/airline
                         </Form.Text>
                         <br/>
-                        <center><Button>Vote for Airline</Button></center>
+                        <center><Button style={{marginTop: 61}} variant='dark'>Vote for Airline</Button></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={FundAirline} name='Fund Airline'>
@@ -64,11 +66,26 @@ export default function AirlineAdmin() {
                             Minimum funding is currently {MINIMUM_PARTNER_FEE + ' wei'}
                         </Form.Text>
                         <br/>
-                        <center><Button>Fund Airline</Button></center>
+                        <center><Button style={{marginTop: 61}} variant='dark'>Fund Airline</Button></center>
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={AddFlight} name='Add Flight'>
-                    4
+                    <br/>
+                    <Form.Label>Flight Date/Time Departure</Form.Label>
+                    <DatePicker
+                        // selected={date}
+                        // onChange={handleDateChange}
+                        showTimeSelect
+                        dateFormat="Pp"
+                    />
+                    <br/>
+                    <Form.Label>Flight Name</Form.Label>
+                    <Form.Control placeholder="Enter flight name..." />
+                    <Form.Text className="text-muted">
+                        Example: [MIA, FL {">"} LA, CA]
+                    </Form.Text>
+                    <br/>
+                    <center><Button variant='dark'>Add Flight</Button></center>
                 </AirlineAdminColumn>
             </Row>
         </Container>

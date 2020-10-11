@@ -1,4 +1,3 @@
-import { set } from 'lodash';
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
 import Web3Context from './Web3';
@@ -27,7 +26,7 @@ export function DappProvider({ children }) {
     const { 
         web3Enabled, 
         appContract, 
-        appContractAddress, 
+        // appContractAddress, 
         dataContract, 
         dataContractAddress, 
         oracleContract,

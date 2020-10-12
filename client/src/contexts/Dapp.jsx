@@ -171,7 +171,13 @@ export function DappProvider({ children }) {
                     }, 1000);
                 });
         },
-        voteAirline() {},
+        voteAirline(airlineName) {
+            if (!airlineName || airlineName.trim() === "") {
+                return;
+            }
+            setAirlineVoteIsLoading(true);
+            const AIRLINE_VOTED_FOR = appContract.events.AIRLINE_VOTED_FOR({ topics: [, web3.utils.sha3(airlineName)] });
+        },
         fundAirline() {},
         addFlight() {}
     };
@@ -392,7 +398,8 @@ export function DappProvider({ children }) {
     const state = {
         isOperational,
         allFlights,
-        MINIMUM_PARTNER_FEE
+        MINIMUM_PARTNER_FEE,
+        DEFAULT_GAS_SETTINGS
     };
 
     const airlineStates = {

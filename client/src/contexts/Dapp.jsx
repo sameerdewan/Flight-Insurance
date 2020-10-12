@@ -238,7 +238,15 @@ export function DappProvider({ children }) {
                     }, 1000);
                 });
         },
-        fundAirline() {},
+        fundAirline(airlineName, funds) {
+            if (!airlineName || airlineName.trim() === "") {
+                return;
+            }
+            if (!funds || funds < MINIMUM_PARTNER_FEE) {
+                return;
+            }
+            setAirlineFundIsLoading(true);
+        },
         addFlight() {}
     };
 

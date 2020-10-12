@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Nav } from 'react-bootstrap';
-import { HOME, BUY_INSURANCE, CLAIM_INSURANCE, AIRLINE_ADMIN, CONTRACT_ADMIN } from '../router/routerPaths';
+import { HOME, PASSENGER_INSURANCE, AIRLINE_ADMIN, CONTRACT_ADMIN } from '../router/routerPaths';
 import { changePath } from '../utils/routerFunctions';
 import { upperFirst } from 'lodash';
 import DappContext from '../contexts/Dapp';
@@ -11,12 +11,8 @@ const TABS = [
         path: HOME
     },
     {
-        label: 'Buy Insurance',
-        path: BUY_INSURANCE
-    },
-    {
-        label: 'Claim Insurance',
-        path: CLAIM_INSURANCE
+        label: 'Passenger Insurance',
+        path: PASSENGER_INSURANCE
     },
     {
         label: 'Airline Administration',

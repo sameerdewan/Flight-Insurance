@@ -113,6 +113,7 @@ contract Data {
 
     function applyAirline(string memory airlineName, address airlineAddress) external 
         isAppContract() {
+            require(MAPPED_AIRLINES[airlineName].EXISTS == false, 'Error: Airline already exists.');
             if (TOTAL_AIRLINES <= 4) {
                 AIRLINE memory airline = AIRLINE({
                     ADDRESS: airlineAddress,

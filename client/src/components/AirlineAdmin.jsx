@@ -9,6 +9,7 @@ import DappContext from '../contexts/Dapp';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SwitchLoaderComponent from './Reusables';
+import { useState } from 'react';
 
 const Column = styled(Col)`
     border-right: 1px dashed lightgrey;
@@ -29,8 +30,12 @@ const AirlineAdminColumn = ({ image, name, children }) => {
 };
 
 export default function AirlineAdmin() {
-    const { state } = useContext(DappContext);
+    const { state, airlineMethods, airlineStates } = useContext(DappContext);
     const { MINIMUM_PARTNER_FEE } = state;
+    const [applyAirlineName, setApplyAirlineName] = useState(undefined);
+    const [voteAirlineName, setVoteAirlineName] = useState(undefined);
+    const [fundAirlineValue, setFundAirlineValue] = useState(undefined);
+    const [fundAirlineName, setFundAirlineName] = useState(undefined);
     return (
         <Container fluid>
             <Row height={'100%'}>
@@ -38,14 +43,22 @@ export default function AirlineAdmin() {
                     <br/>
                     <Form>
                         <Form.Label>Airline Name</Form.Label>
-                        <Form.Control placeholder="Enter Airline Name..." />
+                        <Form.Control placeholder="Enter Airline Name..." onChange={e => setApplyAirlineName(e.target.value)} />
                         <Form.Text className="text-muted">
                             Current account address will be made airline address
                         </Form.Text>
                         <br/>
-                        <center><Button style={{marginTop: 61}} variant='dark'>📝 Apply Airline</Button></center>
+                        <center>
+                            <Button 
+                                onClick={() => airlineMethods.applyAirline(applyAirlineName)} 
+                                style={{marginTop: 91}} 
+                                variant='dark'
+                            >
+                                📝 Apply Airline
+                            </Button>
+                        </center>
                         <br/>
-                        <center><SwitchLoaderComponent /></center>
+                        { airlineStates.airlineApplyIsLoading && <center><SwitchLoaderComponent /></center> }
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={VoteAirline} name='Vote for Airline'>
@@ -53,27 +66,48 @@ export default function AirlineAdmin() {
                     <Form>
                         <Form.Label>Airline Name</Form.Label>
                         <Form.Control placeholder="Enter Airline Name..." />
-                        <Form.Text className="text-muted">
+                        <Form.Text className="text-muted" onChange={e => setVoteAirlineName(e.target.value)}>
                             Current account address must be owner/airline
                         </Form.Text>
                         <br/>
-                        <center><Button style={{marginTop: 61}} variant='dark'>🗳️ Vote for Airline</Button></center>
+                        <center>
+                            <Button 
+                                onClick={() => airlineMethods.voteAirline(voteAirlineName)}
+                                style={{marginTop: 91}} 
+                                variant='dark'
+                            >
+                                🗳️ Vote for Airline
+                            </Button>
+                        </center>
                         <br/>
-                        <center><SwitchLoaderComponent /></center>
+                        { airlineStates.airlineVoteIsLoading && <center><SwitchLoaderComponent /></center> }
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={FundAirline} name='Fund Airline'>
                     <br/>
                     <Form>
+                        <Form.Label>Airline Name</Form.Label>
+                        <Form.Control placeholder="Enter Airline Name..." onChange={e => setFundAirlineName(e.target.value)} />
+                        <Form.Text className="text-muted">
+                            Airline name to fund
+                        </Form.Text>
                         <Form.Label>Funding Amount</Form.Label>
-                        <Form.Control placeholder="Enter funds in wei..." />
+                        <Form.Control placeholder="Enter funds in wei..." onChange={e => setFundAirlineValue(Number(e.target.value))} />
                         <Form.Text className="text-muted">
                             Minimum funding is currently {MINIMUM_PARTNER_FEE + ' wei'}
                         </Form.Text>
                         <br/>
-                        <center><Button style={{marginTop: 61}} variant='dark'>💰 Fund Airline</Button></center>
+                        <center>
+                            <Button 
+                                onClick={() => airlineMethods.fundAirline(fundAirlineName, fundAirlineValue)}
+                                variant='dark'
+                                style={{marginTop: 0}}
+                            >
+                                💰 Fund Airline
+                            </Button>
+                        </center>
                         <br/>
-                        <center><SwitchLoaderComponent /></center>
+                        { airlineStates.airlineFundIsLoading && <center><SwitchLoaderComponent /></center> }
                     </Form>
                 </AirlineAdminColumn>
                 <AirlineAdminColumn image={AddFlight} name='Add Flight'>
@@ -92,9 +126,9 @@ export default function AirlineAdmin() {
                         Example: [MIA, FL {">"} LA, CA]
                     </Form.Text>
                     <br/>
-                    <center><Button variant='dark'>✈️ Add Flight</Button></center>
+                    <center><Button style={{marginTop: 31}} variant='dark'>✈️ Add Flight</Button></center>
                     <br/>
-                    <center><SwitchLoaderComponent /></center>
+                    { airlineStates.airlineAddFlightIsLoading && <center><SwitchLoaderComponent /></center> }
                 </AirlineAdminColumn>
             </Row>
         </Container>

@@ -145,8 +145,11 @@ export function DappProvider({ children }) {
 
     const airlineMethods = {
         applyAirline(airlineName) {
+            if (!airlineName || airlineName.trim() === "") {
+                return;
+            }
             setAirlineApplyIsLoading(true);
-            const AIRLINE_APPLIED = appContract.events.AIRLINE_APPLIED();
+            const AIRLINE_APPLIED = appContract.events.AIRLINE_APPLIED({ topics: [, web3.utils.sha3(airlineName)] });
             AIRLINE_APPLIED
                 .on('data', () => {
                     setTimeout(() => {

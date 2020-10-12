@@ -5,7 +5,7 @@ import { Badge, Spinner } from 'react-bootstrap';
 export default function SwitchLoaderComponent({absolute}) {
     const SwitchLoader = styled(Badge)`
         margin-left: ${props => props.absolute === true ? '10px' : '0px'};
-        position: ${props => props.absolute == true ? 'absolute' : 'unset'};
+        position: ${props => props.absolute === true ? 'absolute' : 'unset'};
         left: ${props => props.absolute === true ? '340px' : '0px'};
         height: fit-content;
     `;

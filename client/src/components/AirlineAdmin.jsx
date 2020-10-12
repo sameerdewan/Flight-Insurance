@@ -65,8 +65,8 @@ export default function AirlineAdmin() {
                     <br/>
                     <Form>
                         <Form.Label>Airline Name</Form.Label>
-                        <Form.Control placeholder="Enter Airline Name..." />
-                        <Form.Text className="text-muted" onChange={e => setVoteAirlineName(e.target.value)}>
+                        <Form.Control placeholder="Enter Airline Name..." onChange={e => setVoteAirlineName(e.target.value)} />
+                        <Form.Text className="text-muted">
                             Current account address must be owner or approved airline
                         </Form.Text>
                         <br/>

@@ -146,6 +146,8 @@ contract Data {
 
     function voteForAirline(string memory airlineName, address voter) external
         isAppContract() isOperational() returns(bool) {
+            require(MAPPED_AIRLINES[airlineName].EXISTS == true, 'Error: Airline does not exist.');
+            require(MAPPED_AIRLINES[airlineName].VOTERS[voter] == false, 'Error: Already voted.');
             MAPPED_AIRLINES[airlineName].VOTERS[voter] = true;
             MAPPED_AIRLINES[airlineName].VOTES = SafeMath.add(MAPPED_AIRLINES[airlineName].VOTES, 1);
             bool approved = checkForApproval(airlineName);

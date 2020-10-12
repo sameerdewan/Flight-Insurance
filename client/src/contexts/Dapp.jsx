@@ -200,13 +200,43 @@ export function DappProvider({ children }) {
             if (!airlineName || airlineName.trim() === "") {
                 return;
             }
-            const voterName = airlines.filter(a => a.address === account)[0] || undefined;
+            const voterName = airlines.filter(a => a.address === account)[0] || account;
             setAirlineVoteIsLoading(true);
-            const AIRLINE_VOTED_FOR = appContract.events.AIRLINE_VOTED_FOR({ topics: [, web3.utils.sha3(airlineName)] });
+            const AIRLINE_VOTED_FOR = appContract.events.AIRLINE_VOTED_FOR({ topics: [web3.utils.sha3(airlineName)] });
             AIRLINE_VOTED_FOR
-                .on('data')
-                .on('error');
-            appContract.methods.voteForAirline(airlineName, voterName).send(DEFAULT_PAYLOAD);
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success(`Airline: ${airlineName} voted for by ${voterName}`);
+                        setAirlineVoteIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`Voter: ${voterName} failed to vote for ${airlineName}`);
+                        setAirlineVoteIsLoading(false);
+                    }, 1000);
+                });
+            const AIRLINE_APPROVED = appContract.events.AIRLINE_APPROVED({ topics: [, web3.utils.sha3(airlineName)] });
+            AIRLINE_APPROVED
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.dark(`Airline ${airlineName} was approved`);
+                        setAirlineVoteIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', () => {
+                   setTimeout(() => {
+                    toast.error(`Something went wrong setting airline ${airlineName} to approved`);
+                    setAirlineVoteIsLoading(false);
+                   }, 1000);
+                });
+            appContract.methods.voteForAirline(airlineName, voterName).send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`Voter: ${voterName} failed to vote for ${airlineName}`);
+                        setAirlineVoteIsLoading(false);
+                    }, 1000);
+                });
         },
         fundAirline() {},
         addFlight() {}

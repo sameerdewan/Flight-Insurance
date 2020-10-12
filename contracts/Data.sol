@@ -24,7 +24,7 @@ contract Data {
     string private constant AIRLINE_INSUFFICIENT_FUNDS = "AIRLINE_INSUFFICIENT_FUNDS";
     string private constant AIRLINE_FUNDED = "AIRLINE_FUNDED";
 
-    mapping(string => AIRLINE) private MAPPED_AIRLINES;
+    mapping(string => AIRLINE) public MAPPED_AIRLINES;
     string[] public AIRLINES;
     uint256 public TOTAL_AIRLINES = 0;
 
@@ -44,7 +44,7 @@ contract Data {
     string private constant FLIGHT_STATUS_CODE_LATE_TECHNICAL = "FLIGHT_STATUS_CODE_LATE_TECHNICAL";
     string private constant FLIGHT_STATUS_CODE_LATE_OTHER = "FLIGHT_STATUS_CODE_LATE_OTHER";
 
-    mapping(bytes32 => FLIGHT) private MAPPED_FLIGHTS;
+    mapping(bytes32 => FLIGHT) public MAPPED_FLIGHTS;
     string[2][] public FLIGHTS;
     uint256 public TOTAL_FLIGHTS = 0;
 

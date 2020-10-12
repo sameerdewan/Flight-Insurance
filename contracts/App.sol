@@ -27,8 +27,8 @@ contract App {
     uint256 public MAXIMUM_PASSENGER_INSURANCE_FEE = 40000000000000000; // .04 ETH
 
     event AIRLINE_APPLIED(address airlinelineAddress, string indexed airlineName);
-    event AIRLINE_VOTED_FOR(string airlineName, address voter);
-    event AIRLINE_APPROVED(string airlineName, address airlineAddress);
+    event AIRLINE_VOTED_FOR(string indexed airlineName, address voter);
+    event AIRLINE_APPROVED(string indexed airlineName, address airlineAddress);
     event AIRLINE_FUNDED(address fundingAddress, string airlineName);
     event FLIGHT_ADDED(address airlineAddress, string airlineName, string flightName, uint256 timestamp);
     event INSURANCE_BOUGHT(address passenger, uint256 insuranceFunds, string airlineName, string flightName);

@@ -8,7 +8,7 @@ export default DappContext;
 
 export function DappProvider({ children }) {
     const [isOperational, setOperationalStatus] = useState(false);
-    const [allFlights, setFlights] = useState([]);
+    const [airlines, setAirlines] = useState([]);
     const [MINIMUM_PARTNER_FEE, setPartnerFee] = useState(undefined);
 
     const [wiredDataToApp, setWiredDataToApp] = useState({ status: false, loading: false });
@@ -127,18 +127,43 @@ export function DappProvider({ children }) {
 
     useEffect(() => {
         (async () => {
-            if (!web3Enabled || !dataContract) {
+            if (!web3 || !web3Enabled || !appContract || !dataContract || !oracleContract) {
                 return;
             }
-            const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
-            const flights = [];
-            for (let flightIndex = 0; flightIndex < amountOfFlights.length + 1; flightIndex++) {
-                const flight = await dataContract.methods.getFlightAtIndex(flightIndex).call();
-                flights.push(flight);
+            const amountOfAirlines = Number(await dataContract.methods.TOTAL_AIRLINES().call());
+            const airlinesNames = [];
+            for (let airlineIndex = 0; airlineIndex < amountOfAirlines; airlineIndex++) {
+                const airlineName = await dataContract.methods.AIRLINES(airlineIndex).call();
+                airlinesNames.push(airlineName);
             }
-            setFlights(flights);
+            const _airlines = [];
+            for (let airlineIndex = 0; airlineIndex < airlinesNames.length; airlineIndex++) {
+                const airlineName = airlinesNames[airlineIndex];
+                const response = await dataContract.methods.MAPPED_AIRLINES(airlineName).call();
+                const airline = {
+                    name: airlineName,
+                    address: response.ADDRESS,
+                    funds: response.FUNDS,
+                    status: response.STATUS
+                };
+                _airlines.push(airline);
+            }
+            setAirlines(_airlines);
+
+            // const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
+            // const flights = [];
+            // for (let flightIndex = 0; flightIndex < amountOfFlights.length + 1; flightIndex++) {
+            //     const flight = await dataContract.methods.getFlightAtIndex(flightIndex).call();
+            //     flights.push(flight);
+            // }
+            // setFlights(flights);
         })();
-    }, [dataContract, web3Enabled]);
+    }, [web3,
+        web3Enabled, 
+        appContract, 
+        dataContract, 
+        oracleContract]
+    );
 
     const DEFAULT_GAS_SETTINGS = { gas: 4712388, gasPrice: 100000000000 };
     const DEFAULT_PAYLOAD = { from: account, ...DEFAULT_GAS_SETTINGS };
@@ -175,8 +200,13 @@ export function DappProvider({ children }) {
             if (!airlineName || airlineName.trim() === "") {
                 return;
             }
+            const voterName = airlines.filter(a => a.address === account)[0] || undefined;
             setAirlineVoteIsLoading(true);
             const AIRLINE_VOTED_FOR = appContract.events.AIRLINE_VOTED_FOR({ topics: [, web3.utils.sha3(airlineName)] });
+            AIRLINE_VOTED_FOR
+                .on('data')
+                .on('error');
+            appContract.methods.voteForAirline(airlineName, voterName).send(DEFAULT_PAYLOAD);
         },
         fundAirline() {},
         addFlight() {}
@@ -397,7 +427,6 @@ export function DappProvider({ children }) {
 
     const state = {
         isOperational,
-        allFlights,
         MINIMUM_PARTNER_FEE,
         DEFAULT_GAS_SETTINGS
     };

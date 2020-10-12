@@ -58,7 +58,7 @@ export function Web3Provider({ children }) {
             await connectDataContract();
             await connectAppContract();
             await connectOracleContract();
-            setAccount(accounts[0]);
+            setAccount(web3?.givenProvider?.selectedAddress || accounts[0]);
             setWeb3Enabled(true);
         window.ethereum.on('accountsChanged', () => window.location.reload());
         })();

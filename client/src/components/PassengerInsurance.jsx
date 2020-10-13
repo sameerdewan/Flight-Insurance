@@ -20,7 +20,7 @@ export default function PassengerInsurance() {
     return (
         <Container fluid>
             <Row>
-                <DappColumn image={ViewFlights} name="View Flights">
+                <DappColumn image={ViewFlights} name="View Flight Status">
                     <br />
                     <Form>
                         <Form.Label>Select Airline and Flight</Form.Label>
@@ -112,7 +112,7 @@ export default function PassengerInsurance() {
                             {flights.map((f, i) => <option key={i}>{f.airlineName} ➡️ {f.flightName}</option>)}
                         </Form.Control>
                         <Form.Text className="text-muted">
-                            Select airline and flight pair to claim insurance for
+                            Select airline and flight pair to claim insurance for. This requires first checking the flight status and reaching out to our oracles.
                         </Form.Text>
                     </Form>
                     <br />

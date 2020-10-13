@@ -10,7 +10,7 @@ import DappContext from '../contexts/Dapp';
 
 export default function PassengerInsurance() {
     const { state, insuranceMethods, insuranceStates } = useContext(DappContext);
-    const { flights, MINIMUM_INSURANCE_FUNDING, MAXIMUM_INSURANCE_FUNDING } = state;
+    const { flights, MINIMUM_INSURANCE_FUNDING, MAXIMUM_INSURANCE_FUNDING, viewFlightDetails, viewFlightDetailsVisible } = state;
     const [viewFlightAirlineFlightNamePair, setViewFlightAirlineFlightNamePair] = useState(undefined);
     const [buyInsuranceAirlineFlightNamePair, setBuyInsuranceAirlineFlightNamePair] = useState(undefined);
     const [buyInsuranceFundingAmount, setBuyInsuranceFundingAmount] = useState(undefined);
@@ -42,8 +42,11 @@ export default function PassengerInsurance() {
                             📥 Retrieve Flight Info
                         </Button>
                     </center>
+                    {
+                        viewFlightDetails && viewFlightDetailsVisible && <code>{JSON.stringify(viewFlightDetails, null, 2)}</code>
+                    }
                     <br />
-                    { insuranceStates.viewFlightsIsLoading && <center><SwitchLoaderComponent /></center> }
+                    { insuranceStates.viewFlightIsLoading && <center><SwitchLoaderComponent /></center> }
                 </DappColumn>
                 <DappColumn image={BuyInsurance} name="Buy Insurance">
                     <br />

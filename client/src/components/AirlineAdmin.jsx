@@ -35,7 +35,7 @@ export default function AirlineAdmin() {
                         <center>
                             <Button 
                                 onClick={() => airlineMethods.applyAirline(applyAirlineName)} 
-                                style={{marginTop: 91}} 
+                                style={{position: 'absolute', bottom: 25, right: '33%'}} 
                                 variant='dark'
                             >
                                 📝 Apply Airline
@@ -57,7 +57,7 @@ export default function AirlineAdmin() {
                         <center>
                             <Button 
                                 onClick={() => airlineMethods.voteAirline(voteAirlineName)}
-                                style={{marginTop: 91}} 
+                                style={{position: 'absolute', bottom: 25, right: '33%'}} 
                                 variant='dark'
                             >
                                 🗳️ Vote for Airline
@@ -85,7 +85,7 @@ export default function AirlineAdmin() {
                             <Button 
                                 onClick={() => airlineMethods.fundAirline(fundAirlineName, fundAirlineValue)}
                                 variant='dark'
-                                style={{marginTop: 0}}
+                                style={{position: 'absolute', bottom: 25, right: '33%'}}
                             >
                                 💰 Fund Airline
                             </Button>
@@ -103,6 +103,9 @@ export default function AirlineAdmin() {
                         showTimeSelect
                         dateFormat="Pp"
                     />
+                    <Form.Text className="text-muted">
+                        Select date and time of flight
+                    </Form.Text>
                     <br/>
                     <Form.Label>Flight Name</Form.Label>
                     <Form.Control placeholder="Enter flight name..." onChange={e => setAddFlightName(e.target.value)} />
@@ -113,7 +116,7 @@ export default function AirlineAdmin() {
                     <center>
                         <Button 
                             onClick={() => airlineMethods.addFlight(addFlightDateTimeDeparture, addFlightName)}
-                            style={{marginTop: 31}} 
+                            style={{position: 'absolute', bottom: 25, right: '33%'}} 
                             variant='dark'
                         >
                             ✈️ Add Flight

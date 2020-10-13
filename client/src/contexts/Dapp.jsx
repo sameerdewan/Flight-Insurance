@@ -9,7 +9,10 @@ export default DappContext;
 export function DappProvider({ children }) {
     const [isOperational, setOperationalStatus] = useState(false);
     const [airlines, setAirlines] = useState([]);
+    const [flights, setFlights] = useState([]);
     const [MINIMUM_PARTNER_FEE, setPartnerFee] = useState(undefined);
+    const [MINIMUM_INSURANCE_FUNDING, setMinimumInsuranceFunding] = useState(undefined);
+    const [MAXIMUM_INSURANCE_FUNDING, setMaximumInsuranceFunding] = useState(undefined);
 
     const [wiredDataToApp, setWiredDataToApp] = useState({ status: false, loading: false });
     const [wiredOracleToApp, setWiredOracleToApp] = useState({ status: false, loading: false });
@@ -117,6 +120,10 @@ export function DappProvider({ children }) {
 
             const partnerFee = await appContract.methods.MINIMUM_PARTNER_FEE().call();
             setPartnerFee(partnerFee);
+            const minInsuranceFunds = await appContract.methods.MINIMUM_PASSENGER_INSURANCE_FEE().call();
+            setMinimumInsuranceFunding(minInsuranceFunds);
+            const maxInsuranceFunds = await appContract.methods.MAXIMUM_PASSENGER_INSURANCE_FEE().call();
+            setMaximumInsuranceFunding(maxInsuranceFunds);
         })();
     }, [web3,
         web3Enabled, 
@@ -151,19 +158,16 @@ export function DappProvider({ children }) {
             setAirlines(_airlines);
 
             const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
-            const flights = [];
+            const _flights = [];
             for (let flightsIndex = 0; flightsIndex < amountOfFlights; flightsIndex++) {
-                const flight = await dataContract.methods.getFlightAtIndex(flightsIndex).call();
-                console.log({ flight });
+                const response = await dataContract.methods.getFlightAtIndex(flightsIndex).call();
+                const flight = {
+                    airlineName: response.airlineName,
+                    flightName: response.flightName
+                };
+                _flights.push(flight);
             }
-
-            // const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
-            // const flights = [];
-            // for (let flightIndex = 0; flightIndex < amountOfFlights.length + 1; flightIndex++) {
-            //     const flight = await dataContract.methods.getFlightAtIndex(flightIndex).call();
-            //     flights.push(flight);
-            // }
-            // setFlights(flights);
+            setFlights(_flights);
         })();
     }, [web3,
         web3Enabled, 
@@ -525,7 +529,11 @@ export function DappProvider({ children }) {
     const state = {
         isOperational,
         MINIMUM_PARTNER_FEE,
-        DEFAULT_GAS_SETTINGS
+        DEFAULT_GAS_SETTINGS,
+        MINIMUM_INSURANCE_FUNDING,
+        MAXIMUM_INSURANCE_FUNDING,
+        flights,
+        airlines
     };
 
     const airlineStates = {

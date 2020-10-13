@@ -6,6 +6,8 @@ const App  = require('./deployments.json').localhost.App;
 const Oracle  = require('./deployments.json').localhost.Oracle;
 const refinedURL = url.replace('http', 'ws');
 
+const app = express();
+
 const oracleHistory = [];
 const oracles = [];
 const MINIMUM_ORACLES = 21;
@@ -91,29 +93,22 @@ async function startOracles() {
         .on('error', error => console.log('reached err'));
 }
 
-function startServer() {
-}
+app.get('/logs', (_, res) => {
+    res.json({ oracleHistory });
+});
 
-(async () => {
+app.get('/oracles', (_, res) => {
+    res.json({ oracles });
+});
+
+app.set('json spaces', 2)
+
+app.listen(5000, async () => {
+    console.log('Oracle Server App running on port 5000...');
+    console.log('GET /logs for server log history');
+    console.log('GET /oracles for registered oracles');
+    console.log('-----------------------------------------');
+    console.log('v               LOGS                    v');
+    console.log('-----------------------------------------');
     await startOracles();
-    startServer();
-})();
-
-// /* SERVER APP */
-// app.get('/logs', (_, res) => {
-//     res.json({ oracle_history });
-// });
-
-// app.get('/oracles', (_, res) => {
-//     res.json({ oracles });
-// });
-
-// app.listen(5000, () => {
-//     start();
-//     console.log('Oracle Server App running on port 5000...');
-//     console.log('GET /logs for server log history');
-//     console.log('GET /oracles for registered oracles');
-//     console.log('-----------------------------------------');
-//     console.log('v               LOGS                    v');
-//     console.log('-----------------------------------------');
-// });
+});

@@ -43,7 +43,15 @@ export default function PassengerInsurance() {
                         </Button>
                     </center>
                     {
-                        viewFlightDetails && viewFlightDetailsVisible && <code>{JSON.stringify(viewFlightDetails, null, 2)}</code>
+                        viewFlightDetails && viewFlightDetailsVisible && (
+                            <React.Fragment>
+                                <code>RESPONSE:</code>
+                                <div style={{border: '1px dashed hotpink', padding: 10}}>
+                                    <code>{JSON.stringify({ flightStatus: viewFlightDetails.flightStatus })}</code>
+                                    <code>{JSON.stringify({ flightTimestamp: new Date(viewFlightDetails.flightTimestamp * 1000).toUTCString() })}</code>
+                                </div>
+                            </React.Fragment>
+                        )
                     }
                     <br />
                     { insuranceStates.viewFlightIsLoading && <center><SwitchLoaderComponent /></center> }

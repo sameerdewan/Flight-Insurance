@@ -34,8 +34,8 @@ contract App {
     event INSURANCE_BOUGHT(address passenger, uint256 insuranceFunds, string airlineName, string flightName);
     event INSURANCE_CLAIMED(address passenger, uint256 claimedValue, string airlineName, string flightName);
     event POLICY_UPDATED(address passenger, string airlineName, string flightName, bool policyActive, uint256 policyFunds, bool payoutAvailable);
-    event ORACLE_RESPONDED(uint8 oracleIndex, string oracleName, string airlineName, string flightName, string flightStatus);
-    event FLIGHT_UPDATED(string airlineName, string flightName, string flightStatus);
+    event ORACLE_RESPONDED(uint8 oracleIndex, string oracleName, string indexed airlineName, string indexed flightName, string flightStatus);
+    event FLIGHT_UPDATED(string indexed airlineName, string indexed flightName, string flightStatus);
 
     event APP_IS_OPERATIONAL();
     event DATA_CONTRACT_REGISTERED();

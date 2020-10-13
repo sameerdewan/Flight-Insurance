@@ -31,6 +31,11 @@ export function DappProvider({ children }) {
     const [airlineFundIsLoading, setAirlineFundIsLoading] = useState(false);
     const [airlineAddFlightIsLoading, setAirlineAddFlightIsLoading] = useState(false); 
 
+    const [viewFlightIsLoading, setViewFlightIsLoading] = useState(false);
+    const [buyInsuranceIsLoading, setBuyInsuranceIsLoading] = useState(false);
+    const [checkPolicyIsLoading, setCheckPolicyIsLoading] = useState(false);
+    const [claimInsuranceIsLoading, setClaimInsuranceIsLoading] = useState(false);
+
     const { 
         web3Enabled, 
         appContract, 
@@ -124,6 +129,9 @@ export function DappProvider({ children }) {
             setMinimumInsuranceFunding(minInsuranceFunds);
             const maxInsuranceFunds = await appContract.methods.MAXIMUM_PASSENGER_INSURANCE_FEE().call();
             setMaximumInsuranceFunding(maxInsuranceFunds);
+
+            console.log(await oracleContract.methods.DATA_ADDRESS().call())
+            console.log(await dataContract.methods.DATA_ADDRESS().call())
         })();
     }, [web3,
         web3Enabled, 
@@ -178,6 +186,77 @@ export function DappProvider({ children }) {
 
     const DEFAULT_GAS_SETTINGS = { gas: 4712388, gasPrice: 100000000000 };
     const DEFAULT_PAYLOAD = { from: account, ...DEFAULT_GAS_SETTINGS };
+
+    const insuranceMethods = {
+        viewFlight(airlineFlightNamePair) {
+            console.log({airlineFlightNamePair})
+            if (!airlineFlightNamePair) {
+                return;
+            }
+            const airlineName = airlineFlightNamePair[0];
+            const flightName = airlineFlightNamePair[1];
+
+            setViewFlightIsLoading(true);
+
+            const ORACLE_REQUEST = oracleContract.events.ORACLE_REQUEST();
+            const ORACLE_RESPONDED = appContract.events.ORACLE_RESPONDED();
+            const FLIGHT_UPDATED = appContract.events.FLIGHT_UPDATED();
+
+            ORACLE_REQUEST
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success(`Oracle Request fired for ${airlineName} flight ${flightName}`);
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`Failed oracle request for ${airlineName} flight ${flightName}`);
+                        setViewFlightIsLoading(false);
+                    }, 1000);
+                });
+            ORACLE_RESPONDED
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success(`Oracle responded to request for ${airlineName} flight ${flightName}`);
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`Oracle request failed to respond to request for ${airlineName} flight ${flightName}`);
+                        setViewFlightIsLoading(false);
+                    }, 1000);
+                });
+            FLIGHT_UPDATED
+                .on('data', async () => {
+                    const data = await dataContract.methods.getFlight(airlineName, flightName).call();
+                    console.log({data});
+                    toast.success(`Flight information verified by oracles for ${airlineName} flight ${flightName}`);
+                    setViewFlightIsLoading(false);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`Failed to update flight information for ${airlineName} flight ${flightName}`);
+                        setViewFlightIsLoading(false);
+                    }, 2000);
+                });
+            appContract.methods.checkFlightStatus(airlineName, flightName).send({...DEFAULT_PAYLOAD, gas: 2000000000, gasLimit: null})
+                .on('error', (e) => {
+                    console.log({e})
+                    toast.error(`Failed to check flight status for ${airlineName} flight ${flightName}`);
+                    setViewFlightIsLoading(false);
+                });
+        },
+        buyInsurance() {},
+        checkPolicy() {},
+        claimInsurance() {}
+    };
+
+    const insuranceStates = {
+        viewFlightIsLoading,
+        buyInsuranceIsLoading,
+        checkPolicyIsLoading,
+        claimInsuranceIsLoading
+    };
 
     const airlineMethods = {
         applyAirline(airlineName) {
@@ -279,7 +358,7 @@ export function DappProvider({ children }) {
                     }, 1000);
                 });
         },
-        async addFlight(flightDateTimeDeparture, flightName) {
+        addFlight(flightDateTimeDeparture, flightName) {
             if (!flightDateTimeDeparture || !flightName || flightName.trim() === "") {
                 return;
             }
@@ -289,18 +368,22 @@ export function DappProvider({ children }) {
             const FLIGHT_ADDED = appContract.events.FLIGHT_ADDED({ topics: [, web3.utils.sha3(currentAirlineName), web3.utils.sha3(flightName)] });
             FLIGHT_ADDED
                 .on('data', () => {
-                    window.location.reload();
                     setTimeout(() => {
                         toast.success(`Airline: ${currentAirlineName} added flight: ${flightName} departing ${flightDateTimeDeparture}`);
                         setAirlineAddFlightIsLoading(false);
                     }, 2000);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3500);
                 })
                 .on('error', () => {
-                    window.location.reload();
                     setTimeout(() => {
                         toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}`);
                         setAirlineAddFlightIsLoading(false);
                     }, 1000);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2500)
                 });
             appContract.methods.addFlight(flightName, formattedFlightDateTimeDeparture, currentAirlineName).send(DEFAULT_PAYLOAD)
                 .on('error', () => {
@@ -311,6 +394,13 @@ export function DappProvider({ children }) {
                     }, 1000);
                 });
         }
+    };
+
+    const airlineStates = {
+        airlineApplyIsLoading,
+        airlineVoteIsLoading,
+        airlineFundIsLoading,
+        airlineAddFlightIsLoading,
     };
 
     const operationalMethods = {
@@ -480,7 +570,7 @@ export function DappProvider({ children }) {
                         setWiredDataToOracle({ loading: false, status: false });
                     }, 1000);
                 });
-            oracleContract.methods.registerDataContract(oracleContractAddress).send(DEFAULT_PAYLOAD)
+            oracleContract.methods.registerDataContract(dataContractAddress).send(DEFAULT_PAYLOAD)
                 .on('error', () => {
                     setTimeout(() => {
                         toast.error('❌ Failed to wire Data Contract to Oracle Contract');
@@ -536,15 +626,18 @@ export function DappProvider({ children }) {
         airlines
     };
 
-    const airlineStates = {
-        airlineApplyIsLoading,
-        airlineVoteIsLoading,
-        airlineFundIsLoading,
-        airlineAddFlightIsLoading,
-    };
-
     return (
-        <DappContext.Provider value={{state, operationalMethods, operationalStatuses, airlineMethods, airlineStates}}>
+        <DappContext.Provider value={
+            {
+                state, 
+                operationalMethods, 
+                operationalStatuses, 
+                airlineMethods, 
+                airlineStates,
+                insuranceMethods,
+                insuranceStates
+            }
+        }>
             { children }
         </DappContext.Provider>
     );

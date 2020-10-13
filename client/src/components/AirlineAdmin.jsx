@@ -78,7 +78,7 @@ export default function AirlineAdmin() {
                         <Form.Label>Funding Amount</Form.Label>
                         <Form.Control placeholder="Enter funds in wei..." onChange={e => setFundAirlineValue(Number(e.target.value))} />
                         <Form.Text className="text-muted">
-                            Minimum funding is currently {">"} {Number(MINIMUM_PARTNER_FEE) + 10 + ' wei'}
+                            Minimum funding is currently {">"} {Number(MINIMUM_PARTNER_FEE) + 10} wei
                         </Form.Text>
                         <br/>
                         <center>

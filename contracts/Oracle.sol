@@ -46,7 +46,7 @@ contract Oracle {
     event DATA_CONTRACT_REGISTERED();
     event ORACLE_CONTRACT_OPERATIONAL();
     event ORACLE_REGISTERED(address oracle);
-    event ORACLE_REQUEST(uint8 oracleIndex, uint256 oracleTimestamp, string airlineName, string flightName);
+    event ORACLE_REQUEST(uint8 oracleIndex, uint256 oracleTimestamp, string indexed airlineName, string indexed flightName);
 
     constructor() public {
         OWNER_ADDRESS = msg.sender;

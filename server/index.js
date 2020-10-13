@@ -90,10 +90,6 @@ async function startOracles() {
         .on('error', error => console.log('reached err'));
 }
 
-function startServer() {
-}
-
 (async () => {
     await startOracles();
-    startServer();
 })();

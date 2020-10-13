@@ -1,3 +1,4 @@
+const express = require('express');
 const Web3 = require('web3');
 const { forEach } = require('lodash');
 const url = require('./deployments.json').localhost.url;
@@ -90,6 +91,29 @@ async function startOracles() {
         .on('error', error => console.log('reached err'));
 }
 
+function startServer() {
+}
+
 (async () => {
     await startOracles();
+    startServer();
 })();
+
+// /* SERVER APP */
+// app.get('/logs', (_, res) => {
+//     res.json({ oracle_history });
+// });
+
+// app.get('/oracles', (_, res) => {
+//     res.json({ oracles });
+// });
+
+// app.listen(5000, () => {
+//     start();
+//     console.log('Oracle Server App running on port 5000...');
+//     console.log('GET /logs for server log history');
+//     console.log('GET /oracles for registered oracles');
+//     console.log('-----------------------------------------');
+//     console.log('v               LOGS                    v');
+//     console.log('-----------------------------------------');
+// });

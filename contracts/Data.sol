@@ -21,7 +21,6 @@ contract Data {
     
     string private constant AIRLINE_APPLIED = "AIRLINE_APPLIED";
     string private constant AIRLINE_APPROVED = "AIRLINE_APPROVED";
-    string private constant AIRLINE_INSUFFICIENT_FUNDS = "AIRLINE_INSUFFICIENT_FUNDS";
     string private constant AIRLINE_FUNDED = "AIRLINE_FUNDED";
 
     mapping(string => AIRLINE) public MAPPED_AIRLINES;
@@ -165,6 +164,7 @@ contract Data {
     function fundAirline(string memory airlineName, uint256 fundingValue) external
         isAppContract() isOperational() {
             MAPPED_AIRLINES[airlineName].FUNDS = SafeMath.add(MAPPED_AIRLINES[airlineName].FUNDS, fundingValue);
+            MAPPED_AIRLINES[airlineName].STATUS = AIRLINE_FUNDED;
     }
 
     function getAirline(string memory airlineName) external view returns(address airlineAddress, string memory airlineStatus, uint256 airlineFunds, bool airlineExists) {
@@ -195,8 +195,8 @@ contract Data {
     }
 
     function getFlightAtIndex(uint256 flightIndex) external view returns(string memory airlineName, string memory flightName) {
-        airlineName = FLIGHTS[0][flightIndex];
-        flightName = FLIGHTS[1][flightIndex];
+        airlineName = FLIGHTS[flightIndex][0];
+        flightName = FLIGHTS[flightIndex][1];
     }
 
     function updateFlight(string memory airlineName, string memory flightName, string memory flightStatus) external 

@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Badge, Spinner } from 'react-bootstrap';
+import { Badge, Spinner, Col } from 'react-bootstrap';
 
-export default function SwitchLoaderComponent({absolute}) {
+export function SwitchLoaderComponent({absolute}) {
     const SwitchLoader = styled(Badge)`
         margin-left: ${props => props.absolute === true ? '10px' : '0px'};
         position: ${props => props.absolute === true ? 'absolute' : 'unset'};
@@ -16,3 +16,21 @@ export default function SwitchLoaderComponent({absolute}) {
         </SwitchLoader>
     );
 }
+
+const Column = styled(Col)`
+    border-right: 1px dashed lightgrey;
+    height: calc(100vh - 150px);
+`;
+
+export const DappColumn = ({ image, name, children }) => {
+    const proportion = 250;
+    return (
+        <Column>
+            <center>
+                <img src={image} height={proportion} width={proportion} />
+                <h5><u>{name}</u></h5>
+            </center>
+            {children}
+        </Column>
+    );
+};

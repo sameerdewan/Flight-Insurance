@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { Form, Alert } from 'react-bootstrap';
-import SwitchLoaderComponent from './Reusables';
+import { SwitchLoaderComponent } from './Reusables';
 import DappContext from '../contexts/Dapp';
 
 const Container = styled.div`

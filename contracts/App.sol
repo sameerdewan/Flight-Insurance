@@ -30,7 +30,7 @@ contract App {
     event AIRLINE_VOTED_FOR(string airlineName, address voter);
     event AIRLINE_APPROVED(string indexed airlineName, address airlineAddress);
     event AIRLINE_FUNDED(address fundingAddress, string indexed airlineName);
-    event FLIGHT_ADDED(address airlineAddress, string airlineName, string flightName, uint256 timestamp);
+    event FLIGHT_ADDED(address airlineAddress, string indexed airlineName, string indexed flightName, uint256 indexed timestamp);
     event INSURANCE_BOUGHT(address passenger, uint256 insuranceFunds, string airlineName, string flightName);
     event INSURANCE_CLAIMED(address passenger, uint256 claimedValue, string airlineName, string flightName);
     event POLICY_UPDATED(address passenger, string airlineName, string flightName, bool policyActive, uint256 policyFunds, bool payoutAvailable);
@@ -128,7 +128,7 @@ contract App {
             (address airlineAddress, string memory airlineStatus, ,) = DATA.getAirline(airlineName);
             require(airlineAddress == msg.sender, 'Error: Invalid request.');
             require(keccak256(abi.encodePacked(airlineStatus)) == keccak256(abi.encodePacked('AIRLINE_FUNDED')), 'Error: Airline is not funded.');
-            DATA.addFlight(msg.sender, flightName, flightTimestamp);
+            DATA.addFlight(airlineName, flightName, flightTimestamp);
             emit FLIGHT_ADDED(msg.sender, airlineName, flightName, flightTimestamp); 
     }
 

@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-import styled from 'styled-components';
+import { Container, Row, Form, Button } from 'react-bootstrap';
 import ApplyAirline from '../images/apply_airline.png';
 import VoteAirline from '../images/vote_airline.png';
 import FundAirline from '../images/fund_airline.png';
@@ -8,26 +7,8 @@ import AddFlight from '../images/add_flight.png';
 import DappContext from '../contexts/Dapp';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import SwitchLoaderComponent from './Reusables';
+import { SwitchLoaderComponent, DappColumn } from './Reusables';
 import { useState } from 'react';
-
-const Column = styled(Col)`
-    border-right: 1px dashed lightgrey;
-    height: calc(100vh - 150px);
-`;
-
-const AirlineAdminColumn = ({ image, name, children }) => {
-    const proportion = 250;
-    return (
-        <Column>
-            <center>
-                <img src={image} height={proportion} width={proportion} />
-                <h5><u>{name}</u></h5>
-            </center>
-            {children}
-        </Column>
-    );
-};
 
 export default function AirlineAdmin() {
     const { state, airlineMethods, airlineStates } = useContext(DappContext);
@@ -36,10 +17,13 @@ export default function AirlineAdmin() {
     const [voteAirlineName, setVoteAirlineName] = useState(undefined);
     const [fundAirlineValue, setFundAirlineValue] = useState(undefined);
     const [fundAirlineName, setFundAirlineName] = useState(undefined);
+    const [addFlightDateTimeDeparture, setAddFlightDateTimeDeparture] = useState(undefined);
+    const [addFlightName, setAddFlightName] = useState(undefined);
+
     return (
         <Container fluid>
-            <Row height={'100%'}>
-                <AirlineAdminColumn image={ApplyAirline} name='Apply Airline' >
+            <Row>
+                <DappColumn image={ApplyAirline} name='Apply Airline' >
                     <br/>
                     <Form>
                         <Form.Label>Airline Name</Form.Label>
@@ -60,8 +44,8 @@ export default function AirlineAdmin() {
                         <br/>
                         { airlineStates.airlineApplyIsLoading && <center><SwitchLoaderComponent /></center> }
                     </Form>
-                </AirlineAdminColumn>
-                <AirlineAdminColumn image={VoteAirline} name='Vote for Airline'>
+                </DappColumn>
+                <DappColumn image={VoteAirline} name='Vote for Airline'>
                     <br/>
                     <Form>
                         <Form.Label>Airline Name</Form.Label>
@@ -82,8 +66,8 @@ export default function AirlineAdmin() {
                         <br/>
                         { airlineStates.airlineVoteIsLoading && <center><SwitchLoaderComponent /></center> }
                     </Form>
-                </AirlineAdminColumn>
-                <AirlineAdminColumn image={FundAirline} name='Fund Airline'>
+                </DappColumn>
+                <DappColumn image={FundAirline} name='Fund Airline'>
                     <br/>
                     <Form>
                         <Form.Label>Airline Name</Form.Label>
@@ -94,7 +78,7 @@ export default function AirlineAdmin() {
                         <Form.Label>Funding Amount</Form.Label>
                         <Form.Control placeholder="Enter funds in wei..." onChange={e => setFundAirlineValue(Number(e.target.value))} />
                         <Form.Text className="text-muted">
-                            Minimum funding is currently {MINIMUM_PARTNER_FEE + ' wei'}
+                            Minimum funding is currently {">"} {Number(MINIMUM_PARTNER_FEE) + 10 + ' wei'}
                         </Form.Text>
                         <br/>
                         <center>
@@ -109,27 +93,35 @@ export default function AirlineAdmin() {
                         <br/>
                         { airlineStates.airlineFundIsLoading && <center><SwitchLoaderComponent /></center> }
                     </Form>
-                </AirlineAdminColumn>
-                <AirlineAdminColumn image={AddFlight} name='Add Flight'>
+                </DappColumn>
+                <DappColumn image={AddFlight} name='Add Flight'>
                     <br/>
                     <Form.Label>Flight Date/Time Departure</Form.Label>
                     <DatePicker
-                        // selected={date}
-                        // onChange={handleDateChange}
+                        selected={addFlightDateTimeDeparture}
+                        onChange={setAddFlightDateTimeDeparture}
                         showTimeSelect
                         dateFormat="Pp"
                     />
                     <br/>
                     <Form.Label>Flight Name</Form.Label>
-                    <Form.Control placeholder="Enter flight name..." />
+                    <Form.Control placeholder="Enter flight name..." onChange={e => setAddFlightName(e.target.value)} />
                     <Form.Text className="text-muted">
                         Example: [MIA, FL {">"} LA, CA]
                     </Form.Text>
                     <br/>
-                    <center><Button style={{marginTop: 31}} variant='dark'>✈️ Add Flight</Button></center>
+                    <center>
+                        <Button 
+                            onClick={() => airlineMethods.addFlight(addFlightDateTimeDeparture, addFlightName)}
+                            style={{marginTop: 31}} 
+                            variant='dark'
+                        >
+                            ✈️ Add Flight
+                        </Button>
+                    </center>
                     <br/>
                     { airlineStates.airlineAddFlightIsLoading && <center><SwitchLoaderComponent /></center> }
-                </AirlineAdminColumn>
+                </DappColumn>
             </Row>
         </Container>
     );

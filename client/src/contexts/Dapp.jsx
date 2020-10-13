@@ -150,6 +150,13 @@ export function DappProvider({ children }) {
             }
             setAirlines(_airlines);
 
+            const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
+            const flights = [];
+            for (let flightsIndex = 0; flightsIndex < amountOfFlights; flightsIndex++) {
+                const flight = await dataContract.methods.getFlightAtIndex(flightsIndex).call();
+                console.log({ flight });
+            }
+
             // const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
             // const flights = [];
             // for (let flightIndex = 0; flightIndex < amountOfFlights.length + 1; flightIndex++) {
@@ -200,7 +207,7 @@ export function DappProvider({ children }) {
             if (!airlineName || airlineName.trim() === "") {
                 return;
             }
-            const voterName = airlines.filter(a => a.address === account)[0] || account;
+            const voterName = airlines.filter(a => a.address === account)[0]?.name || account;
             setAirlineVoteIsLoading(true);
             const AIRLINE_VOTED_FOR = appContract.events.AIRLINE_VOTED_FOR({ topics: [web3.utils.sha3(airlineName)] });
             AIRLINE_VOTED_FOR
@@ -246,8 +253,60 @@ export function DappProvider({ children }) {
                 return;
             }
             setAirlineFundIsLoading(true);
+            const AIRLINE_FUNDED = appContract.events.AIRLINE_FUNDED({ topics: [, web3.utils.sha3(airlineName)] });
+            AIRLINE_FUNDED 
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success(`Airline: ${airlineName} funded`);
+                        setAirlineFundIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`Failed to fund airline: ${airlineName}`);
+                        setAirlineFundIsLoading(false);
+                    }, 1000);
+                });
+            appContract.methods.fundAirline(airlineName).send({ ...DEFAULT_PAYLOAD, value: funds })
+                .on('error', () => {
+                    setTimeout(() => {
+                        toast.error(`Failed to fund airline: ${airlineName}`);
+                        setAirlineFundIsLoading(false);
+                    }, 1000);
+                });
         },
-        addFlight() {}
+        async addFlight(flightDateTimeDeparture, flightName) {
+            if (!flightDateTimeDeparture || !flightName || flightName.trim() === "") {
+                return;
+            }
+            const currentAirlineName = airlines.filter(a => a?.address?.toLowerCase() === account?.toLowerCase())[0]?.name || account;
+            const formattedFlightDateTimeDeparture = flightDateTimeDeparture.getTime() / 1000; // to seconds
+            setAirlineAddFlightIsLoading(true);
+            const FLIGHT_ADDED = appContract.events.FLIGHT_ADDED({ topics: [, web3.utils.sha3(currentAirlineName), web3.utils.sha3(flightName)] });
+            FLIGHT_ADDED
+                .on('data', () => {
+                    window.location.reload();
+                    setTimeout(() => {
+                        toast.success(`Airline: ${currentAirlineName} added flight: ${flightName} departing ${flightDateTimeDeparture}`);
+                        setAirlineAddFlightIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', () => {
+                    window.location.reload();
+                    setTimeout(() => {
+                        toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}`);
+                        setAirlineAddFlightIsLoading(false);
+                    }, 1000);
+                });
+            appContract.methods.addFlight(flightName, formattedFlightDateTimeDeparture, currentAirlineName).send(DEFAULT_PAYLOAD)
+                .on('error', () => {
+                    window.location.reload();
+                    setTimeout(() => {
+                        toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}`);
+                        setAirlineAddFlightIsLoading(false);
+                    }, 1000);
+                });
+        }
     };
 
     const operationalMethods = {

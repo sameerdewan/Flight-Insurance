@@ -23,11 +23,13 @@ contract Oracle {
 
     uint256 public MIN_RESPONSES = 3;
     uint8 private NONCE;
-    mapping(address => ORACLE) private ORACLES;
-    mapping(bytes32 => ORACLE_RESPONSE) private ORACLE_RESPONSES;
+    mapping(address => ORACLE) public ORACLES;
+    mapping(bytes32 => ORACLE_RESPONSE) public ORACLE_RESPONSES;
 
     struct ORACLE {
-        uint8[3] INDEXES;
+        uint8 INDEX_0;
+        uint8 INDEX_1;
+        uint8 INDEX_2;
         bool VALID;
         string NAME;
     }
@@ -46,7 +48,7 @@ contract Oracle {
     event DATA_CONTRACT_REGISTERED();
     event ORACLE_CONTRACT_OPERATIONAL();
     event ORACLE_REGISTERED(address oracle);
-    event ORACLE_REQUEST(uint8 oracleIndex, uint256 oracleTimestamp, string indexed airlineName, string indexed flightName);
+    event ORACLE_REQUEST(uint8 oracleIndex, uint256 oracleTimestamp, string airlineName, string flightName, string indexed airlineNameHashed, string indexed flightNameHashed);
 
     constructor() public {
         OWNER_ADDRESS = msg.sender;
@@ -91,23 +93,20 @@ contract Oracle {
             emit DATA_CONTRACT_REGISTERED();
     }
 
-    function generateIndexes(address account) internal returns(uint8[3] memory indexes) {
-        indexes[0] = getRandomIndex(account);
-
-        indexes[1] = indexes[0];
-        while(indexes[1] == indexes[0]) {
-            indexes[1] = getRandomIndex(account);
+    function generateIndexes(address account) public returns(uint8, uint8, uint8) {
+        uint8 index0 = getRandomIndex(account);
+        uint8 index1 = index0;
+        while(index1 == index0) {
+            index1 = getRandomIndex(account);
         }
-
-        indexes[2] = indexes[1];
-        while((indexes[2] == indexes[0]) || (indexes[2] == indexes[1])) {
-            indexes[2] = getRandomIndex(account);
+        uint8 index2 = index1;
+        while(index2 == index1 || index2 == index0) {
+            index2 = getRandomIndex(account);
         }
-
-        return indexes;
+        return (index0, index1, index2);
     }
 
-    function getRandomIndex(address account) internal returns (uint8) {
+    function getRandomIndex(address account) public returns (uint8) {
         uint8 maxValue = 10;
         uint8 random = uint8(uint256(keccak256(abi.encodePacked(blockhash(block.number - NONCE++), account))) % maxValue);
 
@@ -120,13 +119,15 @@ contract Oracle {
 
     function registerOracle(address oracleAddress, string memory oracleName) external
         isAppContract() isOperational() {
-            uint8[3] memory indexes = generateIndexes(oracleAddress);
+            (uint8 index0, uint8 index1, uint8 index2) = generateIndexes(oracleAddress);
             ORACLES[oracleAddress] = ORACLE({
-                INDEXES: indexes,
+                INDEX_0: index0,
+                INDEX_1: index1,
+                INDEX_2: index2,
                 VALID: true,
                 NAME: oracleName
             });
-            emit ORACLE_REGISTERED(msg.sender);
+            emit ORACLE_REGISTERED(oracleAddress);
     }
 
     function fireOracleFlightStatusRequest(string memory airlineName, string memory flightName) external
@@ -140,12 +141,12 @@ contract Oracle {
                 OPEN: true
             });
             ORACLE_RESPONSES[oracleKey] = oracleResponse;
-            emit ORACLE_REQUEST(oracleIndex, oracleTimestamp, airlineName, flightName);
+            emit ORACLE_REQUEST(oracleIndex, oracleTimestamp, airlineName, flightName, airlineName, flightName);
     }
 
     function submitOracleResponse(uint8 oracleIndex, uint256 oracleTimestamp, string memory airlineName, string memory flightName, string memory flightStatus) external
         isOperational() {
-            bool indexMatchesRequest = ORACLES[msg.sender].INDEXES[0] == oracleIndex || ORACLES[msg.sender].INDEXES[1] == oracleIndex || ORACLES[msg.sender].INDEXES[2] == oracleIndex;
+            bool indexMatchesRequest = ORACLES[msg.sender].INDEX_0 == oracleIndex || ORACLES[msg.sender].INDEX_1 == oracleIndex || ORACLES[msg.sender].INDEX_2 == oracleIndex;
             require(indexMatchesRequest == true, 'Error: Invalid Oracle response.');
             bytes32 oracleKey = keccak256(abi.encodePacked(oracleIndex, oracleTimestamp, airlineName, flightName));
             require(ORACLE_RESPONSES[oracleKey].OPEN == true, 'Error: Oracle Request not open.');

@@ -67,21 +67,6 @@ async function respondToOracleRequest(oracleIndex, oracleTimestamp, airlineName,
     if (!oracles.length) {
         pushEvent('REQUEST DENIED NOT ENOUGH ORACLES');
     }
-    const passingOracles = [];
-    forEach(oracles, oracle => {
-        const index1Check = BigNumber(oracle.indexes[0]).isEqualTo(index);
-        const index2Check = BigNumber(oracle.indexes[1]).isEqualTo(index);
-        const index3Check = BigNumber(oracle.indexes[2]).isEqualTo(index);
-        const isPassing = index1Check || index2Check || index3Check;
-        if (isPassing) {
-            passingOracles.push(oracle);
-        }
-    });
-    if (passingOracles.length === 0) {
-        pushEvent('NO PASSING ORACLES FOUND');
-        return;
-    }
-    pushEvent(`PASSING ORACLES: ${passingOracles.join('::')}`);
 
     forEach(oracles, async oracle => {
         try {
@@ -102,7 +87,10 @@ async function startOracles() {
     await registerOracles(accounts);
 
     oracleContract.events.ORACLE_REQUEST()
-        .on('data', event => console.log('reached'))
+        .on('data', event => {
+            const { oracleIndex, oracleTimestamp, airlineName, flightName } = event.returnValues;
+            respondToOracleRequest(oracleIndex, oracleTimestamp, airlineName, flightName);
+        })
         .on('error', error => console.log('reached err'));
 }
 

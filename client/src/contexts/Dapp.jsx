@@ -208,9 +208,9 @@ export function DappProvider({ children }) {
                         toast.success(`Oracle Request fired for ${airlineName} flight ${flightName}`);
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Failed oracle request for ${airlineName} flight ${flightName}`);
+                        toast.error(`Failed oracle request for ${airlineName} flight ${flightName}: ${e}`);
                         setViewFlightIsLoading(false);
                     }, 1000);
                 });
@@ -220,9 +220,9 @@ export function DappProvider({ children }) {
                         toast.success(`Oracle responded to request for ${airlineName} flight ${flightName}`);
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Oracle request failed to respond to request for ${airlineName} flight ${flightName}`);
+                        toast.error(`Oracle request failed to respond to request for ${airlineName} flight ${flightName}: ${e}`);
                         setViewFlightIsLoading(false);
                     }, 1000);
                 });
@@ -233,16 +233,16 @@ export function DappProvider({ children }) {
                     toast.success(`Flight information verified by oracles for ${airlineName} flight ${flightName}`);
                     setViewFlightIsLoading(false);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Failed to update flight information for ${airlineName} flight ${flightName}`);
+                        toast.error(`Failed to update flight information for ${airlineName} flight ${flightName}: ${e}`);
                         setViewFlightIsLoading(false);
                     }, 2000);
                 });
             appContract.methods.checkFlightStatus(airlineName, flightName).send({...DEFAULT_PAYLOAD, gas: 2000000000, gasLimit: null})
                 .on('error', (e) => {
                     console.log({e})
-                    toast.error(`Failed to check flight status for ${airlineName} flight ${flightName}`);
+                    toast.error(`Failed to check flight status for ${airlineName} flight ${flightName}: ${e}`);
                     setViewFlightIsLoading(false);
                 });
         },
@@ -272,16 +272,16 @@ export function DappProvider({ children }) {
                         setAirlineApplyIsLoading(false);
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`❌ Failed to apply airline: ${airlineName}`);
+                        toast.error(`❌ Failed to apply airline: ${airlineName}: ${e}`);
                         setAirlineApplyIsLoading(false);
                     }, 1000);
                 });
             appContract.methods.applyAirline(airlineName).send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`❌ Failed to apply airline: ${airlineName}`);
+                        toast.error(`❌ Failed to apply airline: ${airlineName}: ${e}`);
                         setAirlineApplyIsLoading(false);
                     }, 1000);
                 });
@@ -300,9 +300,9 @@ export function DappProvider({ children }) {
                         setAirlineVoteIsLoading(false);
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Voter: ${voterName} failed to vote for ${airlineName}`);
+                        toast.error(`Voter: ${voterName} failed to vote for ${airlineName}: ${e}`);
                         setAirlineVoteIsLoading(false);
                     }, 1000);
                 });
@@ -314,16 +314,16 @@ export function DappProvider({ children }) {
                         setAirlineVoteIsLoading(false);
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                    setTimeout(() => {
-                    toast.error(`Something went wrong setting airline ${airlineName} to approved`);
+                    toast.error(`Something went wrong setting airline ${airlineName} to approved: ${e}`);
                     setAirlineVoteIsLoading(false);
                    }, 1000);
                 });
             appContract.methods.voteForAirline(airlineName, voterName).send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Voter: ${voterName} failed to vote for ${airlineName}`);
+                        toast.error(`Voter: ${voterName} failed to vote for ${airlineName}: ${e}`);
                         setAirlineVoteIsLoading(false);
                     }, 1000);
                 });
@@ -344,16 +344,16 @@ export function DappProvider({ children }) {
                         setAirlineFundIsLoading(false);
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Failed to fund airline: ${airlineName}`);
+                        toast.error(`Failed to fund airline: ${airlineName}: ${e}`);
                         setAirlineFundIsLoading(false);
                     }, 1000);
                 });
             appContract.methods.fundAirline(airlineName).send({ ...DEFAULT_PAYLOAD, value: funds })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Failed to fund airline: ${airlineName}`);
+                        toast.error(`Failed to fund airline: ${airlineName}: ${e}`);
                         setAirlineFundIsLoading(false);
                     }, 1000);
                 });
@@ -376,9 +376,9 @@ export function DappProvider({ children }) {
                         window.location.reload();
                     }, 3500);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}`);
+                        toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}: ${e}`);
                         setAirlineAddFlightIsLoading(false);
                     }, 1000);
                     setTimeout(() => {
@@ -414,16 +414,16 @@ export function DappProvider({ children }) {
                         setWiredDataToApp({loading: false, status: true});
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Data Contract to App Contract');
+                        toast.error(`❌ Failed to wire Data Contract to App Contract: ${e}`);
                         setWiredDataToApp({loading: false, status: false});
                     }, 1000);
                 });
             appContract.methods.registerDataContract(dataContractAddress).send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Data Contract to App Contract');
+                        toast.error(`❌ Failed to wire Data Contract to App Contract: ${e}`);
                         setWiredDataToApp({loading: false, status: false});
                     }, 1000);
                 });
@@ -438,16 +438,16 @@ export function DappProvider({ children }) {
                         setWiredOracleToApp({ loading: false, status: true });
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Oracle Contract to App Contract');
+                        toast.error(`❌ Failed to wire Oracle Contract to App Contract: ${e}`);
                         setWiredOracleToApp({ loading: false, status: false });
                     }, 1000);
                 });
             appContract.methods.registerOracleContract(oracleContractAddress).send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Oracle Contract to App Contract');
+                        toast.error(`❌ Failed to wire Oracle Contract to App Contract: ${e}`);
                         setWiredOracleToApp({ loading: false, status: false });
                     }, 1000);
                 });
@@ -462,16 +462,16 @@ export function DappProvider({ children }) {
                         setAppIsOperational({ status: true, loading: false });
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to set App Contract to Operational');
+                        toast.error(`❌ Failed to set App Contract to Operational: ${e}`);
                         setAppIsOperational({ status: false, loading: false });
                     }, 1000);
                 });
             appContract.methods.setAppOperational().send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to set App Contract to Operational');
+                        toast.error(`❌ Failed to set App Contract to Operational: ${e}`);
                         setAppIsOperational({ status: false, loading: false });
                     }, 1000);
                 });
@@ -501,16 +501,16 @@ export function DappProvider({ children }) {
                         setWiredOracleToData({ status: true, loading: false });
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Oracle Contract to Data Contract');
+                        toast.error(`❌ Failed to wire Oracle Contract to Data Contract: ${e}`);
                         setWiredOracleToData({ loading: false, status: false });
                     }, 1000);
                 });
             dataContract.methods.registerOracleContract(oracleContractAddress).send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Oracle Contract to Data Contract');
+                        toast.error(`❌ Failed to wire Oracle Contract to Data Contract: ${e}`);
                         setWiredOracleToData({ loading: false, status: false });
                     }, 1000);
                 });
@@ -525,16 +525,16 @@ export function DappProvider({ children }) {
                         setDataIsOperational({ status: true, loading: false });
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to set Data Contract to Operational');
+                        toast.error(`❌ Failed to set Data Contract to Operational: ${e}`);
                         setDataIsOperational({ loading: false, status: false });
                     }, 1000);
                 });
             dataContract.methods.setDataOperational().send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to set Data Contract to Operational');
+                        toast.error(`❌ Failed to set Data Contract to Operational: ${e}`);
                         setDataIsOperational({ loading: false, status: false });
                     }, 1000);
                 });
@@ -564,16 +564,16 @@ export function DappProvider({ children }) {
                         setWiredDataToOracle({ status: true, loading: false });
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Data Contract to Oracle Contract');
+                        toast.error(`❌ Failed to wire Data Contract to Oracle Contract: ${e}`);
                         setWiredDataToOracle({ loading: false, status: false });
                     }, 1000);
                 });
             oracleContract.methods.registerDataContract(dataContractAddress).send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to wire Data Contract to Oracle Contract');
+                        toast.error(`❌ Failed to wire Data Contract to Oracle Contract: ${e}`);
                         setWiredDataToOracle({ loading: false, status: false });
                     }, 1000);
                 });
@@ -588,16 +588,16 @@ export function DappProvider({ children }) {
                         setOracleIsOperational({ status: true, loading: false });
                     }, 2000);
                 })
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to set Oracle Contract to Operational');
+                        toast.error(`❌ Failed to set Oracle Contract to Operational: ${e}`);
                         setOracleIsOperational({ loading: false, status: false });
                     }, 1000);
                 });
             oracleContract.methods.setOracleOperational().send(DEFAULT_PAYLOAD)
-                .on('error', () => {
+                .on('error', (e) => {
                     setTimeout(() => {
-                        toast.error('❌ Failed to set Oracle Contract to Operational');
+                        toast.error(`❌ Failed to set Oracle Contract to Operational: ${e}`);
                         setOracleIsOperational({ loading: false, status: false });
                     }, 1000);
                 });

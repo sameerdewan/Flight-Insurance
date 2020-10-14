@@ -187,11 +187,12 @@ contract Data {
              TOTAL_FLIGHTS = SafeMath.add(TOTAL_FLIGHTS, 1);
     }
 
-    function getFlight(string memory airlineName, string memory flightName) external view returns(bool flightExists, uint256 flightTimestamp, string memory flightStatus) {
+    function getFlight(string memory airlineName, string memory flightName) external view returns(bool flightExists, uint256 flightTimestamp, string memory flightStatus, uint256 airlineFunds) {
         bytes32 flightKey = keccak256(abi.encodePacked(airlineName, flightName));
         flightExists = MAPPED_FLIGHTS[flightKey].EXISTS;
         flightTimestamp = MAPPED_FLIGHTS[flightKey].TIMESTAMP;
         flightStatus = MAPPED_FLIGHTS[flightKey].STATUS;
+        airlineFunds = MAPPED_AIRLINES[airlineName].FUNDS;
     }
 
     function getFlightAtIndex(uint256 flightIndex) external view returns(string memory airlineName, string memory flightName) {
@@ -205,7 +206,7 @@ contract Data {
             MAPPED_FLIGHTS[flightKey].STATUS = flightStatus;
     }
 
-    function buyInsurance(address passenger, uint256 insuranceFunds, string memory airlineName, string memory flightName) external payable 
+    function buyInsurance(address passenger, uint256 insuranceFunds, string memory airlineName, string memory flightName) external 
         isAppContract() isOperational() {
             bytes32 policyKey = keccak256(abi.encodePacked(passenger, airlineName, flightName));
             POLICY memory policy = POLICY({

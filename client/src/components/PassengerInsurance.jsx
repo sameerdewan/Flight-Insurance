@@ -70,7 +70,7 @@ export default function PassengerInsurance() {
                         <Form.Label>Insurance Amount</Form.Label>
                         <Form.Control placeholder="Enter insurance amount in wei..." onChange={e => setBuyInsuranceFundingAmount(Number(e.target.value))}/>
                         <Form.Text className="text-muted">
-                            Minimum insurance funding amount is currently {Number(MINIMUM_INSURANCE_FUNDING) + 20} wei and maximum funding is {Number(MAXIMUM_INSURANCE_FUNDING)} wei
+                            Insurance funding amount. It is <u>not</u> recommended to insure yourself for more than the funds available for an airline.
                         </Form.Text>
                     </Form>
                     <br />

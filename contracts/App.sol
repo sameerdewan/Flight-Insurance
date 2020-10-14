@@ -23,15 +23,13 @@ contract App {
     bool public ORACLE_OPERATIONAL = false;
 
     uint256 public MINIMUM_PARTNER_FEE = 100000000000000000; // .10 ETH
-    uint256 public MINIMUM_PASSENGER_INSURANCE_FEE = 10000000000000000; // .01 ETH
-    uint256 public MAXIMUM_PASSENGER_INSURANCE_FEE = 40000000000000000; // .04 ETH
 
     event AIRLINE_APPLIED(address airlinelineAddress, string indexed airlineName);
     event AIRLINE_VOTED_FOR(string airlineName, address voter);
     event AIRLINE_APPROVED(string indexed airlineName, address airlineAddress);
     event AIRLINE_FUNDED(address fundingAddress, string indexed airlineName);
     event FLIGHT_ADDED(address airlineAddress, string indexed airlineName, string indexed flightName, uint256 indexed timestamp);
-    event INSURANCE_BOUGHT(address passenger, uint256 insuranceFunds, string airlineName, string flightName);
+    event INSURANCE_BOUGHT(address indexed passenger, uint256 insuranceFunds, string indexed airlineName, string indexed flightName);
     event INSURANCE_CLAIMED(address passenger, uint256 claimedValue, string airlineName, string flightName);
     event POLICY_UPDATED(address passenger, string airlineName, string flightName, bool policyActive, uint256 policyFunds, bool payoutAvailable);
     event ORACLE_RESPONDED(uint8 oracleIndex, string oracleName, string indexed airlineName, string indexed flightName, string flightStatus);
@@ -137,11 +135,9 @@ contract App {
             (, string memory airlineStatus, uint256 funds,) = DATA.getAirline(airlineName);
             require(keccak256(abi.encodePacked(airlineStatus)) == keccak256(abi.encodePacked('AIRLINE_FUNDED')), 'Error: Airline is not funded.');
             require(funds > MINIMUM_PARTNER_FEE, 'Error: MINIMUM_AIRLINE_REGISTRATION_FEE');
-            (bool flightExists, uint256 flightTimestamp,) = DATA.getFlight(airlineName, flightName);
+            (bool flightExists, uint256 flightTimestamp, ,) = DATA.getFlight(airlineName, flightName);
             require(flightExists == true, 'Error: Flight does not exist.');
             require(block.timestamp < flightTimestamp, 'Error: Flight has already left.');
-            require(msg.value > MINIMUM_PASSENGER_INSURANCE_FEE, 'Error: Minimum insurance fee required.');
-            require(msg.value > MAXIMUM_PASSENGER_INSURANCE_FEE, 'Error: Maximum insurance fee enforced.');
             APP_FUNDS = SafeMath.add(APP_FUNDS, msg.value);
             DATA.buyInsurance(msg.sender, msg.value, airlineName, flightName);
             emit INSURANCE_BOUGHT(msg.sender, msg.value, airlineName, flightName);
@@ -149,11 +145,12 @@ contract App {
 
     function checkFlightStatus(string memory airlineName, string memory flightName) external
         isOperational() {
-            (bool flightExists, , string memory flightStatus) = DATA.getFlight(airlineName, flightName);
+            (bool flightExists, uint256 flightTimestamp , string memory flightStatus,) = DATA.getFlight(airlineName, flightName);
             require(flightExists == true, 'Error: Flight does not exist.');
             bytes32 flightStatusHash = keccak256(abi.encodePacked(flightStatus));
             bytes32 unknownStatusHash = keccak256(abi.encodePacked('FLIGHT_STATUS_CODE_UNKNOWN'));
             require(flightStatusHash == unknownStatusHash, 'Error: Flight status is already available.');
+            require(flightTimestamp < block.timestamp, 'Error: Flight has not left yet.');
             ORACLE.fireOracleFlightStatusRequest(airlineName, flightName);
     }
 
@@ -172,7 +169,7 @@ contract App {
             (bool policyActive, uint256 policyFunds,) = DATA.getPolicy(msg.sender, airlineName, flightName);
             require(policyActive == true, 'Error: Policy not active.');
             require(policyFunds > 0, 'Error: No funds available to withdraw for policy.'); 
-            (, , string memory flightStatus) = DATA.getFlight(airlineName, flightName);
+            (, , string memory flightStatus,) = DATA.getFlight(airlineName, flightName);
             bytes32 flightStatusHash = keccak256(abi.encodePacked(flightStatus));
             bytes32 airlineAtFaultStatusHash = keccak256(abi.encodePacked('FLIGHT_STATUS_CODE_LATE_AIRLINE'));
             if (flightStatusHash == airlineAtFaultStatusHash) {

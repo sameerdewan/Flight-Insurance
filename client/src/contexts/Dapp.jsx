@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
 import Web3Context from './Web3';
+import BigNumber from "bignumber.js";
+
 
 const DappContext = createContext();
 
@@ -132,13 +134,6 @@ export function DappProvider({ children }) {
 
             const partnerFee = await appContract.methods.MINIMUM_PARTNER_FEE().call();
             setPartnerFee(partnerFee);
-            const minInsuranceFunds = await appContract.methods.MINIMUM_PASSENGER_INSURANCE_FEE().call();
-            setMinimumInsuranceFunding(minInsuranceFunds);
-            const maxInsuranceFunds = await appContract.methods.MAXIMUM_PASSENGER_INSURANCE_FEE().call();
-            setMaximumInsuranceFunding(maxInsuranceFunds);
-
-            console.log(await oracleContract.methods.DATA_ADDRESS().call())
-            console.log(await dataContract.methods.DATA_ADDRESS().call())
         })();
     }, [web3,
         web3Enabled, 
@@ -241,11 +236,12 @@ export function DappProvider({ children }) {
                         toast.error(`Failed to update flight information for ${airlineName} flight ${flightName}: ${e}`);
                     }, 2000);
                 });
-            appContract.methods.checkFlightStatus(airlineName, flightName).send({...DEFAULT_PAYLOAD, gas: 2000000000, gasLimit: null})
+            appContract.methods.checkFlightStatus(airlineName, flightName).send(DEFAULT_PAYLOAD)
                 .on('error', (e) => {
                     setTimeout(async () => {
-                        if (e.message.includes('Flight status is already available')) {
+                        if (e.message.includes('Flight status is already available') || e.message.includes('Flight has not left yet')) {
                             const data = await dataContract.methods.getFlight(airlineName, flightName).call();
+                            console.log({data});
                             toast.success(`Flight status loaded for ${airlineName} flight ${flightName}`);
                             setViewFlightDetails({...data, airlineName, flightName});
                         } else {
@@ -255,7 +251,39 @@ export function DappProvider({ children }) {
                     }, 2000);
                 });
         },
-        buyInsurance() {},
+        buyInsurance(airlineFlightNamePair, fundingValue) {
+            console.log({airlineFlightNamePair, fundingValue})
+            if (!airlineFlightNamePair || !fundingValue) {
+                return;
+            }
+            const airlineName = airlineFlightNamePair[0];
+            const flightName = airlineFlightNamePair[1];
+
+            setBuyInsuranceIsLoading(true);
+            console.log(fundingValue)
+
+            const INSURANCE_BOUGHT = appContract.events.INSURANCE_BOUGHT();
+            INSURANCE_BOUGHT
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success(`Passenger ${account} bought insurance for ${airlineName} flight ${flightName}`);
+                        setBuyInsuranceIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', (e) => {
+                    setTimeout(() => {
+                        toast.error(`Passenger ${account} failed to buy insurance for ${airlineName} flight ${flightName}: ${e}`);
+                        setBuyInsuranceIsLoading(false);
+                    }, 1000);
+                });
+            appContract.methods.buyInsurance(airlineName, flightName).send({...DEFAULT_PAYLOAD, value: new BigNumber(fundingValue) })
+                .on('error', (e) => {
+                    setTimeout(() => {
+                        toast.error(`Passenger ${account} failed to buy insurance for ${airlineName} flight ${flightName}: ${e}`);
+                        setBuyInsuranceIsLoading(false);
+                    });
+                });
+        },
         checkPolicy() {},
         claimInsurance() {}
     };
@@ -359,7 +387,7 @@ export function DappProvider({ children }) {
                         setAirlineFundIsLoading(false);
                     }, 1000);
                 });
-            appContract.methods.fundAirline(airlineName).send({ ...DEFAULT_PAYLOAD, value: funds })
+            appContract.methods.fundAirline(airlineName).send({ ...DEFAULT_PAYLOAD, value: new BigNumber(funds) })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Failed to fund airline: ${airlineName}: ${e}`);

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "clean": "rm -rf node_modules && rm -rf build && rm -rf ./server/deployments.json && rm -rf ./client/src/deployments.json",
-    "dapp": "cd client && npm start",
+    "dapp": "cd client && npm install && npm start",
     "server": "node server/index.js",
     "ganache": "ganache-cli -m 'spirit supply whale amount human item harsh scare congress discover talent hamster' --allowUnlimitedContractSize  -l 0x1fffffffffffff -e 100000 -a 50",
     "compile": "truffle compile",

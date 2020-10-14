@@ -22,7 +22,7 @@ contract App {
     address public ORACLE_ADDRESS;
     bool public ORACLE_OPERATIONAL = false;
 
-    uint256 public MINIMUM_PARTNER_FEE = 100000000000000000; // .10 ETH
+    uint256 public MINIMUM_PARTNER_FEE = 10000000000000000000; // 10 ETH
 
     event AIRLINE_APPLIED(address airlinelineAddress, string indexed airlineName);
     event AIRLINE_VOTED_FOR(string airlineName, address voter);
@@ -165,13 +165,14 @@ contract App {
     }
 
     function checkPolicy(string memory airlineName, string memory flightName) external
-        isOperational() returns(bool payoutAvailable) {
+        isOperational() {
+            bool payoutAvailable = false;
             (bool policyActive, uint256 policyFunds,) = DATA.getPolicy(msg.sender, airlineName, flightName);
             require(policyActive == true, 'Error: Policy not active.');
             require(policyFunds > 0, 'Error: No funds available to withdraw for policy.'); 
             (, , string memory flightStatus,) = DATA.getFlight(airlineName, flightName);
             bytes32 flightStatusHash = keccak256(abi.encodePacked(flightStatus));
-            bytes32 airlineAtFaultStatusHash = keccak256(abi.encodePacked('FLIGHT_STATUS_CODE_LATE_AIRLINE'));
+            bytes32 airlineAtFaultStatusHash = keccak256(abi.encodePacked('STATUS_CODE_LATE_AIRLINE'));
             if (flightStatusHash == airlineAtFaultStatusHash) {
                 payoutAvailable = true;
                 DATA.updatePolicy(msg.sender, airlineName, flightName, policyActive, policyFunds, true);

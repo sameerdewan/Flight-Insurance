@@ -10,7 +10,7 @@ import DappContext from '../contexts/Dapp';
 
 export default function PassengerInsurance() {
     const { state, insuranceMethods, insuranceStates } = useContext(DappContext);
-    const { flights, MINIMUM_INSURANCE_FUNDING, MAXIMUM_INSURANCE_FUNDING, viewFlightDetails, viewFlightDetailsVisible } = state;
+    const { flights,viewFlightDetails, viewFlightDetailsVisible, checkPolicyDetails, checkPolicyDetailsVisible } = state;
     const [viewFlightAirlineFlightNamePair, setViewFlightAirlineFlightNamePair] = useState(undefined);
     const [buyInsuranceAirlineFlightNamePair, setBuyInsuranceAirlineFlightNamePair] = useState(undefined);
     const [buyInsuranceFundingAmount, setBuyInsuranceFundingAmount] = useState(undefined);
@@ -48,7 +48,10 @@ export default function PassengerInsurance() {
                                 <code>RESPONSE:</code>
                                 <div style={{border: '1px dashed hotpink', padding: 10}}>
                                     <code>{JSON.stringify({ flightStatus: viewFlightDetails.flightStatus })}</code>
-                                    <code>{JSON.stringify({ flightTimestamp: new Date(viewFlightDetails.flightTimestamp * 1000).toUTCString() })}</code>
+                                    <br/>
+                                    <code>{JSON.stringify({ flightTime: new Date(viewFlightDetails.flightTimestamp * 1000).toUTCString() })}</code>
+                                    <br />
+                                    <code>{JSON.stringify({ airlineFunds: `${viewFlightDetails.airlineFunds} wei` })}</code>
                                 </div>
                             </React.Fragment>
                         )
@@ -108,6 +111,20 @@ export default function PassengerInsurance() {
                             🔎 Check Policy
                         </Button>
                     </center>
+                    {
+                        checkPolicyDetails && checkPolicyDetailsVisible && (
+                            <React.Fragment>
+                                <code>RESPONSE:</code>
+                                <div style={{border: '1px dashed hotpink', padding: 10}}>
+                                    <code>{JSON.stringify({ policyActive: checkPolicyDetails.policyActive })}</code>
+                                    <br/>
+                                    <code>{JSON.stringify({ policyFunds: `${checkPolicyDetails.policyFunds} wei` })}</code>
+                                    <br />
+                                    <code>{JSON.stringify({ payoutAvailable: checkPolicyDetails.payoutAvailable })}</code>
+                                </div>
+                            </React.Fragment>
+                        )
+                    }
                     <br />
                     { insuranceStates.checkPolicyIsLoading && <center><SwitchLoaderComponent /></center> }
                 </DappColumn>

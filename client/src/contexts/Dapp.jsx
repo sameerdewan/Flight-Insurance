@@ -41,6 +41,9 @@ export function DappProvider({ children }) {
     const [viewFlightDetails, setViewFlightDetails] = useState(undefined);
     const [viewFlightDetailsVisible, setViewFlightDetailsVisible] = useState(false);
 
+    const [checkPolicyDetails, setCheckPolicyDetails] = useState(undefined);
+    const [checkPolicyDetailsVisible, setCheckPolicyDetailsVisible] = useState(false);
+
     const { 
         web3Enabled, 
         appContract, 
@@ -56,6 +59,10 @@ export function DappProvider({ children }) {
     useEffect(() => {
         setViewFlightDetailsVisible(!viewFlightIsLoading);
     }, [viewFlightIsLoading]);
+
+    useEffect(() => {
+        setCheckPolicyDetailsVisible(!checkPolicyIsLoading);
+    }, [checkPolicyIsLoading]);
 
     useEffect(() => {
         const allOperationalStatuses = [
@@ -186,7 +193,7 @@ export function DappProvider({ children }) {
         oracleContract]
     );
 
-    const DEFAULT_GAS_SETTINGS = { gas: 4712388, gasPrice: 100000000000 };
+    const DEFAULT_GAS_SETTINGS = { gas: new BigNumber(4712388), gasPrice: new BigNumber(100000000000) };
     const DEFAULT_PAYLOAD = { from: account, ...DEFAULT_GAS_SETTINGS };
 
     const insuranceMethods = {
@@ -237,11 +244,18 @@ export function DappProvider({ children }) {
                     }, 2000);
                 });
             appContract.methods.checkFlightStatus(airlineName, flightName).send(DEFAULT_PAYLOAD)
+                .on('receipt', () => {
+                    setTimeout(async () => {
+                        const data = await dataContract.methods.getFlight(airlineName, flightName).call();
+                        toast.success(`Flight status loaded for ${airlineName} flight ${flightName}`);
+                        setViewFlightDetails({...data, airlineName, flightName});
+                        setViewFlightIsLoading(false);
+                    }, 2000);
+                })
                 .on('error', (e) => {
                     setTimeout(async () => {
                         if (e.message.includes('Flight status is already available') || e.message.includes('Flight has not left yet')) {
                             const data = await dataContract.methods.getFlight(airlineName, flightName).call();
-                            console.log({data});
                             toast.success(`Flight status loaded for ${airlineName} flight ${flightName}`);
                             setViewFlightDetails({...data, airlineName, flightName});
                         } else {
@@ -252,7 +266,6 @@ export function DappProvider({ children }) {
                 });
         },
         buyInsurance(airlineFlightNamePair, fundingValue) {
-            console.log({airlineFlightNamePair, fundingValue})
             if (!airlineFlightNamePair || !fundingValue) {
                 return;
             }
@@ -284,15 +297,65 @@ export function DappProvider({ children }) {
                     });
                 });
         },
-        checkPolicy() {},
-        claimInsurance() {}
-    };
+        checkPolicy(airlineFlightNamePair) {
+            if (!airlineFlightNamePair) {
+                return;
+            }
+            const airlineName = airlineFlightNamePair[0];
+            const flightName = airlineFlightNamePair[1];
 
-    const insuranceStates = {
-        viewFlightIsLoading,
-        buyInsuranceIsLoading,
-        checkPolicyIsLoading,
-        claimInsuranceIsLoading
+            setCheckPolicyIsLoading(true);
+
+            appContract.methods.checkPolicy(airlineName, flightName).send(DEFAULT_PAYLOAD)
+                .on('receipt', async () => {
+                    const data = await dataContract.methods.getPolicy(account, airlineName, flightName).call();
+                    setTimeout(() => {
+                        toast.success(`Policy for ${airlineName} flight ${flightName} for passenger ${account} loaded`);
+                        setCheckPolicyDetails({...data, airlineName, flightName});
+                        setCheckPolicyIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', (e) => {
+                    toast.error(`Failed to load policy: ${e}`);
+                    setCheckPolicyIsLoading(false);
+                });
+        },
+        claimInsurance(airlineFlightNamePair) {
+            if (!airlineFlightNamePair) {
+                return;
+            }
+            const airlineName = airlineFlightNamePair[0];
+            const flightName = airlineFlightNamePair[1];
+
+            setClaimInsuranceIsLoading(true);
+
+            const INSURANCE_CLAIMED = appContract.events.INSURANCE_CLAIMED();
+            INSURANCE_CLAIMED
+                .on('data', () => {
+                    setTimeout(() => {
+                        toast.success(`Success! Insurance has been claimed. Check your balance.`);
+                    }, 2000);
+                })
+                .on('error', e => {
+                    setTimeout(() => {
+                        toast.error(`Error loading claim. :${e}`);
+                    }, 1000);
+                });
+
+            appContract.methods.claimInsurance(airlineName, flightName).send(DEFAULT_PAYLOAD)
+                .on('receipt', () => {
+                    setTimeout(() => {
+                        toast.success(`Claim filed`);
+                        setClaimInsuranceIsLoading(false);
+                    }, 2000);
+                })
+                .on('error', e => {
+                    setTimeout(() => {
+                        toast.error(`Failed to file claim: ${e}`);
+                        setClaimInsuranceIsLoading(false);
+                    }, 1000);
+                });
+        }
     };
 
     const airlineMethods = {
@@ -662,7 +725,16 @@ export function DappProvider({ children }) {
         flights,
         airlines,
         viewFlightDetails,
-        viewFlightDetailsVisible
+        viewFlightDetailsVisible,
+        checkPolicyDetails,
+        checkPolicyDetailsVisible
+    };
+
+    const insuranceStates = {
+        viewFlightIsLoading,
+        buyInsuranceIsLoading,
+        checkPolicyIsLoading,
+        claimInsuranceIsLoading
     };
 
     return (

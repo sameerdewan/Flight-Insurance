@@ -20,10 +20,15 @@ Ganache CLI v6.9.1 (ganache-core: 2.10.2)
 
 ### Steps (Video)(Advised/Preferred)
 [1. Setting up the Project](https://www.youtube.com/watch?v=Ei4pDGOKuUg)
+
 [2. Starting the dApp](https://www.youtube.com/watch?v=qArOa3MNDko)
+
 [3. Airline Administration](https://www.youtube.com/watch?v=sQF9RQkqmfA)
+
 [4. Airline Funding and Flight Creation](https://www.youtube.com/watch?v=dYen0hV3V8g)
+
 [5. Running our Oracles](https://www.youtube.com/watch?v=ed67CiWAS3g)
+
 [6. Getting an Insurance Payout](https://www.youtube.com/watch?v=0p-yBrRm7Y8)
 
 ### Steps (Text)

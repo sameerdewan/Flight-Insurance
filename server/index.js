@@ -90,7 +90,9 @@ async function startOracles() {
             const { oracleIndex, oracleTimestamp, airlineName, flightName } = event.returnValues;
             respondToOracleRequest(oracleIndex, oracleTimestamp, airlineName, flightName);
         })
-        .on('error', error => console.log('reached err'));
+        .on('error', error => {
+            pushEvent(error);
+        });
 }
 
 app.get('/logs', (_, res) => {

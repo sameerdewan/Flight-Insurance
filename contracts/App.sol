@@ -25,7 +25,7 @@ contract App {
     uint256 public MINIMUM_PARTNER_FEE = 10000000000000000000; // 10 ETH
 
     event AIRLINE_APPLIED(address airlinelineAddress, string indexed airlineName);
-    event AIRLINE_VOTED_FOR(string airlineName, address voter);
+    event AIRLINE_VOTED_FOR(string indexed airlineName, address voter);
     event AIRLINE_APPROVED(string indexed airlineName, address airlineAddress);
     event AIRLINE_FUNDED(address fundingAddress, string indexed airlineName);
     event FLIGHT_ADDED(address airlineAddress, string indexed airlineName, string indexed flightName, uint256 indexed timestamp);

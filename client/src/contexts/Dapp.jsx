@@ -280,16 +280,17 @@ export function DappProvider({ children }) {
                 .on('data', () => {
                     setTimeout(() => {
                         toast.success(`Passenger ${account} bought insurance for ${airlineName} flight ${flightName}`);
-                        setBuyInsuranceIsLoading(false);
                     }, 2000);
                 })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Passenger ${account} failed to buy insurance for ${airlineName} flight ${flightName}: ${e}`);
-                        setBuyInsuranceIsLoading(false);
                     }, 1000);
                 });
             appContract.methods.buyInsurance(airlineName, flightName).send({...DEFAULT_PAYLOAD, value: new BigNumber(fundingValue) })
+                .on('receipt', () => {
+                    setBuyInsuranceIsLoading(false);
+                })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Passenger ${account} failed to buy insurance for ${airlineName} flight ${flightName}: ${e}`);
@@ -369,16 +370,17 @@ export function DappProvider({ children }) {
                 .on('data', () => {
                     setTimeout(() => {
                         toast.success(`✅ Airline: ${airlineName} successfully applied`);
-                        setAirlineApplyIsLoading(false);
                     }, 2000);
                 })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`❌ Failed to apply airline: ${airlineName}: ${e}`);
-                        setAirlineApplyIsLoading(false);
                     }, 1000);
                 });
             appContract.methods.applyAirline(airlineName).send(DEFAULT_PAYLOAD)
+                .on('receipt', () => {
+                    setAirlineApplyIsLoading(false);
+                })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`❌ Failed to apply airline: ${airlineName}: ${e}`);
@@ -397,13 +399,11 @@ export function DappProvider({ children }) {
                 .on('data', () => {
                     setTimeout(() => {
                         toast.success(`Airline: ${airlineName} voted for by ${voterName}`);
-                        setAirlineVoteIsLoading(false);
                     }, 2000);
                 })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Voter: ${voterName} failed to vote for ${airlineName}: ${e}`);
-                        setAirlineVoteIsLoading(false);
                     }, 1000);
                 });
             const AIRLINE_APPROVED = appContract.events.AIRLINE_APPROVED({ topics: [, web3.utils.sha3(airlineName)] });
@@ -411,16 +411,17 @@ export function DappProvider({ children }) {
                 .on('data', () => {
                     setTimeout(() => {
                         toast.dark(`Airline ${airlineName} was approved`);
-                        setAirlineVoteIsLoading(false);
                     }, 2000);
                 })
                 .on('error', (e) => {
                    setTimeout(() => {
                     toast.error(`Something went wrong setting airline ${airlineName} to approved: ${e}`);
-                    setAirlineVoteIsLoading(false);
                    }, 1000);
                 });
             appContract.methods.voteForAirline(airlineName, voterName).send(DEFAULT_PAYLOAD)
+                .on('receipt', () => {
+                    setAirlineVoteIsLoading(false);
+                })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Voter: ${voterName} failed to vote for ${airlineName}: ${e}`);
@@ -441,16 +442,17 @@ export function DappProvider({ children }) {
                 .on('data', () => {
                     setTimeout(() => {
                         toast.success(`Airline: ${airlineName} funded`);
-                        setAirlineFundIsLoading(false);
                     }, 2000);
                 })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Failed to fund airline: ${airlineName}: ${e}`);
-                        setAirlineFundIsLoading(false);
                     }, 1000);
                 });
             appContract.methods.fundAirline(airlineName).send({ ...DEFAULT_PAYLOAD, value: new BigNumber(funds) })
+                .on('receipt', () => {
+                    setAirlineFundIsLoading(false);
+                })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Failed to fund airline: ${airlineName}: ${e}`);
@@ -470,7 +472,6 @@ export function DappProvider({ children }) {
                 .on('data', () => {
                     setTimeout(() => {
                         toast.success(`Airline: ${currentAirlineName} added flight: ${flightName} departing ${flightDateTimeDeparture}`);
-                        setAirlineAddFlightIsLoading(false);
                     }, 2000);
                     setTimeout(() => {
                         window.location.reload();
@@ -479,13 +480,15 @@ export function DappProvider({ children }) {
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}: ${e}`);
-                        setAirlineAddFlightIsLoading(false);
                     }, 1000);
                     setTimeout(() => {
                         window.location.reload();
                     }, 2500)
                 });
             appContract.methods.addFlight(flightName, formattedFlightDateTimeDeparture, currentAirlineName).send(DEFAULT_PAYLOAD)
+                .on('receipt', () => {
+                    setAirlineAddFlightIsLoading(false);
+                })
                 .on('error', () => {
                     window.location.reload();
                     setTimeout(() => {

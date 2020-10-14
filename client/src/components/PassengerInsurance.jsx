@@ -29,7 +29,8 @@ export default function PassengerInsurance() {
                             {flights.map((f, i) => <option key={i}>{f.airlineName} ➡️ {f.flightName}</option>)}
                         </Form.Control>
                         <Form.Text className="text-muted">
-                            Select airline and flight pair to retrieve info for and pull the latest information for from our oracle network
+                            Select airline and flight pair to retrieve info for and pull the latest information for from our oracle network. If the flight has not left yet, our oracles will
+                            not be contacted, and the flight status will be unknown.
                         </Form.Text>
                     </Form>
                     <br />

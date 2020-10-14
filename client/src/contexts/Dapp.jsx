@@ -371,7 +371,7 @@ export function DappProvider({ children }) {
             AIRLINE_APPLIED
                 .on('data', () => {
                     setTimeout(() => {
-                        toast.success(`✅ Airline: ${airlineName} successfully applied`);
+                        toast.success(`✅ Airline: ${airlineName} successfully applied. Refresh to see status changes.`);
                     }, 2000);
                 })
                 .on('error', (e) => {
@@ -412,7 +412,7 @@ export function DappProvider({ children }) {
             appContract.methods.voteForAirline(airlineName, voterName).send(DEFAULT_PAYLOAD)
                 .on('receipt', () => {
                     setAirlineVoteIsLoading(false);
-                    toast.success(`Airline ${airlineName} voted for. Refresh to check status in footer.`);
+                    toast.success(`Airline ${airlineName} voted for. Refresh to check status in footer while under that account.`);
                 })
                 .on('error', (e) => {
                     setTimeout(() => {

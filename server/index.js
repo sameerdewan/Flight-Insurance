@@ -12,7 +12,7 @@ const oracleHistory = [];
 const oracles = [];
 const MINIMUM_ORACLES = 21;
 const GAS = 4712388;
-const FEE = 100000000000000000;
+const FEE = 11000000000000000000;
 
 function getStatus() {
     const STATUS_CODE_ON_TIME = "STATUS_CODE_ON_TIME";

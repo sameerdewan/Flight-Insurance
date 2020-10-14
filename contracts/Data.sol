@@ -113,29 +113,27 @@ contract Data {
     function applyAirline(string memory airlineName, address airlineAddress) external 
         isAppContract() {
             require(MAPPED_AIRLINES[airlineName].EXISTS == false, 'Error: Airline already exists.');
-            if (TOTAL_AIRLINES <= 4) {
-                AIRLINE memory airline = AIRLINE({
-                    ADDRESS: airlineAddress,
-                    STATUS: AIRLINE_APPROVED,
-                    EXISTS: true,
-                    FUNDS: 0,
-                    VOTES: 3
-                });
-                MAPPED_AIRLINES[airlineName] = airline;
-                AIRLINES.push(airlineName);
-                TOTAL_AIRLINES = SafeMath.add(TOTAL_AIRLINES, 1);
-            } else {
-            AIRLINE memory airline = AIRLINE({
+            AIRLINE memory airlineAutoApproved = AIRLINE({
+                ADDRESS: airlineAddress,
+                STATUS: AIRLINE_APPLIED,
+                EXISTS: true,
+                FUNDS: 0,
+                VOTES: 3
+            });
+            AIRLINE memory airlineRegular = AIRLINE({
                 ADDRESS: airlineAddress,
                 STATUS: AIRLINE_APPLIED,
                 EXISTS: true,
                 FUNDS: 0,
                 VOTES: 0
             });
+            AIRLINE memory airline = airlineRegular;
+            if (TOTAL_AIRLINES < 5 && AIRLINES.length < 4) {
+                airline = airlineAutoApproved;
+            }
             MAPPED_AIRLINES[airlineName] = airline;
             AIRLINES.push(airlineName);
             TOTAL_AIRLINES = SafeMath.add(TOTAL_AIRLINES, 1);
-        }
     }
 
     function getVoter(string memory airlineName, address voter) external view
@@ -144,21 +142,18 @@ contract Data {
     }
 
     function voteForAirline(string memory airlineName, address voter) external
-        isAppContract() isOperational() returns(bool) {
+        isAppContract() isOperational() {
             require(MAPPED_AIRLINES[airlineName].EXISTS == true, 'Error: Airline does not exist.');
             require(MAPPED_AIRLINES[airlineName].VOTERS[voter] == false, 'Error: Already voted.');
             MAPPED_AIRLINES[airlineName].VOTERS[voter] = true;
             MAPPED_AIRLINES[airlineName].VOTES = SafeMath.add(MAPPED_AIRLINES[airlineName].VOTES, 1);
-            bool approved = checkForApproval(airlineName);
-            return approved;
+            if (MAPPED_AIRLINES[airlineName].VOTES >= MINIMUM_AIRLINE_APPROVERS) {
+                MAPPED_AIRLINES[airlineName].STATUS = AIRLINE_APPROVED;
+            }
     }
 
-    function checkForApproval(string memory airlineName) internal returns(bool) {
-        if (MAPPED_AIRLINES[airlineName].VOTES >= MINIMUM_AIRLINE_APPROVERS) {
-            MAPPED_AIRLINES[airlineName].STATUS = AIRLINE_APPROVED;
-            return true;
-        }
-        return false;
+    function checkForApproval(string memory airlineName) public view returns(bool) {
+        return MAPPED_AIRLINES[airlineName].VOTES >= MINIMUM_AIRLINE_APPROVERS;
     }
 
     function fundAirline(string memory airlineName, uint256 fundingValue) external

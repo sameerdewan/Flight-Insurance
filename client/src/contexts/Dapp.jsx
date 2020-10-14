@@ -174,6 +174,8 @@ export function DappProvider({ children }) {
             }
             setAirlines(_airlines);
 
+            console.log({amountOfAirlines, _airlines})
+
             const amountOfFlights = Number(await dataContract.methods.TOTAL_FLIGHTS().call());
             const _flights = [];
             for (let flightsIndex = 0; flightsIndex < amountOfFlights; flightsIndex++) {
@@ -392,9 +394,10 @@ export function DappProvider({ children }) {
             if (!airlineName || airlineName.trim() === "") {
                 return;
             }
-            const voterName = airlines.filter(a => a.address === account)[0]?.name || account;
+            const voterName = airlines.filter(a => a.address.toLowerCase() === account.toLowerCase())[0]?.name || account;
+            console.log({voterName})
             setAirlineVoteIsLoading(true);
-            const AIRLINE_VOTED_FOR = appContract.events.AIRLINE_VOTED_FOR({ topics: [web3.utils.sha3(airlineName)] });
+            const AIRLINE_VOTED_FOR = appContract.events.AIRLINE_VOTED_FOR({ topics: [, web3.utils.sha3(airlineName)] });
             AIRLINE_VOTED_FOR
                 .on('data', () => {
                     setTimeout(() => {
@@ -406,21 +409,10 @@ export function DappProvider({ children }) {
                         toast.error(`Voter: ${voterName} failed to vote for ${airlineName}: ${e}`);
                     }, 1000);
                 });
-            const AIRLINE_APPROVED = appContract.events.AIRLINE_APPROVED({ topics: [, web3.utils.sha3(airlineName)] });
-            AIRLINE_APPROVED
-                .on('data', () => {
-                    setTimeout(() => {
-                        toast.dark(`Airline ${airlineName} was approved`);
-                    }, 2000);
-                })
-                .on('error', (e) => {
-                   setTimeout(() => {
-                    toast.error(`Something went wrong setting airline ${airlineName} to approved: ${e}`);
-                   }, 1000);
-                });
             appContract.methods.voteForAirline(airlineName, voterName).send(DEFAULT_PAYLOAD)
                 .on('receipt', () => {
                     setAirlineVoteIsLoading(false);
+                    toast.success(`Airline ${airlineName} voted for. Refresh to check status in footer.`);
                 })
                 .on('error', (e) => {
                     setTimeout(() => {
@@ -471,26 +463,19 @@ export function DappProvider({ children }) {
             FLIGHT_ADDED
                 .on('data', () => {
                     setTimeout(() => {
-                        toast.success(`Airline: ${currentAirlineName} added flight: ${flightName} departing ${flightDateTimeDeparture}`);
+                        toast.success(`Airline: ${currentAirlineName} added flight: ${flightName} departing ${flightDateTimeDeparture}. Reload pages.`);
                     }, 2000);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3500);
                 })
                 .on('error', (e) => {
                     setTimeout(() => {
                         toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}: ${e}`);
                     }, 1000);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2500)
                 });
             appContract.methods.addFlight(flightName, formattedFlightDateTimeDeparture, currentAirlineName).send(DEFAULT_PAYLOAD)
                 .on('receipt', () => {
                     setAirlineAddFlightIsLoading(false);
                 })
                 .on('error', () => {
-                    window.location.reload();
                     setTimeout(() => {
                         toast.error(`Failed to add flight: ${flightName} departing ${flightDateTimeDeparture} for airline: ${currentAirlineName}`);
                         setAirlineAddFlightIsLoading(false);

@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import Web3Context from '../contexts/Web3'; 
 import MetamaskLogo from '../images/metamask_logo.png';
-import { Navbar } from 'react-bootstrap'; 
+import { Badge, Navbar } from 'react-bootstrap'; 
 import styled from 'styled-components';
+import DappContext from '../contexts/Dapp';
 
 const AccountCode = styled.code`
     color: white;
@@ -11,6 +12,13 @@ const AccountCode = styled.code`
 
 export default function Footer() {
     const { account } = useContext(Web3Context);
+    const { state } = useContext(DappContext);
+    const { airlines } = state;
+
+    const name = airlines.filter(a => a.address.toLowerCase() === account.toLowerCase())[0]?.name || account;
+    const status = airlines.filter(a => a.address.toLowerCase() === account.toLowerCase())[0]?.status || '???';
+    const isAirline = airlines.filter(a => a.address.toLowerCase() === account.toLowerCase()).length;
+
     return (
         <Navbar fixed="bottom" variant="dark" bg="dark">
             <Navbar.Brand>
@@ -21,7 +29,12 @@ export default function Footer() {
                 height="30"
                 className="d-inline-block align-top"
                 />{' '}
-                <AccountCode>{account}</AccountCode>
+                {
+                    !isAirline && <AccountCode>{account}</AccountCode>
+                }
+                {isAirline &&
+                    <AccountCode>Airline: {name} || Status: <Badge>{status}</Badge></AccountCode>
+                }
             </Navbar.Brand>
         </Navbar>
     );

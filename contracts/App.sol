@@ -68,6 +68,7 @@ contract App {
             require(keccak256(abi.encodePacked(voterAirlineStatus)) == keccak256(abi.encodePacked('AIRLINE_APPROVED')), 'Error: You are not an approved airline.');
             bool hasVoted = DATA.getVoter(airlineName, msg.sender);
             require(hasVoted == false, 'Error: You have already voted for this airline.');
+            _;
         }
     }
 
@@ -105,8 +106,9 @@ contract App {
 
     function voteForAirline(string memory airlineName, string memory voterAirlineName) external 
         isOperational() isValidVoter(airlineName, voterAirlineName) {
-            bool approved = DATA.voteForAirline(airlineName, msg.sender);
+            DATA.voteForAirline(airlineName, msg.sender);
             emit AIRLINE_VOTED_FOR(airlineName, msg.sender);
+            bool approved = DATA.checkForApproval(airlineName);
             if (approved == true) {
                 (address airlineAddress, , ,) = DATA.getAirline(airlineName);
                 emit AIRLINE_APPROVED(airlineName, airlineAddress);

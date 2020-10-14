@@ -5,7 +5,8 @@ interface DataInterface {
     function registerAppContract(address appAddress) external;
     function applyAirline(string memory airlineName, address airlineAddress) external;
     function getVoter(string memory airlineName, address votingAirline) external view returns(bool);
-    function voteForAirline(string memory airlineName, address votingAirline) external returns(bool);
+    function voteForAirline(string memory airlineName, address votingAirline) external;
+    function checkForApproval(string memory airlineName) external returns(bool);
     function fundAirline(string memory airlineName, uint256 fundingValue) external payable;
     function addFlight(string memory airlineName, string memory flightName, uint256 flightTimestamp) external;
     function getAirline(string memory airlineName) external returns(address airlineAddress, string memory airlineStatus, uint256 airlineFunds, bool airlineExists);

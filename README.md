@@ -19,17 +19,17 @@ Ganache CLI v6.9.1 (ganache-core: 2.10.2)
 > **_Note:_**  The commands <i>must</i> be run in order. Each step sequentially needs the previous to have run to completion. I have also created a video guide walkthrough that goes through the build steps and testing steps that helps you navigate this in an intuitve way.
 
 ### Steps (Video)(Advised/Preferred)
-[1. Setting up the Project](https://www.youtube.com/watch?v=Ei4pDGOKuUg)
+<a target="_blank" href="https://www.youtube.com/watch?v=Ei4pDGOKuUg">1. Setting up the Project</a>
 
-[2. Starting the dApp](https://www.youtube.com/watch?v=qArOa3MNDko)
+<a target="_blank" href="https://www.youtube.com/watch?v=qArOa3MNDko">2. Starting the dApp</a>
 
-[3. Airline Administration](https://www.youtube.com/watch?v=sQF9RQkqmfA)
+<a target="_blank" href="https://www.youtube.com/watch?v=sQF9RQkqmfA">3. Airline Administration</a>
 
-[4. Airline Funding and Flight Creation](https://www.youtube.com/watch?v=dYen0hV3V8g)
+<a target="_blank" href="https://www.youtube.com/watch?v=dYen0hV3V8g">4. Airline Funding and Flight Creation</a>
 
-[5. Running our Oracles](https://www.youtube.com/watch?v=ed67CiWAS3g)
+<a target="_blank" href="https://www.youtube.com/watch?v=ed67CiWAS3g">5. Running our Oracles</a>
 
-[6. Getting an Insurance Payout](https://www.youtube.com/watch?v=0p-yBrRm7Y8)
+<a target="_blank" href="https://www.youtube.com/watch?v=0p-yBrRm7Y8">6. Getting an Insurance Payout</a>
 
 ### Steps (Text)
 

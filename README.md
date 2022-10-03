@@ -1,4 +1,4 @@
-# Flight Surety dApp
+# Flight Insurance dApp
 This project is for building an insurance dapp on the ethereum blockchain.
 
 ## Project Specifications

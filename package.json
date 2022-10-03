@@ -1,7 +1,7 @@
 {
-  "name": "flightsurety",
+  "name": "flight-insurance",
   "version": "1.0.0",
-  "description": "Udacity Oracle Project for Blockchain Engineer Nanodegree",
+  "description": "flight insurance dapp",
   "directories": {
     "test": "test"
   },

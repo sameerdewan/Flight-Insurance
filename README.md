@@ -1,5 +1,5 @@
 # Flight Surety dApp
-This project is for the Udacity Blockchain Program, building an insurance dapp on the ethereum blockchain.
+This project is for building an insurance dapp on the ethereum blockchain.
 
 ## Project Specifications
 Truffle v5.1.26 (core: 5.1.26)
